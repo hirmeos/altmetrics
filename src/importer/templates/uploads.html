@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Uploads</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">File name</th>
+                <th scope="col">Link</th>
+                <th scope="col">Uploaded</th>
+                <th scope="col">Processed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for up in ups %}
+                <tr>
+                    <td>{{ up.file_name }}</td>
+                    <td><a href="{{ up.link }}">Download</a></td>
+                    <td>{{ up.date_uploaded }}</td>
+                    <td>{{ up.processed }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

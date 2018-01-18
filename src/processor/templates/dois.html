@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Uploads</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">DOI</th>
+                <th scope="col">Imported from</th>
+                <th scope="col">Processed</th>
+                <th scope="col">Last checked</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doi in dois %}
+                <tr>
+                    <td>{{ doi.doi }}</td>
+                    <td>
+                        {{ doi.last_upload.file_name }}
+                    </td>
+                    <td>
+                        {% if doi.last_checked %}
+                            {{ doi.last_checked }}
+                        {% else %}
+                            False
+                        {% endif %}
+                    </td>
+                    <td>{{ doi.last_checked }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

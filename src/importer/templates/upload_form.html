@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block extended_head %}
+    <meta charset="utf-8">
+    <title>s3direct</title>
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <form action="" method="post">{% csrf_token %}
+                    {{ form.as_p }}
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <nav class="navbar navbar-light bg-light">
+                    <a class="btn btn-primary submitbutton" role="button">
+                        Save
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            $('.submitbutton').click(function (e) {
+                var file_path = $('.file-url')[0].value;
+                var file_name = file_path.split('/').pop();
+                window.location.replace('save/' + file_name)
+            })
+        })
+    </script>
+{% endblock %}

@@ -36,7 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'raven.contrib.django.raven_compat',
-    'material',
+    's3direct',
+    'core',
+    'importer',
+    'processor',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +57,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': '',
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,6 +72,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+
+# ## STATIC FILES ##
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
 
 # ## VERSION ##
 
@@ -119,6 +127,19 @@ USE_TZ = True
 # ## STATIC FILES ##
 
 STATIC_URL = '/static/'
+
+
+# ## CELERY
+
+RMQ_USER = config.get('rmq', 'RMQ_USER')
+RMQ_PASSWORD = config.get('rmq', 'RMQ_PASSWORD')
+RMQ_URI = config.get('rmq', 'RMQ_URI')
+
+CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
+    user=RMQ_USER,
+    password=RMQ_PASSWORD,
+    uri=RMQ_URI,
+)
 
 
 # ## LOGGING ##
@@ -199,3 +220,19 @@ RAVEN_CONFIG = {  # Sentry.
 
 
 # ## EXTERNAL SERVICES ##
+
+AWS_ACCESS_KEY_ID = config.get('s3', 'AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config.get('s3', 'AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config.get('s3', 'AWS_STORAGE_BUCKET_NAME')
+S3DIRECT_REGION = config.get('s3', 'S3DIRECT_REGION')
+
+S3DIRECT_DESTINATIONS = {
+    'default': {
+        'key': '/',
+    }
+}
+
+S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}'.format(
+    region=S3DIRECT_REGION,
+    bucket_name=AWS_STORAGE_BUCKET_NAME,
+)
