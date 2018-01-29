@@ -7,6 +7,9 @@ from configparser import RawConfigParser
 
 import raven
 
+from generic import utils
+
+
 config = RawConfigParser()
 config.read('../config.ini')
 
@@ -217,6 +220,11 @@ RAVEN_CONFIG = {  # Sentry.
     'dsn': config.get('sentry', 'DSN'),
     'release': SENTRY_RELEASE
 }
+
+
+# ## PLUGINS ##
+
+AVAILABLE_PLUGINS = utils.load_plugins(folder='providers')
 
 
 # ## EXTERNAL SERVICES ##

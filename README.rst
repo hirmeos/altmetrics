@@ -39,3 +39,13 @@ environment.
     ./manage.py migrate
     ./manage.py collectstatic
     ./manage.py runserver
+
+
+Credits
+-------
+
+* OPERAS / HIRMEOS for having funded, supported and advised the development
+* Marty Alchin and Régis Décamps for the `KISS plugin architecture`_
+
+
+.. _KISS plugin architecture: https://github.com/regisd/simple_plugin_framework

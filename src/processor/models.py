@@ -26,6 +26,15 @@ class Doi(models.Model):
     )
 
 
+class Url(models.Model):
+
+    url = models.URLField()
+    doi = models.ForeignKey(
+        Doi,
+        on_delete=models.CASCADE,
+    )
+
+
 class Scrape(models.Model):
 
     start_date = models.DateTimeField(
@@ -42,7 +51,7 @@ class Event(models.Model):
     )
     source_id = models.CharField(
         max_length=250,
-        help_text='ID of the event in the social media where it originated.'
+        help_text='ID of the event in the source, where it originated.'
     )
     source = models.CharField(
         max_length=250,
@@ -58,4 +67,8 @@ class Event(models.Model):
         Scrape,
         on_delete=models.DO_NOTHING,
         help_text='Scrape process which pulled the event.',
+    )
+    doi = models.ForeignKey(
+        Doi,
+        on_delete=models.CASCADE,
     )

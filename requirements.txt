@@ -1,4 +1,5 @@
 -e git://github.com/ubiquitypress/entity-fishing-client-python.git@0.2.1#egg=entity-fishing-client
+arrow==0.12.1
 boto3==1.5.8
 botocore==1.8.22
 celery==4.1.0

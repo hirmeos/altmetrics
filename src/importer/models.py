@@ -1,4 +1,4 @@
-import unicodedata
+from unicodedata import normalize
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -40,7 +40,7 @@ class CSVUpload(models.Model):
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         )
-        return unicodedata.normalize(
+        return normalize(
             "NFKD",
             client.get_object(
                 Bucket=settings.AWS_STORAGE_BUCKET_NAME,
@@ -51,5 +51,11 @@ class CSVUpload(models.Model):
 
 @receiver(post_save, sender=CSVUpload)
 def import_dois(sender, instance, **kwargs):
+    """ Trigger a Celery task to save DOIs into database at every CSV upload.
+
+    Args:
+        sender (object): Sender.
+        instance (CSVUpload): CSV object which has triggered the signal.
+    """
     print('Triggering signal')
     # register_doi.delay(instance.content, instance.id)

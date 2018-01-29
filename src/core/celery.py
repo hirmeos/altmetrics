@@ -13,14 +13,14 @@ app = Celery('core')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 app.conf.CELERYBEAT_SCHEDULE = {
-    'pull-xref-events': {
-        'task': 'pull-xref-events',
+    'pull-metrics': {
+        'task': 'pull-metrics',
         'schedule': crontab(minute=0, hour=12, day_of_week='monday')
     }
 }
 app.conf.CELERY_ROUTES = {
     'register-dois': {'queue': 'hirmeos-metrics-register-dois'},
-    'pull-xref-events': {'queue': 'hirmeos-metrics-query-xref'},
+    'pull-metrics': {'queue': 'hirmeos-metrics-gather'},
 }
 
 # Load task modules from all registered Django app configs.
