@@ -244,3 +244,8 @@ S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}'.format(
     region=S3DIRECT_REGION,
     bucket_name=AWS_STORAGE_BUCKET_NAME,
 )
+
+
+LOGIN_REDIRECT_URL='/'
+LOGOUT_REDIRECT_URL='/'
+LOGIN_URL='/login'
