@@ -1,9 +1,12 @@
 from csv import reader as csv_reader
 from io import StringIO
 
+from celery.utils.log import get_task_logger
 from core.celery import app
-from processor.models import Doi
+from processor.models import Doi, Url
 
+
+logger = get_task_logger(__name__)
 
 @app.task(name='register-dois')
 def register_doi(csv, csv_upload_id):
@@ -14,10 +17,29 @@ def register_doi(csv, csv_upload_id):
         csv_upload_id (int): ID of the CSVUpload from last import for this DOI.
     """
 
-    reader = csv_reader(StringIO(csv))
+    try:
+        with StringIO(csv) as p:
+            reader = csv_reader(p)
 
-    for row in reader:
-        Doi.objects.create(
-            doi=row[0].strip(' '),
-            last_upload_id=csv_upload_id,
-        )
+            for row in reader:
+                if len(row) >= 2 and len(row[0].strip()) > 0 and len(row[1].strip()) > 0:
+                    doi, _ = Doi.objects.get_or_create(
+                        doi=row[1].strip(),
+                        last_upload_id=csv_upload_id,
+                    )
+
+                    Url.objects.get_or_create(
+                        url=row[0].strip(),
+                        doi=doi
+                    )
+                else:
+                    msg = 'Problem parsing line {line_num} ' \
+                          'for csv upload id of {upload_id}'.format(
+                              line_num=reader.line_num,
+                              upload_id=csv_upload_id
+                          )
+                    logger.error(msg)
+                    print(msg)
+    except Exception as e:
+        logger.error(e)
+        print(e)
