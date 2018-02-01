@@ -15,25 +15,20 @@
                 </form>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col">
-                <nav class="navbar navbar-light bg-light">
-                    <a class="btn btn-primary submitbutton" role="button">
-                        Save
-                    </a>
-                </nav>
-            </div>
-        </div>
     </div>
 
     <script type="text/javascript" charset="utf-8">
-        $(document).ready(function(){
-            $('.submitbutton').click(function (e) {
+        function redirect_on_file_url_update() {
+            if($('.file-url')[0].value.length > 0) {
                 var file_path = $('.file-url')[0].value;
                 var file_name = file_path.split('/').pop();
-                window.location.replace('save/' + file_name)
-            })
-        })
+                window.location.replace('save/' + file_name);
+            } else {
+                setTimeout(redirect_on_file_url_update);
+            }
+        }
+        $(document).ready(function(){
+            redirect_on_file_url_update();
+        });
     </script>
 {% endblock %}
