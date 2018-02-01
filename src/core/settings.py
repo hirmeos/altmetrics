@@ -9,6 +9,7 @@ import raven
 
 from generic import utils
 
+import uuid
 
 config = RawConfigParser()
 config.read('../config.ini')
@@ -234,7 +235,18 @@ AWS_SECRET_ACCESS_KEY = config.get('s3', 'AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config.get('s3', 'AWS_STORAGE_BUCKET_NAME')
 S3DIRECT_REGION = config.get('s3', 'S3DIRECT_REGION')
 
+def create_filename(filename):
+    ext = filename.split('.')[-1]
+    newfilename = filename.split('.')[-2]
+    filename = '{uuid}-{filename}.{ext}'.format(uuid=uuid.uuid4().hex, filename=newfilename, ext=ext)
+
+    return filename
+
 S3DIRECT_DESTINATIONS = {
+    # Allow anybody to upload any MIME type with a custom name function
+    'custom_filename': {
+        'key': create_filename
+    },
     'default': {
         'key': '/',
     }

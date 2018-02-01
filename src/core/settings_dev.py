@@ -1,6 +1,7 @@
 from .settings import *
 
 
+
 config = RawConfigParser()
 config.read('../local.ini')
 
@@ -38,3 +39,4 @@ S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}/'.format(
     region=S3DIRECT_REGION,
     bucket_name=AWS_STORAGE_BUCKET_NAME,
 )
+
