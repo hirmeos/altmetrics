@@ -10,4 +10,4 @@ class CrossrefEventDataProvider(GenericDataProvider):
 
     def process(self, doi):
         client = CrossRefClient()
-        return client.get_doi(doi)
+        return [event for event in client.get_events(doi) if event.source in supported_sources]

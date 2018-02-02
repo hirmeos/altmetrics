@@ -8,8 +8,8 @@ class MountPoint(type):
     def __init__(cls, name, bases, attrs):
         if not hasattr(cls, 'plugins'):
             cls.plugins = []
-        else:
-            cls.plugins.append(cls)
+        
+        cls.plugins.append(cls)
 
 
 class ExtensionsAt(object):
@@ -27,12 +27,7 @@ class ExtensionsAt(object):
 
 def list_plugins(folder):
     """ Utility method to list available plugins. """
-    plugins = list()
-
-    for directory in os.listdir(folder):
-        plugins.append(directory)
-
-    return plugins
+    return os.listdir(folder)
 
 
 def load_plugins(folder, **kwargs):
