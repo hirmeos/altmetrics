@@ -49,7 +49,7 @@ class CrossRefClient(ApiClient):
         """
         return [
             Event.from_message_event(doi, event).to_map()
-            for event in self.get_doi(doi).get('message').get('events')
+            for event in json.loadself.get_doi(doi).get('message', {}).get('events', [])
         ]
 
 
