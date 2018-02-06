@@ -47,4 +47,38 @@ class CrossRefClient(ApiClient):
         Returns:
             object: A Python iterable of events.
         """
-        return self.get_doi(doi).get('message').get('events')
+        return [
+            Event.from_message_event(doi, event).to_map()
+            for event in json.loadself.get_doi(doi).get('message', {}).get('events', [])
+        ]
+
+
+class Event(object):
+    external_id = None
+    source_id = None
+    source = None
+    created_at = None
+    content = None
+    doi = None
+
+    @classmethod
+    def from_message_event(cls, doi, event):
+        instance = cls()
+        instance.external_id = event.get('id')
+        instance.source_id = event.get('subj_id')
+        instance.source = event.get('source_id')
+        instance.created_at = event.get('timestamp')
+        instance.content = event.get('subj', {}).get('api-url')
+        instance.doi = doi
+
+        return instance
+
+    def to_map(self):
+        return {
+            'external_id': self.external_id,
+            'source_id': self.source_id,
+            'source': self.source,
+            'created_at': self.created_at,
+            'content': self.content,
+            'doi': self.doi
+        }

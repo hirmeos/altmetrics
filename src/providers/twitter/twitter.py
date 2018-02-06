@@ -5,3 +5,6 @@ class TwitterProvider(GenericDataProvider):
 
     def load(self, string):
         pass
+
+    def process(self, doi):
+        return []
