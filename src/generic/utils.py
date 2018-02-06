@@ -55,13 +55,13 @@ def load_plugins(folder, **kwargs):
 
     for addon in names:
         if addon in ignored_plugins:
-            print("Plugin %(addon)s not loaded because it is disabled".format(
+            print("Plugin {addon}s not loaded because it is disabled".format(
                 addon=addon
             ))
             continue
         if addon in loaded_plugins:
             print(
-                "Plugin %(addon)s not reloaded because it has already been "
+                "Plugin {addon}s not reloaded because it has already been "
                 "loaded".format(addon=addon)
             )
             continue
