@@ -1,4 +1,4 @@
-__author__ = "Your name and here <your@email.here>"
+__author__ = "Your name here and <your@email.here>"
 __version__ = 0.1 # version of the plugin
 __desc__ = "A description of what your plugin provides"
 
