@@ -8,5 +8,7 @@ from . import generic
    which is an instance of it's own implementation of GenericDataProvider
    in this case GenericEventDataProvider. Part of the default params to 
    __init__ is the program param, which is a string id of the provider.
+   Plugins are designed to fetch data from other sources and create Events in 
+   the Database for the Dois, such as Facebook post mentions.
 '''
 PROVIDER = generic.GenericEventDataProvider('generic')
