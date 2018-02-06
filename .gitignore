@@ -2,3 +2,5 @@
 .python-version
 *local.ini*
 src/static
+*__pycache__*
+*~

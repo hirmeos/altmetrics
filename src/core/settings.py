@@ -225,7 +225,7 @@ RAVEN_CONFIG = {  # Sentry.
 
 # ## PLUGINS ##
 
-AVAILABLE_PLUGINS = utils.load_plugins(folder='providers')
+AVAILABLE_PLUGINS = utils.load_plugins(folder='providers', ignore=['generic'])
 
 
 # ## EXTERNAL SERVICES ##
