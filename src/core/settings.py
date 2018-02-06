@@ -225,7 +225,7 @@ RAVEN_CONFIG = {  # Sentry.
 
 # ## PLUGINS ##
 
-AVAILABLE_PLUGINS = utils.load_plugins(folder='providers')
+AVAILABLE_PLUGINS = utils.load_plugins(folder='providers', ignore=['generic'])
 
 
 # ## EXTERNAL SERVICES ##
@@ -238,7 +238,11 @@ S3DIRECT_REGION = config.get('s3', 'S3DIRECT_REGION')
 def create_filename(filename):
     ext = filename.split('.')[-1]
     newfilename = filename.split('.')[-2]
-    filename = '{uuid}-{filename}.{ext}'.format(uuid=uuid.uuid4().hex, filename=newfilename, ext=ext)
+    filename = '{uuid}-{filename}.{ext}'.format(
+        uuid=uuid.uuid4().hex,
+        filename=newfilename,
+        ext=ext
+    )
 
     return filename
 
