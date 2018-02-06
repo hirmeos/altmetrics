@@ -2,7 +2,7 @@
 from generic.mount_point import GenericDataProvider
 
 class GenericEventDataProvider(GenericDataProvider):
-    '''Data Provider class which inherits from GenericDataProvider.
+    """Data Provider class which inherits from GenericDataProvider.
        It is used to fetch from a particular source and format it into a list of dicts with the following keys
        [
             {
@@ -15,10 +15,10 @@ class GenericEventDataProvider(GenericDataProvider):
             }
         ]
         It must provide a process method which has a Doi model instance passed to it.
-    '''
+    """
     
     def process(self, doi):
-        '''Retrive and process the data
+        """Retrive and process the data
 
            Retrive and process data from a source specific to this plugin. Must return
            a list of dicts representing an event like a Facebook post mention.
@@ -38,7 +38,7 @@ class GenericEventDataProvider(GenericDataProvider):
                   'doi': '' # The actual DOI, which is the DOI passed into this method
                  }
                ]
-        '''
+        """
 
         # this will fail to create an event, as external id is not in uuid form.
         return [
