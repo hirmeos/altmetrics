@@ -19,9 +19,28 @@ class GenericEventDataProvider(GenericDataProvider):
     
     def process(self, doi):
         '''Retrive and process the data
-           doi - A Doi model object we're getting events for
-           returns a list of dicts which represent events
+
+           Retrive and process data from a source specific to this plugin. Must return
+           a list of dicts representing an event like a Facebook post mention.
+
+           Attributes:
+               doi (Doi model instance) - A Doi model object we're getting events for
+
+           Returns:
+               A list of dicts which represent events
+               [
+                 {
+                  'external_id': '', # the id of the event, in the form of uuid4
+                  'source_id': '', # An identifier for the source of the document
+                  'source': '', # where the event came from, ie twitter, facebook
+                  'created_at': '', # A datetime when this event was created
+                  'content': '', # the actual content of the document, could be a link
+                  'doi': '' # The actual DOI, which is the DOI passed into this method
+                 }
+               ]
         '''
+
+        # this will fail to create an event, as external id is not in uuid form.
         return [
             {
                 'external_id': 'uuid4', # the id of the event, in the form of uuid4
