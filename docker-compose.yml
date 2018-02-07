@@ -1,0 +1,11 @@
+version: "2"
+services:
+  hirmeos_metrics:
+    build: ./
+    working_dir: /hirmeos_metrics/src
+    command: ['/usr/local/bin/supervisord']
+    #command: ['/usr/local/bin/gunicorn', '--log-level', 'debug', 'core.wsgi:application', '--bind', '0:80', '--pid', '/tmp/gunicorn.pid']
+    ports:
+      - "80:80"
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings_live

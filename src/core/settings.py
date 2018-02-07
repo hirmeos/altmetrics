@@ -25,7 +25,7 @@ ADMINS = (
 )
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.get('security', 'SECRET_KEY')
+# SECRET_KEY = config.get('security', 'SECRET_KEY')
 
 DEBUG = True
 
@@ -81,6 +81,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    ('static', os.path.join(BASE_DIR, "static")),
+]
 
 # ## VERSION ##
 
@@ -91,16 +94,16 @@ METRICS_VERSION = '0.1'
 
 # ## DATABASES ##
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config.get('database', 'NAME'),
-        'USER': config.get('database', 'USER'),
-        'PASSWORD': config.get('database', 'PASSWORD'),
-        'HOST': config.get('database', 'HOST'),
-        'PORT': config.get('database', 'PORT'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config.get('database', 'NAME'),
+#         'USER': config.get('database', 'USER'),
+#         'PASSWORD': config.get('database', 'PASSWORD'),
+#         'HOST': config.get('database', 'HOST'),
+#         'PORT': config.get('database', 'PORT'),
+#     }
+# }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -128,22 +131,17 @@ USE_L10N = True
 USE_TZ = True
 
 
-# ## STATIC FILES ##
-
-STATIC_URL = '/static/'
-
-
 # ## CELERY
 
-RMQ_USER = config.get('rmq', 'RMQ_USER')
-RMQ_PASSWORD = config.get('rmq', 'RMQ_PASSWORD')
-RMQ_URI = config.get('rmq', 'RMQ_URI')
+# RMQ_USER = config.get('rmq', 'RMQ_USER')
+# RMQ_PASSWORD = config.get('rmq', 'RMQ_PASSWORD')
+# RMQ_URI = config.get('rmq', 'RMQ_URI')
 
-CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
-    user=RMQ_USER,
-    password=RMQ_PASSWORD,
-    uri=RMQ_URI,
-)
+# CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
+#     user=RMQ_USER,
+#     password=RMQ_PASSWORD,
+#     uri=RMQ_URI,
+# )
 
 
 # ## LOGGING ##
