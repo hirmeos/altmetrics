@@ -25,3 +25,4 @@ urlpatterns = [
         include('s3direct.urls')
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
