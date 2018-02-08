@@ -17,4 +17,4 @@ RUN cd /hirmeos_metrics/src && mkdir /static && ./manage.py collectstatic
 ADD supervisord.conf /etc/
 ADD env_to_config.py /usr/local/bin/
 RUN chmod +x /usr/local/bin/env_to_config.py
-ENTRYPOINT ['/usr/local/bin/supervisord']
+CMD /usr/local/bin/supervisord
