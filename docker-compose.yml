@@ -1,0 +1,7 @@
+version: "2"
+services:
+  hirmeos_metrics:
+    build: ./
+    working_dir: /hirmeos_metrics/src
+    ports:
+      - "80:80"

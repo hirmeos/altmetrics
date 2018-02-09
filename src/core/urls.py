@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path(
@@ -21,5 +23,13 @@ urlpatterns = [
     path(
         's3direct/',
         include('s3direct.urls')
-    ),
-]
+    ),    
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if not settings.DEBUG:
+    urlpatterns.append(
+        path(
+            '',
+            include('static_handler.urls')
+        )
+    )
