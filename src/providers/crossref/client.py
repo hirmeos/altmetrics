@@ -48,12 +48,13 @@ class CrossRefClient(ApiClient):
             object: A Python iterable of events.
         """
         return [
-            Event.from_message_event(doi, event).to_map()
-            for event in json.loadself.get_doi(doi).get('message', {}).get('events', [])
+            Event.from_message_event(doi, event).to_map() for event
+            in self.get_doi(doi).get('message', {}).get('events', [])
         ]
 
 
 class Event(object):
+
     external_id = None
     source_id = None
     source = None

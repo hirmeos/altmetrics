@@ -57,5 +57,4 @@ def import_dois(sender, instance, **kwargs):
         sender (object): Sender.
         instance (CSVUpload): CSV object which has triggered the signal.
     """
-    print('Triggering signal')
-    # register_doi.delay(instance.content, instance.id)
+    register_doi.delay(instance.content, instance.id)

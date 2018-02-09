@@ -3,49 +3,48 @@ Django settings for metrics project.
 """
 
 import os
+import uuid
 from configparser import RawConfigParser
 
 import raven
 
 from generic import utils
 
-from os import getenv
-import uuid
 
 def fetch_variables_from_enviroment(config):
     config['database'] = {
-        'USER': str(getenv('DB_USER')),
-        'PASSWORD': str(getenv('DB_PASSWORD')),
-        'HOST': str(getenv('DB_HOST')),
-        'PORT': str(getenv('DB_PORT', '5432')),
-        'ENGINE': str(getenv('DB_ENGINE', 'postgresql')),
-        'NAME': str(getenv('DB_NAME'))
+        'USER': str(os.getenv('DB_USER')),
+        'PASSWORD': str(os.getenv('DB_PASSWORD')),
+        'HOST': str(os.getenv('DB_HOST')),
+        'PORT': str(os.getenv('DB_PORT', '5432')),
+        'ENGINE': str(os.getenv('DB_ENGINE', 'postgresql')),
+        'NAME': str(os.getenv('DB_NAME'))
     }
 
     config['security'] = {
-        'SECRET_KEY': str(getenv('SECRET_KEY'))
+        'SECRET_KEY': str(os.getenv('SECRET_KEY'))
     }
 
     config['sentry'] = {
-        'DSN': str(getenv('SENTRY_DSN'))
+        'DSN': str(os.getenv('SENTRY_DSN'))
     }
 
     config['s3'] = {
-        'AWS_ACCESS_KEY_ID': str(getenv('AWS_ACCESS_KEY_ID')),
-        'AWS_SECRET_ACCESS_KEY': str(getenv('AWS_SECRET_ACCESS_KEY')),
-        'AWS_STORAGE_BUCKET_NAME': str(getenv('AWS_STORAGE_BUCKET_NAME')),
-        'S3DIRECT_REGION': str(getenv('S3DIRECT_REGION'))
+        'AWS_ACCESS_KEY_ID': str(os.getenv('AWS_ACCESS_KEY_ID')),
+        'AWS_SECRET_ACCESS_KEY': str(os.getenv('AWS_SECRET_ACCESS_KEY')),
+        'AWS_STORAGE_BUCKET_NAME': str(os.getenv('AWS_STORAGE_BUCKET_NAME')),
+        'S3DIRECT_REGION': str(os.getenv('S3DIRECT_REGION'))
     }
 
     config['rmq'] = {
-        'RMQ_USER': str(getenv('RMQ_USER')),
-        'RMQ_PASSWORD': str(getenv('RMQ_PASSWORD')),
-        'RMQ_URI': str(getenv('RMQ_URI'))
+        'RMQ_USER': str(os.getenv('RMQ_USER')),
+        'RMQ_PASSWORD': str(os.getenv('RMQ_PASSWORD')),
+        'RMQ_URI': str(os.getenv('RMQ_URI'))
     }
 
 
 config = RawConfigParser()
-if getenv('USE_ENV', False):
+if os.getenv('USE_ENV', False):
     fetch_variables_from_enviroment(config)
 else:
     config.read('../config.ini')
@@ -131,16 +130,16 @@ METRICS_VERSION = '0.1'
 
 # ## DATABASES ##
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config.get('database', 'NAME'),
-#         'USER': config.get('database', 'USER'),
-#         'PASSWORD': config.get('database', 'PASSWORD'),
-#         'HOST': config.get('database', 'HOST'),
-#         'PORT': config.get('database', 'PORT'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config.get('database', 'NAME'),
+        'USER': config.get('database', 'USER'),
+        'PASSWORD': config.get('database', 'PASSWORD'),
+        'HOST': config.get('database', 'HOST'),
+        'PORT': config.get('database', 'PORT'),
+    }
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [

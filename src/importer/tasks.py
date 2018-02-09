@@ -8,6 +8,7 @@ from processor.models import Doi, Url
 
 logger = get_task_logger(__name__)
 
+
 @app.task(name='register-dois')
 def register_doi(csv, csv_upload_id):
     """ Given a CSV model object, get csv and register the DOIs in the database.
@@ -22,7 +23,11 @@ def register_doi(csv, csv_upload_id):
             reader = csv_reader(p)
 
             for row in reader:
-                if len(row) >= 2 and len(row[0].strip()) > 0 and len(row[1].strip()) > 0:
+                if (
+                    len(row) >= 2 and
+                    len(row[0].strip()) > 0
+                    and len(row[1].strip()) > 0
+                ):
                     doi, _ = Doi.objects.get_or_create(
                         doi=row[1].strip(),
                         last_upload_id=csv_upload_id,
@@ -36,7 +41,7 @@ def register_doi(csv, csv_upload_id):
                     msg = 'Problem parsing line {line_num} ' \
                           'for csv upload id of {upload_id}'.format(
                               line_num=reader.line_num,
-                              upload_id=csv_upload_id
+                              upload_id=csv_upload_id,
                           )
                     logger.error(msg)
                     print(msg)

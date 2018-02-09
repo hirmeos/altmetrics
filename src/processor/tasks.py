@@ -1,11 +1,11 @@
-from core.celery import app
-
-import arrow
 from datetime import datetime
-
 
 from django.conf import settings
 from django.db.models import Q
+
+import arrow
+
+from core.celery import app
 
 from .models import Doi, Event, Scrape
 
@@ -15,7 +15,7 @@ def pull_metrics():
     """ For each enabled data source plugin, call a scrape. """
 
     dois_unprocessed_or_to_refresh = Doi.objects.filter(
-        Q(last_checked__isnull=True) |
+        Q(last_checked__isnull=True),
         Q(last_checked__lte=arrow.utcnow().shift(days=-7).datetime)
     )
 
@@ -32,5 +32,5 @@ def pull_metrics():
                     created_at=event.get('created_at'),
                     content=event.get('content'),
                     doi=doi,
-                    scrape=Scrape.objects.create(end_date=datetime.utcnow())
+                    scrape=Scrape.objects.create(end_date=datetime.utcnow()),
                 )

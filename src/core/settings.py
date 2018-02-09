@@ -4,6 +4,7 @@ DEBUG = False
 
 SECRET_KEY = config.get('security', 'SECRET_KEY')
 
+
 # ## CELERY
 
 RMQ_USER = config.get('rmq', 'RMQ_USER')
@@ -23,20 +24,6 @@ ALLOWED_HOSTS += [
 ]
 
 
-# ## DATABASES ##
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config.get('database', 'NAME'),
-        'USER': config.get('database', 'USER'),
-        'PASSWORD': config.get('database', 'PASSWORD'),
-        'HOST': config.get('database', 'HOST'),
-        'PORT': config.get('database', 'PORT'),
-    }
-}
-
-
 # ## EXTERNAL SERVICES ##
 
 AWS_ACCESS_KEY_ID = config.get('s3', 'AWS_ACCESS_KEY_ID')
@@ -49,7 +36,7 @@ S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}/'.format(
     bucket_name=AWS_STORAGE_BUCKET_NAME,
 )
 
-STATIC_ROOT='/static_files/'
+STATIC_ROOT = '/static_files/'
 STATICFILES_DIRS = [
     ('static', "/static"),
 ]
