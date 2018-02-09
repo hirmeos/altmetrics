@@ -49,7 +49,7 @@ S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}/'.format(
     bucket_name=AWS_STORAGE_BUCKET_NAME,
 )
 
-STATIC_ROOT='/static/'
+STATIC_ROOT='/static_files/'
 STATICFILES_DIRS = [
     ('static', "/static"),
 ]

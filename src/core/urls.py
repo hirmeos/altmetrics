@@ -23,6 +23,13 @@ urlpatterns = [
     path(
         's3direct/',
         include('s3direct.urls')
-    ),
+    ),    
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+if not settings.DEBUG:
+    urlpatterns.append(
+        path(
+            '',
+            include('static_handler.urls')
+        )
+    )

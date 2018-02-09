@@ -3,6 +3,5 @@ services:
   hirmeos_metrics:
     build: ./
     working_dir: /hirmeos_metrics/src
-    #command: ['/usr/local/bin/supervisord']
     ports:
       - "80:80"

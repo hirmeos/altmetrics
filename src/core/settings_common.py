@@ -9,10 +9,46 @@ import raven
 
 from generic import utils
 
+from os import getenv
 import uuid
 
+def fetch_variables_from_enviroment(config):
+    config['database'] = {
+        'USER': str(getenv('DB_USER')),
+        'PASSWORD': str(getenv('DB_PASSWORD')),
+        'HOST': str(getenv('DB_HOST')),
+        'PORT': str(getenv('DB_PORT', '5432')),
+        'ENGINE': str(getenv('DB_ENGINE', 'postgresql')),
+        'NAME': str(getenv('DB_NAME'))
+    }
+
+    config['security'] = {
+        'SECRET_KEY': str(getenv('SECRET_KEY'))
+    }
+
+    config['sentry'] = {
+        'DSN': str(getenv('SENTRY_DSN'))
+    }
+
+    config['s3'] = {
+        'AWS_ACCESS_KEY_ID': str(getenv('AWS_ACCESS_KEY_ID')),
+        'AWS_SECRET_ACCESS_KEY': str(getenv('AWS_SECRET_ACCESS_KEY')),
+        'AWS_STORAGE_BUCKET_NAME': str(getenv('AWS_STORAGE_BUCKET_NAME')),
+        'S3DIRECT_REGION': str(getenv('S3DIRECT_REGION'))
+    }
+
+    config['rmq'] = {
+        'RMQ_USER': str(getenv('RMQ_USER')),
+        'RMQ_PASSWORD': str(getenv('RMQ_PASSWORD')),
+        'RMQ_URI': str(getenv('RMQ_URI'))
+    }
+
+
 config = RawConfigParser()
-config.read('../config.ini')
+if getenv('USE_ENV', False):
+    fetch_variables_from_enviroment(config)
+else:
+    config.read('../config.ini')
 
 
 # ## GENERIC CONFIG ##
@@ -44,6 +80,7 @@ INSTALLED_APPS = [
     'core',
     'importer',
     'processor',
+    'static_handler',
 ]
 
 MIDDLEWARE = [
@@ -79,11 +116,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # ## STATIC FILES ##
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    ('static', os.path.join(BASE_DIR, "static")),
-]
+#STATICFILES_DIRS = [
+#    ('static', os.path.join(BASE_DIR, "static")),
+#]
 
 # ## VERSION ##
 
