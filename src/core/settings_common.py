@@ -115,11 +115,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # ## STATIC FILES ##
 
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
-#STATICFILES_DIRS = [
-#    ('static', os.path.join(BASE_DIR, "static")),
-#]
 
 # ## VERSION ##
 
