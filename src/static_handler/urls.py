@@ -1,5 +1,4 @@
-from django.urls import re_path, include
-from django.conf import settings
+from django.urls import re_path
 
 from .views import StaticFileServeView
 
@@ -10,4 +9,3 @@ urlpatterns = [
         StaticFileServeView.as_view()
     ),
 ]
-

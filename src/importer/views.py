@@ -38,7 +38,6 @@ class SaveUploadView(RedirectView):
         return super().dispatch(*args, **kwargs)
 
 
-
 class UploadsView(ListView):
     
     model = CSVUpload

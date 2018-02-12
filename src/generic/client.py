@@ -1,6 +1,7 @@
 """ Generic API Client """
 from copy import deepcopy
 import json
+
 import requests
 
 try:
