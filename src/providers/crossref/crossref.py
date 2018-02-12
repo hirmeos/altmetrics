@@ -11,6 +11,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
     def process(self, doi):
         """doi is the DOI model"""
         client = CrossRefClient()
+
         return [
             event
             for event in client.get_events(doi.doi)
