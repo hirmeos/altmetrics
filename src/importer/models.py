@@ -10,7 +10,6 @@ from boto3 import client as s3client
 
 from .tasks import register_doi
 
-
 class CSVUpload(models.Model):
 
     file_name = models.CharField(
@@ -57,4 +56,5 @@ def import_dois(sender, instance, **kwargs):
         sender (object): Sender.
         instance (CSVUpload): CSV object which has triggered the signal.
     """
+    pass
     register_doi.delay(instance.content, instance.id)

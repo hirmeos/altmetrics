@@ -1,7 +1,5 @@
 from .settings_common import *
 
-
-
 config = RawConfigParser()
 config.read('../local.ini')
 

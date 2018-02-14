@@ -60,7 +60,7 @@ ADMINS = (
 )
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = config.get('security', 'SECRET_KEY')
+SECRET_KEY = config.get('security', 'SECRET_KEY')
 
 DEBUG = True
 

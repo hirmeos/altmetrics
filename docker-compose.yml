@@ -1,7 +1,21 @@
 version: "2"
 services:
+  postgres:
+    image: 'postgres:9.6-alpine'
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_DB=metrics
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=diagnosti
+
   hirmeos_metrics:
     build: ./
     working_dir: /hirmeos_metrics/src
+    command: ['python', 'manage.py', 'runserver', '0.0.0.0:8000', '--settings=core.settings_dev']
+    volumes:
+      - ./:/hirmeos_metrics
     ports:
-      - "80:80"
+      - "8000:8000"
+    depends_on:
+      - postgres
