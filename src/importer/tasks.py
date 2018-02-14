@@ -3,8 +3,7 @@ from io import StringIO
 
 from celery.utils.log import get_task_logger
 from core.celery import app
-from processor.models import Doi, Url
-
+from processor.models import Doi, DoiUpload, Url
 
 logger = get_task_logger(__name__)
 
@@ -17,7 +16,6 @@ def register_doi(csv, csv_upload_id):
         csv (str): A string representing the content of a CSV.
         csv_upload_id (int): ID of the CSVUpload from last import for this DOI.
     """
-
     try:
         with StringIO(csv) as p:
             reader = csv_reader(p)
@@ -30,12 +28,16 @@ def register_doi(csv, csv_upload_id):
                 ):
                     doi, _ = Doi.objects.get_or_create(
                         doi=row[1].strip(),
-                        last_upload_id=csv_upload_id,
                     )
 
                     Url.objects.get_or_create(
                         url=row[0].strip(),
                         doi=doi
+                    )
+
+                    DoiUpload.objects.get_or_create(
+                        doi=doi,
+                        upload_id=csv_upload_id
                     )
                 else:
                     msg = 'Problem parsing line {line_num} ' \

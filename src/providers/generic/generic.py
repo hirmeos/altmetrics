@@ -11,6 +11,7 @@ class GenericEventDataProvider(GenericDataProvider):
         to it.
     """
 
+
     def process(self, doi):
         """ Retrieve and process the data.
 
@@ -18,7 +19,7 @@ class GenericEventDataProvider(GenericDataProvider):
            return a list of dicts representing an event like a Facebook post
            mention.
 
-           Attributes:
+           Parameters:
                doi (Doi): A Doi model object we're getting events events for.
 
            Returns:
@@ -53,3 +54,25 @@ class GenericEventDataProvider(GenericDataProvider):
                 'doi': '',
             }
         ]
+
+
+    def is_authorised(self, users, **kwargs):
+        """An optional method that allows you to deny the use of this plugin
+           based upon custom criteria. The most common recommended one is to
+           use user groups, and allow only users in a particular user group to
+           use the plugin. User groups are part of the standard django framework.
+
+           Parameters:
+               users (User): A User model queryset for all the users that
+                             uploaded csvs with the doi in it.
+               **kwargs:  is an optional list of keyword params which may change
+                          in the future, and any extra params will be documented
+
+           Returns:
+               True if authorised, False if not
+        """
+
+        if users.filter(groups__name='generic'):
+            return True  #  authorise the use of the plugin for the doi
+
+        return False  #  not authorised to use this plugin for the doi

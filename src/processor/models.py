@@ -14,12 +14,6 @@ class Doi(models.Model):
             ),
         ],
     )
-    last_upload = models.ForeignKey(
-        'importer.CSVUpload',
-        null=False,
-        unique=False,
-        on_delete=models.CASCADE,
-    )
     last_checked = models.DateTimeField(
         null=True,
         default=None,
@@ -31,9 +25,21 @@ class Url(models.Model):
     url = models.URLField()
     doi = models.ForeignKey(
         Doi,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
 
+
+class DoiUpload(models.Model):
+    doi = models.ForeignKey(
+        Doi,
+        null=False,
+        on_delete=models.PROTECT
+    )
+    upload = models.ForeignKey(
+        'importer.CSVUpload',
+        null=False,
+        on_delete=models.PROTECT
+    )
 
 class Scrape(models.Model):
 
