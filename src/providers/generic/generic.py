@@ -11,7 +11,6 @@ class GenericEventDataProvider(GenericDataProvider):
         to it.
     """
 
-
     def process(self, doi):
         """ Retrieve and process the data.
 
@@ -55,16 +54,16 @@ class GenericEventDataProvider(GenericDataProvider):
             }
         ]
 
-
     def is_authorised(self, users, **kwargs):
         """An optional method that allows you to deny the use of this plugin
            based upon custom criteria. The most common recommended one is to
            use user groups, and allow only users in a particular user group to
-           use the plugin. User groups are part of the standard django framework.
+           use the plugin. User groups are part of the standard Django
+           framework.
 
            Parameters:
                users (User): A User model queryset for all the users that
-                             uploaded csvs with the doi in it.
+                             uploaded CSVs with the doi in it.
                **kwargs:  is an optional list of keyword params which may change
                           in the future, and any extra params will be documented
 
@@ -73,6 +72,6 @@ class GenericEventDataProvider(GenericDataProvider):
         """
 
         if users.filter(groups__name='generic'):
-            return True  #  authorise the use of the plugin for the doi
+            return True  # Authorise the use of the plugin for the DOI.
 
-        return False  #  not authorised to use this plugin for the doi
+        return False  # Not authorised to use this plugin for the DOI.

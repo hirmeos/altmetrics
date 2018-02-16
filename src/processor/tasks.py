@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.db.models import Q
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 import arrow
 
@@ -13,15 +13,15 @@ from .models import Doi, DoiUpload, Event, Scrape
 
 logger = get_task_logger(__name__)
 
+
 def users_from_uploads(doi):
-    """
-      Generates a list of users that uploaded a csv that created the doi
+    """ Generates a list of users that uploaded a csv that created the DOI.
 
       Parameters:
         doi (Doi): the doi used to generate a list of users from
 
       Returns:
-        A list of users that uploaded a csv with the doi in it.
+        list: Users that uploaded a CSV with the doi in it.
     """
 
     uploads = [doiup.upload for doiup in DoiUpload.objects.filter(doi=doi)]
@@ -36,7 +36,7 @@ def users_from_uploads(doi):
 
 
 def doi_event_generator(doi):
-    """Generator of events for each of the dois being processed
+    """Generator of events for each of the DOIs being processed
 
        Calls on every available plugin, and returns events generated for that
        doi by that plugin process method. Plugins can optionally check if they
@@ -52,11 +52,24 @@ def doi_event_generator(doi):
     """
 
     for source in settings.AVAILABLE_PLUGINS:
-        if hasattr(settings.AVAILABLE_PLUGINS.get(source).PROVIDER, 'is_authorised'):
+        if hasattr(
+            settings.AVAILABLE_PLUGINS.get(source).PROVIDER,
+            'is_authorised'
+        ):
 
             users = users_from_uploads(doi)
-            if settings.AVAILABLE_PLUGINS.get(source).PROVIDER.is_authorised(users):
-                yield settings.AVAILABLE_PLUGINS.get(source).PROVIDER.process(doi)
+            if (
+                settings.AVAILABLE_PLUGINS.get(
+                    source
+                ).PROVIDER.is_authorised(
+                    users
+                )
+            ):
+                yield settings.AVAILABLE_PLUGINS.get(
+                    source
+                ).PROVIDER.process(
+                    doi
+                )
 
         else:
             yield settings.AVAILABLE_PLUGINS.get(source).PROVIDER.process(doi)
@@ -68,11 +81,10 @@ def pull_metrics():
 
     dois_unprocessed_or_to_refresh = Doi.objects.filter(
         Q(last_checked__isnull=True) |
-        Q(last_checked__lte=arrow.utcnow().shift(days=-7).datetime)
+        Q(last_checked__lte=arrow.utcnow().shift(days=-7).datetime),
     )
 
     for doi in dois_unprocessed_or_to_refresh:
-
         for events in doi_event_generator(doi):
             for event in events:
                 try:
@@ -83,7 +95,9 @@ def pull_metrics():
                         created_at=event.get('created_at'),
                         content=event.get('content'),
                         doi=doi,
-                        scrape=Scrape.objects.create(end_date=datetime.utcnow()),
+                        scrape=Scrape.objects.create(
+                            end_date=datetime.utcnow()
+                        ),
                     )
                 except Exception as e:
                     logger.error(e)

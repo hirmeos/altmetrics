@@ -10,6 +10,7 @@ from boto3 import client as s3client
 
 from .tasks import register_doi
 
+
 class CSVUpload(models.Model):
 
     file_name = models.CharField(
