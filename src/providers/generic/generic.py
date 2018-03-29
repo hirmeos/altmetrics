@@ -22,7 +22,7 @@ class GenericEventDataProvider(GenericDataProvider):
                doi (Doi): A Doi model object we're getting events events for.
 
            Returns:
-               list: Contains dicts which representing the events, e.g.
+               list: Contains dicts representing the events, e.g.
 
                [
                  {
