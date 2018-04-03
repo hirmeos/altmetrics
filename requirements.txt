@@ -1,16 +1,26 @@
--e git://github.com/hirmeos/entity-fishing-client-python.git@0.2.1#egg=entity-fishing-client
+amqp==2.2.2
+appnope==0.1.0
 arrow==0.12.1
+beautifulsoup4==4.6.0
+billiard==3.5.0.3
 boto3==1.5.8
 botocore==1.8.22
 celery==4.1.0
+certifi==2018.1.18
+chardet==3.0.4
+colorlog==3.1.2
 decorator==4.1.2
 Django==2.0.1
 django-s3direct==1.0.4
 docutils==0.14
+-e git://github.com/hirmeos/entity-fishing-client-python.git@36fc89f6d6f9f52921b47fda870a21c4567c209c#egg=entity_fishing_client
+idna==2.6
+ipdb==0.11
 ipython==6.2.1
 ipython-genutils==0.2.0
 jedi==0.11.1
 jmespath==0.9.3
+kombu==4.1.0
 parso==0.1.1
 pexpect==4.3.1
 pickleshare==0.7.4
@@ -26,4 +36,7 @@ s3transfer==0.1.12
 simplegeneric==0.8.1
 six==1.11.0
 traitlets==4.3.2
+urllib3==1.22
+vine==1.1.4
 wcwidth==0.1.7
+zenlog==1.1

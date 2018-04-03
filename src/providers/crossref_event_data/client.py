@@ -3,14 +3,14 @@ from urllib.parse import urljoin
 from nerd_client.client import ApiClient
 
 
-class CrossRefClient(ApiClient):
+class CrossRefEventDataClient(ApiClient):
     """ Dedicated CrossRef Event Data API client. """
 
     api_base = "https://query.eventdata.crossref.org"
     events_service = urljoin(api_base, "events")
 
     def __init__(self):
-        super(CrossRefClient, self).__init__(base_url=self.api_base)
+        super(CrossRefEventDataClient, self).__init__(base_url=self.api_base)
 
     @staticmethod
     def _build_filters(values):
