@@ -19,6 +19,9 @@ class Doi(models.Model):
         default=None,
     )
 
+    def __str__(self):
+        return self.doi
+
 
 class Url(models.Model):
 
@@ -27,6 +30,9 @@ class Url(models.Model):
         Doi,
         on_delete=models.PROTECT,
     )
+
+    def __str__(self):
+        return self.url
 
 
 class DoiUpload(models.Model):
@@ -41,12 +47,19 @@ class DoiUpload(models.Model):
         on_delete=models.PROTECT
     )
 
+    def __str__(self):
+        return 'DoiUpload: {}, {}'.format(self.doi, self.upload)
+
+
 class Scrape(models.Model):
 
     start_date = models.DateTimeField(
         auto_now_add=True,
     )
     end_date = models.DateTimeField()
+
+    def __str__(self):
+        return 'Scrape on: {}'.format(self.start_date)
 
 
 class Event(models.Model):
@@ -78,3 +91,6 @@ class Event(models.Model):
         Doi,
         on_delete=models.CASCADE,
     )
+
+    def __str__(self):
+        return 'Event: {}'.format(self.doi, self.source)

@@ -22,7 +22,7 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
         ).format(
             user=settings.CROSSREF_TEST_USER,
             password=settings.CROSSREF_TEST_PASSWORD,
-            doi=doi,
+            doi=doi.doi,
             start_date=start_date,
             end_date=end_date
         )
@@ -43,7 +43,7 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
                     'year': item.find('year').text
                     if item.find('year') else None
                 }
-                event_dict = {
+                return {
                     'external_id': str(uuid.uuid4()),
                     'source_id': item.find('doi').text,
                     'source': 'crossref_cited_by',
@@ -51,8 +51,6 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
                     'content': content,
                     'doi': doi
                 }
-                new_event = Event(**event_dict)
-
 
         else:
             return 'No citations available'

@@ -48,6 +48,9 @@ class CSVUpload(models.Model):
             )['Body'].read().decode('utf-8')
         )
 
+    def __str__(self):
+        return 'CSVUpload: {}'.format(self.date_uploaded)
+
 
 @receiver(post_save, sender=CSVUpload)
 def import_dois(sender, instance, **kwargs):
@@ -57,5 +60,4 @@ def import_dois(sender, instance, **kwargs):
         sender (object): Sender.
         instance (CSVUpload): CSV object which has triggered the signal.
     """
-    pass
     register_doi.delay(instance.content, instance.id)
