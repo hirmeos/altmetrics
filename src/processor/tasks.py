@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 
 import arrow
 
@@ -56,7 +55,6 @@ def doi_event_generator(doi):
             settings.AVAILABLE_PLUGINS.get(source).PROVIDER,
             'is_authorised'
         ):
-
             users = users_from_uploads(doi)
             if (
                 settings.AVAILABLE_PLUGINS.get(
@@ -96,7 +94,7 @@ def pull_metrics():
                         content=event.get('content'),
                         doi=doi,
                         scrape=Scrape.objects.create(
-                            end_date=datetime.utcnow()
+                            end_date=timezone.now()
                         ),
                     )
                 except Exception as e:

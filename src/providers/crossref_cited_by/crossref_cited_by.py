@@ -4,27 +4,26 @@ import requests
 import uuid
 
 from django.conf import settings
+from django.utils import timezone
 
 from generic.mount_point import GenericDataProvider
-from processor.models import Event
 
 
 class CrossrefCitedByDataProvider(GenericDataProvider):
     """ Implements Crossref Cited-by API integration. """
 
-    def process(self, doi, start_date, end_date):
+    def process(self, doi):
         """ Pull citation data from API and create Event models. """
 
         api_url = (
             'http://doi.crossref.org/servlet/getForwardLinks?'
             'usr={user}&pwd={password}&doi={doi}'
-            '&startDate={start_date}&endDate={end_date}'
+            '&startDate=1900-01-01&endDate={end_date}'
         ).format(
             user=settings.CROSSREF_TEST_USER,
             password=settings.CROSSREF_TEST_PASSWORD,
             doi=doi.doi,
-            start_date=start_date,
-            end_date=end_date
+            end_date='{}-12-31'.format(datetime.datetime.now().year)
         )
         api_request = requests.get(api_url)
         xml_data = BeautifulSoup(api_request.text, 'xml')
@@ -43,14 +42,14 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
                     'year': item.find('year').text
                     if item.find('year') else None
                 }
-                return {
+                return [{
                     'external_id': str(uuid.uuid4()),
                     'source_id': item.find('doi').text,
                     'source': 'crossref_cited_by',
-                    'created_at': datetime.datetime.now(),
+                    'created_at': timezone.now(),
                     'content': content,
                     'doi': doi
-                }
+                }]
 
         else:
-            return 'No citations available'
+            return []
