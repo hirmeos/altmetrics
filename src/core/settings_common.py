@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'importer',
     'processor',
     'static_handler',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

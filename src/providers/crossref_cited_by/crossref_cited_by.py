@@ -12,7 +12,7 @@ from generic.mount_point import GenericDataProvider
 class CrossrefCitedByDataProvider(GenericDataProvider):
     """ Implements Crossref Cited-by API integration. """
 
-    def process(self, doi):
+    def process(self, doi, test_data=None):
         """ Pull citation data from API and create Event models. """
 
         api_url = (
@@ -25,8 +25,12 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
             doi=doi.doi,
             end_date='{}-12-31'.format(datetime.datetime.now().year)
         )
-        api_request = requests.get(api_url)
-        xml_data = BeautifulSoup(api_request.text, 'xml')
+        if test_data:
+            request_content = open(test_data, 'r').read()
+        else:
+            request_content = requests.get(api_url).text
+
+        xml_data = BeautifulSoup(request_content, 'xml')
         xml_journal_citations = xml_data.find_all('journal_cite')
 
         if xml_journal_citations:
@@ -43,7 +47,7 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
                     if item.find('year') else None
                 }
                 return [{
-                    'external_id': str(uuid.uuid4()),
+                    'external_id': str(uuid.uuid4()), # No external ID supplied.
                     'source_id': item.find('doi').text,
                     'source': 'crossref_cited_by',
                     'created_at': timezone.now(),
