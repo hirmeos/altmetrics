@@ -12,6 +12,12 @@ router.register(r'events', views.EventViewSet)
 router.register(r'scrapes', views.ScrapeViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path(
+        '',
+        include(router.urls)
+    ),
+    path(
+        '',
+        include('rest_framework.urls', namespace='rest_framework')
+    )
 ]

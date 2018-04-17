@@ -9,6 +9,12 @@ class DoiSerializer(serializers.HyperlinkedModelSerializer):
         fields = 'doi', 'last_checked'
 
 
+class ScrapeSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = processor_models.Scrape
+        fields = 'start_date', 'end_date'
+
+
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = processor_models.Event
@@ -19,14 +25,7 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             'created_at',
             'content',
             'scrape',
-            'doi'
+            'doi',
         )
-
-
-class ScrapeSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = processor_models.Scrape
-        fields = 'start_date', 'end_date'
-
-
-
+    scrape = ScrapeSerializer()
+    doi = DoiSerializer()
