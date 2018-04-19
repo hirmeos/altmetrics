@@ -9,7 +9,7 @@ class Doi(models.Model):
         unique=True,
         validators=[
             RegexValidator(
-                regex='^10.\d{4,9}/[-._;()/:A-Z0-9]+$',
+                regex='/^10.\d{4,9}/[-._;()/:A-Z0-9]+$/i',
                 message='DOI not valid.',
             ),
         ],
@@ -22,6 +22,11 @@ class Doi(models.Model):
     def __str__(self):
         return self.doi
 
+    def owners(self):
+        return [
+            doi_upload.owner() for doi_upload in self.doiupload_set.all()
+        ]
+
 
 class Url(models.Model):
 
@@ -33,6 +38,9 @@ class Url(models.Model):
 
     def __str__(self):
         return self.url
+
+    def owners(self):
+        return self.doi.owners()
 
 
 class DoiUpload(models.Model):
@@ -49,6 +57,9 @@ class DoiUpload(models.Model):
 
     def __str__(self):
         return 'DoiUpload: {}, {}'.format(self.doi, self.upload)
+
+    def owner(self):
+        return self.upload.user
 
 
 class Scrape(models.Model):
@@ -94,3 +105,7 @@ class Event(models.Model):
 
     def __str__(self):
         return 'Event: {}'.format(self.doi, self.source)
+
+    def owners(self):
+        """ Return the users who own the DOI associated with this event. """
+        return self.doi.owners()
