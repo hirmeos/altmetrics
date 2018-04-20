@@ -22,7 +22,7 @@ class DoiViewSet(viewsets.ModelViewSet):
         """ Return objects owned by user. """
 
         return [
-            doi for doi in self.queryset
+            doi for doi in processor_models.Doi.objects.all()
             if self.request.user in doi.owners()
         ]
 
@@ -37,7 +37,7 @@ class DoiUploadViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """ Return objects owned by user. """
         return [
-            doiupload for doiupload in self.queryset
+            doiupload for doiupload in processor_models.DoiUpload.objects.all()
             if doiupload.owner() == self.request.user
         ]
 
@@ -53,7 +53,7 @@ class EventViewSet(viewsets.ModelViewSet):
         """ Return objects owned by user. """
 
         return [
-            event for event in self.queryset
+            event for event in processor_models.Event.objects.all()
             if self.request.user in event.owners()
         ]
 
@@ -77,6 +77,6 @@ class UrlViewSet(viewsets.ModelViewSet):
         """ Return objects owned by user. """
 
         return [
-            url for url in self.queryset
+            url for url in processor_models.Url.objects.all()
             if self.request.user in url.owners()
         ]
