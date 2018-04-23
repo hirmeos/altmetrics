@@ -14,7 +14,7 @@ Django==2.0.1
 django-s3direct==1.0.4
 djangorestframework==3.8.2
 docutils==0.14
--e git://github.com/hirmeos/entity-fishing-client-python.git@36fc89f6d6f9f52921b47fda870a21c4567c209c#egg=entity_fishing_client
+-e git+git://github.com/hirmeos/entity-fishing-client-python.git@0.3#egg=entity_fishing_client
 idna==2.6
 ipdb==0.11
 ipython==6.2.1
