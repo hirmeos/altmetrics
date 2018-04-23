@@ -44,6 +44,7 @@ class Url(models.Model):
 
 
 class DoiUpload(models.Model):
+
     doi = models.ForeignKey(
         Doi,
         null=False,
@@ -107,5 +108,4 @@ class Event(models.Model):
         return 'Event: {}'.format(self.doi, self.source)
 
     def owners(self):
-        """ Return the users who own the DOI associated with this event. """
         return self.doi.owners()
