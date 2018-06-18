@@ -24,7 +24,11 @@ urlpatterns = [
     path(
         's3direct/',
         include('s3direct.urls')
-    ),    
+    ),
+    path(
+        'api/',
+        include('api.urls')
+    )
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

@@ -4,3 +4,7 @@
 src/static
 *__pycache__*
 *~
+.tox
+
+# docs
+docs/build

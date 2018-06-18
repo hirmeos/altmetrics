@@ -1,104 +1,54 @@
-from datetime import datetime
+from itertools import chain
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 
-import arrow
-
-from core.celery import app
+from arrow import utcnow
 from celery.utils.log import get_task_logger
 
-from .models import Doi, DoiUpload, Event, Scrape
+from core.celery import app
+
+from .models import Event, Namespace, Scrape, Uri
+from .utils import event_generator
 
 logger = get_task_logger(__name__)
 
 
-def users_from_uploads(doi):
-    """ Generates a list of users that uploaded a csv that created the DOI.
-
-      Parameters:
-        doi (Doi): the doi used to generate a list of users from
-
-      Returns:
-        list: Users that uploaded a CSV with the doi in it.
-    """
-
-    uploads = [doiup.upload for doiup in DoiUpload.objects.filter(doi=doi)]
-    users = None
-    for upload in uploads:
-        if users:
-            users |= User.objects.filter(csvupload=upload)
-        else:
-            users = User.objects.filter(csvupload=upload)
-
-    return users
-
-
-def doi_event_generator(doi):
-    """Generator of events for each of the DOIs being processed
-
-       Calls on every available plugin, and returns events generated for that
-       doi by that plugin process method. Plugins can optionally check if they
-       are authorised to generate events for the doi, and won't process the doi
-       if they aren't, going to the next plugin
-
-       Parameters:
-           doi (Doi): the doi which events are fetched for
-
-       Returns:
-           yields a list of events for each plugin, which if turned into a list
-           will be a list of lists of events.
-    """
-
-    for source in settings.AVAILABLE_PLUGINS:
-        if hasattr(
-            settings.AVAILABLE_PLUGINS.get(source).PROVIDER,
-            'is_authorised'
-        ):
-
-            users = users_from_uploads(doi)
-            if (
-                settings.AVAILABLE_PLUGINS.get(
-                    source
-                ).PROVIDER.is_authorised(
-                    users
-                )
-            ):
-                yield settings.AVAILABLE_PLUGINS.get(
-                    source
-                ).PROVIDER.process(
-                    doi
-                )
-
-        else:
-            yield settings.AVAILABLE_PLUGINS.get(source).PROVIDER.process(doi)
-
-
 @app.task(name='pull-metrics')
 def pull_metrics():
-    """ For each enabled data source plugin, call a scrape. """
+    """ Call a scrape for each enabled data source plugin. """
 
-    dois_unprocessed_or_to_refresh = Doi.objects.filter(
+    uri_unprocessed_or_refreshable = Uri.objects.filter(
         Q(last_checked__isnull=True) |
-        Q(last_checked__lte=arrow.utcnow().shift(days=-7).datetime),
+        Q(
+            last_checked__lte=utcnow().shift(
+                days=-settings.DAYS_BEFORE_REFRESH
+            ).datetime
+        ),
     )
 
-    for doi in dois_unprocessed_or_to_refresh:
-        for events in doi_event_generator(doi):
-            for event in events:
-                try:
-                    Event.objects.get_or_create(
-                        external_id=event.get('external_id'),
-                        source_id=event.get('source_id'),
-                        source=event.get('source'),
-                        created_at=event.get('created_at'),
-                        content=event.get('content'),
-                        doi=doi,
-                        scrape=Scrape.objects.create(
-                            end_date=datetime.utcnow()
-                        ),
-                    )
-                except Exception as e:
-                    logger.error(e)
-                    print(e)
+    if uri_unprocessed_or_refreshable:
+        scrape = Scrape.objects.create()
+
+    # TODO: we need a way to check whether the user wants a specific DOI to
+    # be in one or more namespaces. For now, we will assume that there is
+    # only one namespace and the user wants all his DOIs to be in there.
+
+    for uri in uri_unprocessed_or_refreshable:
+
+        events = event_generator(
+            uri=uri,
+            namespaces=Namespace.objects.all(),
+            scrape=scrape,
+        )
+
+        flatten = chain.from_iterable(events)
+
+        try:
+            Event.objects.bulk_create(flatten)
+        except Exception as e:
+            logger.error(e)
+
+    scrape.end_date = timezone.now()
+    scrape.save()

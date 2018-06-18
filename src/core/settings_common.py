@@ -1,17 +1,17 @@
 """
-Django settings for metrics project.
+Django settings for the HIRMEOS Metrics project.
 """
 
+from configparser import RawConfigParser
 import os
 import uuid
-from configparser import RawConfigParser
 
 import raven
 
 from generic import utils
 
 
-def fetch_variables_from_enviroment(config):
+def fetch_variables_from_environment(config):
     config['database'] = {
         'USER': str(os.getenv('DB_USER')),
         'PASSWORD': str(os.getenv('DB_PASSWORD')),
@@ -45,7 +45,7 @@ def fetch_variables_from_enviroment(config):
 
 config = RawConfigParser()
 if os.getenv('USE_ENV', False):
-    fetch_variables_from_enviroment(config)
+    fetch_variables_from_environment(config)
 else:
     config.read('../config.ini')
 
@@ -56,7 +56,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TECH_EMAIL = 'tech@ubiquitypress.com'
 ADMINS = (
-    ('Tech', 'tech@ubiquitypress.com'),
+    ('Tech', TECH_EMAIL),
 )
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -80,6 +80,9 @@ INSTALLED_APPS = [
     'importer',
     'processor',
     'static_handler',
+    'rest_framework',
+    'rest_framework_swagger',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -112,10 +115,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/login'
+
 
 # ## STATIC FILES ##
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected-static')
 
 # ## VERSION ##
 
@@ -140,16 +148,24 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.'
+        'UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.'
+        'MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.'
+        'CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.'
+        'NumericPasswordValidator',
     },
 ]
 
@@ -165,15 +181,15 @@ USE_TZ = True
 
 # ## CELERY
 
-# RMQ_USER = config.get('rmq', 'RMQ_USER')
-# RMQ_PASSWORD = config.get('rmq', 'RMQ_PASSWORD')
-# RMQ_URI = config.get('rmq', 'RMQ_URI')
+RMQ_USER = config.get('rmq', 'RMQ_USER')
+RMQ_PASSWORD = config.get('rmq', 'RMQ_PASSWORD')
+RMQ_URI = config.get('rmq', 'RMQ_URI')
 
-# CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
-#     user=RMQ_USER,
-#     password=RMQ_PASSWORD,
-#     uri=RMQ_URI,
-# )
+CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
+    user=RMQ_USER,
+    password=RMQ_PASSWORD,
+    uri=RMQ_URI,
+)
 
 
 # ## LOGGING ##
@@ -247,7 +263,7 @@ SENTRY_RELEASE = (
     )
 )
 
-RAVEN_CONFIG = {  # Sentry.
+RAVEN_CONFIG = {
     'dsn': config.get('sentry', 'DSN'),
     'release': SENTRY_RELEASE
 }
@@ -255,7 +271,15 @@ RAVEN_CONFIG = {  # Sentry.
 
 # ## PLUGINS ##
 
-AVAILABLE_PLUGINS = utils.load_plugins(folder='providers', ignore=['generic'])
+PLUGINS, ORIGINS = utils.load_plugins(
+    folder='plugins',
+    ignore=['generic', '__pycache__']
+)
+
+
+# ## BEHAVIOUR #
+
+DAYS_BEFORE_REFRESH = 7
 
 
 # ## EXTERNAL SERVICES ##
@@ -265,16 +289,18 @@ AWS_SECRET_ACCESS_KEY = config.get('s3', 'AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config.get('s3', 'AWS_STORAGE_BUCKET_NAME')
 S3DIRECT_REGION = config.get('s3', 'S3DIRECT_REGION')
 
+
 def create_filename(filename):
     ext = filename.split('.')[-1]
-    newfilename = filename.split('.')[-2]
+    new_filename = filename.split('.')[-2]
     filename = '{uuid}-{filename}.{ext}'.format(
         uuid=uuid.uuid4().hex,
-        filename=newfilename,
-        ext=ext
+        filename=new_filename,
+        ext=ext,
     )
 
     return filename
+
 
 S3DIRECT_DESTINATIONS = {
     # Allow anybody to upload any MIME type with a custom name function
@@ -290,8 +316,3 @@ S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}'.format(
     region=S3DIRECT_REGION,
     bucket_name=AWS_STORAGE_BUCKET_NAME,
 )
-
-
-LOGIN_REDIRECT_URL='/'
-LOGOUT_REDIRECT_URL='/'
-LOGIN_URL='/login'

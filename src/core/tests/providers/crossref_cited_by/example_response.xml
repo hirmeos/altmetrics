@@ -1,0 +1,31 @@
+<crossref_result xmlns="http://www.crossref.org/qrschema/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.crossref.org/qrschema/2.0 http://www.crossref.org/qrschema/crossref_query_output2.0.xsd">
+<query_result>
+<head>
+<email_address>none</email_address>
+<doi_batch_id>none</doi_batch_id>
+</head>
+<body>
+<forward_link doi="10.5334/bbc">
+<journal_cite fl_count="0">
+<issn type="print">1475-7257</issn>
+<issn type="electronic">1475-7257</issn>
+<journal_title>Psychology Learning & Teaching</journal_title>
+<journal_abbreviation>Psychology Learning & Teaching</journal_abbreviation>
+<article_title>PLAT 17(1) 2018</article_title>
+<contributors>
+<contributor first-author="true" sequence="first" contributor_role="author">
+<given_name>Birgit</given_name>
+<surname>Spinath</surname>
+</contributor>
+</contributors>
+<volume>17</volume>
+<issue>1</issue>
+<first_page>3</first_page>
+<year>2018</year>
+<publication_type>full_text</publication_type>
+<doi type="journal_article">10.1177/1475725717748530</doi>
+</journal_cite>
+</forward_link>
+</body>
+</query_result>
+</crossref_result>

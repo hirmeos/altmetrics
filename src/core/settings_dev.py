@@ -38,3 +38,5 @@ S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}/'.format(
     bucket_name=AWS_STORAGE_BUCKET_NAME,
 )
 
+CROSSREF_TEST_USER = config.get('crossref', 'CROSSREF_TEST_USER')
+CROSSREF_TEST_PASSWORD = config.get('crossref', 'CROSSREF_TEST_PASS')

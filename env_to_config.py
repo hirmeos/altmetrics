@@ -36,6 +36,11 @@ if __name__ == '__main__':
         'RMQ_URI': str(getenv('RMQ_URI'))
     }
 
+    config['crossref'] = {
+        'CROSSREF_TEST_USER': str(getenv('CROSSREF_TEST_USER')),
+        'CROSSREF_TEST_PASS': str(getenv('CROSSREF_TEST_PASS'))
+    }
+
     with open('../config.ini', 'w') as configfile:
         config.write(configfile)
 
