@@ -1,11 +1,6 @@
 Introduction
 ============
 
-Welcome to the HIRMEOS annotation / metrics documentation.
-
-The aim of this project is to document two of the services developed as part of
-the HIRMEOS project.
-
 What is this supposed to be?
 ----------------------------
 
