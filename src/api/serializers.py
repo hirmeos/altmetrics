@@ -1,45 +1,52 @@
 from rest_framework import serializers
 
-from processor import models as processor_models
+from processor.models import Uri, Url, Scrape, Event, UriUpload
 
 
-class DoiSerializer(serializers.HyperlinkedModelSerializer):
+class UriSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
-        model = processor_models.Doi
-        fields = 'doi', 'last_checked'
+        model = Uri
+        fields = 'raw', 'last_checked'
 
 
-class DoiUploadSerializer(serializers.HyperlinkedModelSerializer):
+class UriUploadSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
-        model = processor_models.DoiUpload
-        fields = 'doi',
-    doi = DoiSerializer()
+        model = UriUpload
+        fields = 'uri',
+
+    uri = UriSerializer()
 
 
 class ScrapeSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
-        model = processor_models.Scrape
+        model = Scrape
         fields = 'start_date', 'end_date'
 
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
-        model = processor_models.Event
+        model = Event
         fields = (
+            'value',
             'external_id',
-            'source_id',
-            'source',
+            'origin_id',
             'created_at',
             'content',
+            'uri',
             'scrape',
-            'doi',
         )
+
     scrape = ScrapeSerializer()
-    doi = DoiSerializer()
 
 
 class UrlSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
-        model = processor_models.Url
-        fields = 'url', 'doi'
-    doi = DoiSerializer()
+        model = Url
+        fields = 'url', 'uri'
+
+    uri = UriSerializer()

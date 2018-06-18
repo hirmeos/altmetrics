@@ -1,11 +1,11 @@
 from django.views.generic import ListView
 
-from .models import Doi
+from .models import Uri
 
 
 class DoisView(ListView):
 
-    model = Doi
+    model = Uri
     template_name = 'dois.html'
     context_object_name = 'dois'
 

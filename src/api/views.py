@@ -1,68 +1,62 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_swagger.views import get_swagger_view
 
-from processor import models as processor_models
+from processor.models import (
+    Event,
+    Scrape,
+    Uri,
+    UriUpload,
+    Url,
+)
+
 from .serializers import (
-    DoiSerializer,
-    DoiUploadSerializer,
+    UriUploadSerializer,
     EventSerializer,
     ScrapeSerializer,
+    UriSerializer,
     UrlSerializer
 )
 
+schema_view = get_swagger_view(title='HIRMEOS Metrics API')
 
-class DoiViewSet(viewsets.ModelViewSet):
-    """ API endpoint to display DOIs. """
+
+class UriViewSet(viewsets.ModelViewSet):
+    """ API endpoint to display URIs. """
 
     permission_classes = (IsAuthenticated,)
-    queryset = processor_models.Doi.objects.all()
-    serializer_class = DoiSerializer
-
-    def get_queryset(self):
-        """ Return objects owned by user. """
-
-        return [
-            doi for doi in processor_models.Doi.objects.all()
-            if self.request.user in doi.owners()
-        ]
+    queryset = Uri.objects.all()
+    serializer_class = UriSerializer
 
 
 class DoiUploadViewSet(viewsets.ModelViewSet):
     """ API endpoint to display DOI Uploads. """
 
     permission_classes = (IsAuthenticated,)
-    serializer_class = DoiUploadSerializer
-    queryset = processor_models.DoiUpload.objects.all()
+    serializer_class = UriUploadSerializer
+    queryset = UriUpload.objects.all()
 
     def get_queryset(self):
         """ Return objects owned by user. """
         return [
-            doiupload for doiupload in processor_models.DoiUpload.objects.all()
-            if doiupload.owner() == self.request.user
+            upload for upload in UriUpload.objects.all()
+            if upload.owner() == self.request.user
         ]
 
 
-class EventViewSet(viewsets.ModelViewSet):
+class EventViewSet(viewsets.ReadOnlyModelViewSet):
     """ API endpoint to display Events. """
 
     permission_classes = (IsAuthenticated,)
-    queryset = processor_models.Event.objects.all()
+    queryset = Event.objects.all()
     serializer_class = EventSerializer
 
-    def get_queryset(self):
-        """ Return objects owned by user. """
 
-        return [
-            event for event in processor_models.Event.objects.all()
-            if self.request.user in event.owners()
-        ]
-
-
-class ScrapeViewSet(viewsets.ModelViewSet):
+class ScrapeViewSet(viewsets.ReadOnlyModelViewSet):
     """ API endpoint to display Scrapes. """
 
     permission_classes = (IsAuthenticated,)
-    queryset = processor_models.Scrape.objects.all()
+    queryset = Scrape.objects.all()
     serializer_class = ScrapeSerializer
 
 
@@ -70,13 +64,33 @@ class UrlViewSet(viewsets.ModelViewSet):
     """ API endpoint to display URLs. """
 
     permission_classes = (IsAuthenticated,)
-    queryset = processor_models.Url.objects.all()
+    queryset = Url.objects.all()
     serializer_class = UrlSerializer
 
     def get_queryset(self):
         """ Return objects owned by user. """
 
-        return [
-            url for url in processor_models.Url.objects.all()
-            if self.request.user in url.owners()
-        ]
+        return [u for u in Url.objects.all() if self.request.user in u.owners()]
+
+
+class AltmetricViewSet(viewsets.ReadOnlyModelViewSet):
+    """ API endpoint to display Altmetrics. """
+
+    # permission_classes = (IsAuthenticated,)
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+    def get_queryset(self):
+        params = self.request.query_params
+
+        if (
+                params.get('view') == 'source' and
+                params.get('source') == 'hypothesis'
+        ):
+            qs = self.queryset.filter(
+                uri='info:doi:{uri}'.format(uri=params.get('uri'))
+            )
+
+            return qs
+
+        return self.queryset

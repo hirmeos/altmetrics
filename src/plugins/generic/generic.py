@@ -54,11 +54,12 @@ class GenericEventDataProvider(GenericDataProvider):
             }
         ]
 
-    def is_authorised(self, users, **kwargs):
-        """An optional method that allows you to deny the use of this plugin
-           based upon custom criteria. The most common recommended one is to
-           use user groups, and allow only users in a particular user group to
-           use the plugin. User groups are part of the standard Django
+    @staticmethod
+    def is_authorised(users, **kwargs):
+        """ An optional method that allows you to deny the use of this plugin.
+           It's based upon custom criteria. The most common recommended one
+           is to use user groups, and allow only users in a particular user
+           group to use the plugin. User groups are part of the standard Django
            framework.
 
            Parameters:

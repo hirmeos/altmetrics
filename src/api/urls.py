@@ -3,15 +3,25 @@ from django.urls import path
 
 from rest_framework import routers
 
-from api import views
+from api.views import (
+    schema_view,
+    AltmetricViewSet,
+    DoiUploadViewSet,
+    EventViewSet,
+    ScrapeViewSet,
+    UriViewSet,
+    UrlViewSet,
+)
 
 
-router = routers.DefaultRouter()
-router.register(r'dois', views.DoiViewSet)
-router.register(r'doiuploads', views.DoiUploadViewSet)
-router.register(r'events', views.EventViewSet)
-router.register(r'scrapes', views.ScrapeViewSet)
-router.register(r'urls', views.UrlViewSet)
+router = routers.DefaultRouter(trailing_slash=False)
+
+router.register(r'uri', UriViewSet)
+router.register(r'altmetrics', AltmetricViewSet)
+router.register(r'uriupload', DoiUploadViewSet)
+router.register(r'event', EventViewSet)
+router.register(r'scrape', ScrapeViewSet)
+router.register(r'url', UrlViewSet)
 
 urlpatterns = [
     path(
@@ -21,5 +31,9 @@ urlpatterns = [
     path(
         '',
         include('rest_framework.urls', namespace='rest_framework')
-    )
+    ),
+    path(
+        'docs',
+        schema_view
+    ),
 ]

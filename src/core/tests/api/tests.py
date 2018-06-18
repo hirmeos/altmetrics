@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from rest_framework.test import APIClient
 
+import processor.models.scrape
 from core.tests.factories import (
     generic_factories,
     importer_factories,
@@ -161,7 +162,7 @@ class APITestCase(TestCase):
         """ Test that Scrapes display for authenticated users. """
 
         test_scrape = processor_factories.ScrapeFactory()
-        number_of_scrapes = len(processor_models.Scrape.objects.all())
+        number_of_scrapes = len(processor.models.scrape.Scrape.objects.all())
         self.login()
 
         response = self.client.get('/api/scrapes/')

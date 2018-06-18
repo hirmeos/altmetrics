@@ -4,7 +4,7 @@ __desc__ = "A description of what your plugin provides"
 
 from . import generic
 
-"""The generic plugin is a python module wich must have a PROVIDER variable
+"""The generic plugin is a python module which must have a PROVIDER variable
    which is an instance of its own implementation of GenericDataProvider
    in this case GenericEventDataProvider. Part of the default params to
    __init__ is the program param, which is a string id of the provider.

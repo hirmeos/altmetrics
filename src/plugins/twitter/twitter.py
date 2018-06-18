@@ -1,8 +1,9 @@
 from generic.mount_point import GenericDataProvider
 
 
-class FacebookProvider(GenericDataProvider):
-    """ Implements a Scrapy-based interface to get FB data. """
+class TwitterProvider(GenericDataProvider):
+
+    supported_origins = ['twitter']
 
     def load(self, string):
         pass

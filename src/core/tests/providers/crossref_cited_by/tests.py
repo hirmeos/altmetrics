@@ -6,19 +6,23 @@ from django.utils import timezone
 
 import requests
 
-from providers.crossref_cited_by.crossref_cited_by import CrossrefCitedByDataProvider
-from processor import models as processor_models
-
+import processor.models.uri
+import processor.models.event
+import processor.models.scrape
+from plugins.crossref_cited_by.crossref_cited_by import (
+    CrossrefCitedByDataProvider,
+)
 
 
 class CitedByProcessorTestCase(TestCase):
+
     def setUp(self):
         self.response_fixture = path.join(
             path.dirname(path.realpath(__file__)),
             'example_response.xml'
         )
-        self.doi = processor_models.Doi.objects.create(doi='10.5334/bbc')
-        self.scrape = processor_models.Scrape.objects.create(
+        self.doi = processor.models.uri.Uri.objects.create(doi='10.5334/bbc')
+        self.scrape = processor.models.scrape.Scrape.objects.create(
             end_date=timezone.now()
         )
 
@@ -27,7 +31,7 @@ class CitedByProcessorTestCase(TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_process_returns_event_dict(self):
-        cited_by_events = processor_models.Event.objects.filter(
+        cited_by_events = processor.models.event.Event.objects.filter(
             source='crossref_cited_by'
         )
         self.assertEqual(len(cited_by_events), 0)

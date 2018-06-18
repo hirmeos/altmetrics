@@ -1,28 +1,35 @@
 from django.contrib import admin
 
-from .models import *
+from .models import Uri, Url, UriUpload, Scrape, Event
 
 
-class DoiAdmin(admin.ModelAdmin):
-    list_display = ('doi', 'last_checked')
-admin.site.register(Doi, DoiAdmin)
+class UriAdmin(admin.ModelAdmin):
+
+    list_display = ('raw', 'last_checked')
 
 
 class UrlAdmin(admin.ModelAdmin):
-    list_display = ('url', 'doi')
-admin.site.register(Url, UrlAdmin)
+
+    list_display = ('url', 'uri')
 
 
-class DoiUploadAdmin(admin.ModelAdmin):
-    list_display = ('doi', 'upload')
-admin.site.register(DoiUpload, DoiUploadAdmin)
+class UriUploadAdmin(admin.ModelAdmin):
+
+    list_display = ('uri', 'upload')
 
 
 class ScrapeAdmin(admin.ModelAdmin):
+
     list_display = ('start_date', 'end_date')
-admin.site.register(Scrape, ScrapeAdmin)
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('doi', 'source', 'created_at', 'scrape')
+
+    list_display = ('uri', 'measure', 'created_at', 'scrape')
+
+
+admin.site.register(Uri, UriAdmin)
+admin.site.register(Url, UrlAdmin)
+admin.site.register(UriUpload, UriUploadAdmin)
+admin.site.register(Scrape, ScrapeAdmin)
 admin.site.register(Event, EventAdmin)

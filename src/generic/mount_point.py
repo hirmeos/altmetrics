@@ -2,8 +2,7 @@ from . import utils
 
 
 class GenericDataProvider(object, metaclass=utils.MountPoint):
-    """ Plugins can inherit this mount point in order to add a data provider.
-    """
+    """ Plugins can inherit this mount point to add a data provider. """
 
     def __init__(self, program):
         # Nothing is implemented here.

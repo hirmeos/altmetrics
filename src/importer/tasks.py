@@ -3,12 +3,12 @@ from io import StringIO
 
 from celery.utils.log import get_task_logger
 from core.celery import app
-from processor.models import Doi, DoiUpload, Url
+from processor.models import Uri, UriUpload, Url
 
 logger = get_task_logger(__name__)
 
 
-@app.task(name='register-dois')
+@app.task(name='register-doi')
 def register_doi(csv, csv_upload_id):
     """ Given a CSV model object, get csv and register the DOIs in the database.
 
@@ -21,30 +21,29 @@ def register_doi(csv, csv_upload_id):
             reader = csv_reader(p)
 
             for row in reader:
+                doi_raw = row[1].strip()
+                url = row[0].strip()
+
                 if (
-                    len(row) >= 2 and
-                    len(row[0].strip()) > 0
-                    and len(row[1].strip()) > 0
+                        len(row) >= 2 and
+                        len(doi_raw) > 0 and
+                        len(url) > 0
                 ):
-                    doi, _ = Doi.objects.get_or_create(
-                        doi=row[1].strip(),
-                    )
+                    doi, _ = Uri.objects.get_or_create(doi=doi_raw)
+                    Url.objects.get_or_create(url=url, doi=doi)
 
-                    Url.objects.get_or_create(
-                        url=row[0].strip(),
-                        doi=doi
-                    )
-
-                    DoiUpload.objects.get_or_create(
+                    UriUpload.objects.get_or_create(
                         doi=doi,
                         upload_id=csv_upload_id
                     )
                 else:
-                    msg = 'Problem parsing line {line_num} ' \
-                          'for csv upload id of {upload_id}'.format(
-                              line_num=reader.line_num,
-                              upload_id=csv_upload_id,
-                          )
+                    msg = (
+                        'Problem parsing line {line_num} for '
+                        'csv upload id of {upload_id}'.format(
+                            line_num=reader.line_num,
+                            upload_id=csv_upload_id,
+                        )
+                    )
                     logger.error(msg)
                     print(msg)
     except Exception as e:
