@@ -9,7 +9,14 @@ Welcome to HIRMEOS Metrics documentation!
 Welcome to the HIRMEOS annotation / metrics documentation.
 
 The aim of this project is to document two of the services developed as part of
-the HIRMEOS project: the Annotation service and Metrics.
+the HIRMEOS_ project: the Annotation service and Metrics.
+
+Please note that whilst all the services are available as open source and links
+to the relevant code is provided in the documentation, the hosted version of the
+service is available to partners only. Please check the HIRMEOS_ website for
+more information on how to get in touch with the project management.
+
+.. _HIRMEOS: http://www.hirmeos.eu
 
 .. toctree::
    :maxdepth: 3

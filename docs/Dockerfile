@@ -1,5 +1,3 @@
-# htpasswd pw:  Un1vers1tet
-
 FROM        nginx:latest
 MAINTAINER  Francesco de Virgilio <francesco.devirgilio@ubiquitypress.com>
 

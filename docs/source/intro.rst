@@ -1,9 +1,7 @@
 Introduction
 ============
 
-What is this supposed to be?
-----------------------------
-
-* a guide on how the annotation are gathered and used in the project
-* a guide for existing and new partners on how to make sure annotations in their
-  platforms are indexed correctly
+Different services have been developed in the context of the HIRMEOS project,
+and most of them are hosted by different institutions. The scope of this
+documentation is to guide the partners through set configuration and setup of
+the Annotation (WP5) and Altmetrics (WP6) functionalities.
