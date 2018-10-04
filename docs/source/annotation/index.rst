@@ -65,22 +65,26 @@ on an HTML page is the Hypothes.is `Quickstart`_ guide.
 
 .. _Quickstart: https://web.hypothes.is/help/embedding-hypothesis-in-websites-and-platforms/
 
-ePub
+EPUB
 ....
 
 At the most basic level, the only resources required to enable annotations on an
-ePub are the Hypothes.is CDN and ``epub.js``:
+EPUB are the Hypothes.is CDN, ``jszip 3.1.5`` and ``epub.js 0.3.66``:
 
-.. code-block: html
+.. code-block:: html
 
     <script src="https://cdn.hypothes.is/hypothesis"></script>
+    <script src="https://storage.googleapis.com/hirmeos/v1/jszip.min.js"></script>
     <script src="https://storage.googleapis.com/hirmeos/v1/epub.min.js"></script>
 
-`This link`_ hosted by Hypothes.is contains a working implementation on an empty
-HTML page. In the example, a function in ``reader.js`` is initiated when loading
-the page, in order to execute some logic related to the ePub and Hypothes.is.
+`This link`_ hosted by Hypothes.is contains a working implementation.
+In the example, a function in ``reader.js`` is called when loading the page.
+This function initialises an epub.js reader and enables Hypothes.is annotation
+throughout the page, including within the EPUB content.
+The code for this working implementation can be found in `this git repository`_.
 
 .. _`This link`: https://cdn.hypothes.is/demos/epub/epub.js/index.html?loc=titlepage.xhtml
+.. _`this git repository`: https://github.com/futurepress/hypothesis-reader
 
 PDF
 ...
@@ -125,7 +129,7 @@ What happens next:
 
 The results are available on the HIRMEOS metrics, by source:
 
-.. code-blocK:: guess
+.. code-block:: text
 
     https://metrics.ubiquity.press/api/altmetrics?uri=10.5334/dsj-2016-006&view=source&source=hypothesis
 
