@@ -9,7 +9,7 @@ class CrossRefEventDataClient(ApiClient):
     api_base = 'https://api.eventdata.crossref.org/v1/events'
 
     def __init__(self):
-        super(CrossRefEventDataClient, self).__init__(base_url=self.api_base)
+        super().__init__(base_url=self.api_base)
 
     @staticmethod
     def _build_filters(values):
@@ -36,9 +36,16 @@ class CrossRefEventDataClient(ApiClient):
             dict: JSON containing CrossRef Event API information about the DOI.
         """
         filters = self._build_filters({'obj-id': doi, 'source': origin})
-        response, _ = self.get(self.api_base, params=filters)
+        response, status = self.get(self.api_base, params=filters)
 
-        return self.decode(response)
+        result = self.decode(response), None
+        if status != 200:  # TODO: Check status and handle error if not 200
+            return None, result
+
+        return result, None
+
+
+
 
     def get_events(self, doi, origin):
         """ Get list of CrossRef Event Data API events.

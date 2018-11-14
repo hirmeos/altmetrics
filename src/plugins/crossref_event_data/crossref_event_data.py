@@ -28,9 +28,9 @@ class CrossrefEventDataProvider(GenericDataProvider):
         Returns:
             list: Contains valid objects.
         """
-        return [event for event in events if self.validator.load(event)]
+        return (self.validator.dump(event) for event in events)
 
-    def _build(self, event_data, uri, origin, scrape, measure):
+    def _build(self, event_data):
         """ Build a target Event object using the defined schema.
 
         Args:
@@ -40,30 +40,24 @@ class CrossrefEventDataProvider(GenericDataProvider):
         Returns:
             object: An HIRMEOS metrics' ORM Event.
         """
-        self.target_schema.context['origin'] = origin
-        event = self.target_schema.dump(event_data).data
+        return (data for data, errors in event_data if not errors)
 
-        event.scrape = scrape
-        event.measure = measure
-        event.uploader = uri.owner
-
-        return event
-
-    def process(self, uri, origin, scrape, measure):
+    def process(self, uri, origin, scrape):
         """ Implement processing of an URI to get events.
 
         Args:
             uri (Uri): An Uri object.
             origin (str): Service which originated the event we are fetching.
             scrape (object): Scrape from ORM, not saved to database (yet).
-            measure (object): Measure from ORM.
 
         Returns:
             list: Contains events found for the given URI, as dictionaries.
         """
 
         events = self.client.get_events(doi=uri.raw, origin=origin)
+        if events.errors:
+            return None, {'Error stuff': 'Error stuff details'}
         valid = self._validate(events)
-        events = [self._build(e, uri, origin, scrape, measure) for e in valid]
+        events = [self._build(e, uri, origin, scrape) for e in valid]
 
-        return events
+        return events, None

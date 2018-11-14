@@ -1,52 +1,37 @@
-from rest_framework import serializers
-
-from processor.models import Uri, Url, Scrape, Event, UriUpload
+from marshmallow import Schema, fields, ValidationError, pre_load
 
 
-class UriSerializer(serializers.HyperlinkedModelSerializer):
+class UriSerializer(Schema):
 
-    class Meta:
-        model = Uri
-        fields = 'raw', 'last_checked'
-
-
-class UriUploadSerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = UriUpload
-        fields = 'uri',
-
-    uri = UriSerializer()
+    id = fields.Integer()
+    raw = fields.String()
+    last_checked = fields.DateTime()
 
 
-class ScrapeSerializer(serializers.HyperlinkedModelSerializer):
+class ScrapeSerializer(Schema):
 
-    class Meta:
-        model = Scrape
-        fields = 'start_date', 'end_date'
-
-
-class EventSerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = Event
-        fields = (
-            'value',
-            'external_id',
-            'origin_id',
-            'created_at',
-            'content',
-            'uri',
-            'scrape',
-        )
-
-    scrape = ScrapeSerializer()
+    id = fields.Integer(dump_only=True)
+    start_date = fields.DateTime()
+    end_date = fields.DateTime()
 
 
-class UrlSerializer(serializers.HyperlinkedModelSerializer):
+# Custom validator example
+def name_of_validator(data):
+    if not data:
+        raise ValidationError('Data not provided.')
 
-    class Meta:
-        model = Url
-        fields = 'url', 'uri'
 
-    uri = UriSerializer()
+class EventSerializer(Schema):
+
+    id = fields.Integer(dump_only=True)
+    uri = fields.Nested(UriSerializer)
+    external_id = fields.UUID()
+    origin = fields.Integer(validate=name_of_validator)  # TODO: Add validator
+    created_at = fields.DateTime()
+    scrape = fields.Nested(ScrapeSerializer)
+
+
+class UrlSerializer(Schema):
+
+    id = fields.Integer(dump_only=True)
+    uri = scrape = fields.Nested(UriSerializer)

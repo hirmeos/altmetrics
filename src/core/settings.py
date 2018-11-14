@@ -1,42 +1,93 @@
-from .settings_common import *
+"""
+Common settings for the HIRMEOS Metrics project.
+"""
 
-DEBUG = False
+import os
 
-SECRET_KEY = config.get('security', 'SECRET_KEY')
+import raven
 
-
-# ## CELERY
-
-RMQ_USER = config.get('rmq', 'RMQ_USER')
-RMQ_PASSWORD = config.get('rmq', 'RMQ_PASSWORD')
-RMQ_URI = config.get('rmq', 'RMQ_URI')
-
-CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
-    user=RMQ_USER,
-    password=RMQ_PASSWORD,
-    uri=RMQ_URI,
-)
-
-ALLOWED_HOSTS += [
-    'localhost',
-    '127.0.0.1',
-    'metrics.ubiquity.press'
-]
+from generic import utils
 
 
-# ## EXTERNAL SERVICES ##
+class Config(object):
 
-AWS_ACCESS_KEY_ID = config.get('s3', 'AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = config.get('s3', 'AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = config.get('s3', 'AWS_STORAGE_BUCKET_NAME')
-S3DIRECT_REGION = config.get('s3', 'S3DIRECT_REGION')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'secret-key')
 
-S3_URL_TEMPLATE = 'https://s3-{region}.amazonaws.com/{bucket_name}/'.format(
-    region=S3DIRECT_REGION,
-    bucket_name=AWS_STORAGE_BUCKET_NAME,
-)
+    APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
-STATIC_ROOT = '/static_files/'
-STATICFILES_DIRS = [
-    ('static', "/static"),
-]
+    # ## CELERY
+
+    RMQ_USER = os.getenv('RMQ_USER')
+    RMQ_PASSWORD = os.getenv('RMQ_PASSWORD')
+    RMQ_URI = os.getenv('RMQ_URI')
+
+    CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
+        user=RMQ_USER,
+        password=RMQ_PASSWORD,
+        uri=RMQ_URI,
+    )
+
+    # ## DATABASES ##
+    DB_USER = os.getenv('DB_USER')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_HOST = os.getenv('DB_HOST')
+    DB_NAME = os.getenv('DB_NAME')
+    PORT = '5432'
+
+    SQLALCHEMY_DATABASE_URI = (
+        'postgresql://{user}:{passwd}@{host}:{port}/{db}'.format(
+            user=DB_USER,
+            passwd=DB_PASSWORD,
+            host=DB_HOST,
+            port=PORT,
+            db=DB_NAME,
+        )
+    )
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # ## LOGGING ##
+
+    # TODO: set up logging
+
+    METRICS_VERSION = "0.0.1"
+
+    # # ## PLUGINS ##
+    #
+    PLUGINS, ORIGINS = utils.load_plugins(
+        folder='plugins',
+        ignore=['generic', '__pycache__']
+    )
+
+    # ## BEHAVIOUR #
+
+    DAYS_BEFORE_REFRESH = 7
+
+
+class DevConfig(Config):
+    DEBUG = True
+    FLASK_ENV = "development"
+
+
+class LiveConfig(Config):
+
+    DEBUG = False
+    FLASK_ENV = "production"
+
+    # TODO: Sentry config
+    # SENTRY_RELEASE = (
+    #     '{main}-{sha}'.format(
+    #         main=Config.METRICS_VERSION,
+    #         sha=raven.fetch_git_sha(
+    #             os.path.join(
+    #                 '/',
+    #                 *os.path.dirname(os.path.realpath(__file__)).split('/')[:-2]
+    #             )
+    #         )
+    #     )
+    # )
+    #
+    # RAVEN_CONFIG = {
+    #     'dsn': os.getenv('SENTRY_DSN'),
+    #     'release': SENTRY_RELEASE
+    # }
