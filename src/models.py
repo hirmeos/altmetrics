@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import Enum
+
 import re
 
 from flask_sqlalchemy import SQLAlchemy
@@ -8,28 +8,46 @@ from sqlalchemy.orm import validates
 from validators import url as url_validator
 
 from app import app
+from core.settings import StaticProviders, Origins
 
 
 db = SQLAlchemy(app)
 
+# alias common db types
+Column = db.Column
+DateTime = db.DateTime
+Enum = db.Enum
+ForeignKey = db.ForeignKey
+Integer = db.Integer
+Model = db.Model
+String = db.String
+relationship = db.relationship
 
-class Origins(Enum):
-    twitter_doi = 1
-    twitter_url = 2
-    wikipedia = 3
-    hypothesis = 4
-    facebook = 5
-    wordpress = 6
 
+class Uri(Model):
+    """DOI to be scraped.
 
-class Uri(db.Model):
-    """DOI to be scraped."""
+    Columns
+    -------
+    raw:
+        String representation of doi/uri.
+    last_checked:
+        datetime when scraped was triggered for this uri.
+    """
 
     __tablename__ = 'uri'
 
-    id = db.Column(db.Integer, primary_key=True)
-    raw = db.Column(db.String(50), unique=True, nullable=False)
-    last_checked = db.Column(db.DateTime, default=datetime.utcnow)
+    id = Column(Integer, primary_key=True)
+    raw = Column(String(50), unique=True, nullable=False)
+    last_checked = Column(DateTime)
+
+    # Child Relationships
+    deleted_events = relationship('DeletedEvent', backref='uri')
+    errors = relationship('Error', backref='uri')
+    events = relationship('Event', backref='uri')
+    urls = relationship('Url', backref='uri')
+
+    metrics = relationship('Metric', uselist=False, backref='uri')
 
     # TODO: Add validator DOIs.
     @validates('raw')
@@ -48,14 +66,15 @@ class Uri(db.Model):
     #     return self.users.all()
 
 
-class Url(db.Model):
+class Url(Model):
     """Url associated with DOI."""
 
     __tablename__ = 'url'
 
-    id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String)
-    uri = db.Column(db.Integer, db.ForeignKey('uri.id'), nullable=False)
+    id = Column(Integer, primary_key=True)
+    url = Column(String)
+
+    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
 
     @validates('url')
     def url_validator(self, key, url):
@@ -66,88 +85,119 @@ class Url(db.Model):
         return self.url
 
 
-class Scrape(db.Model):
+class Scrape(Model):
     """Keep track of when DOIs were checked for new events."""
 
     __tablename__ = 'scrape'
 
-    id = db.Column(db.Integer, primary_key=True)
-    start_date = db.Column(db.DateTime, default=datetime.utcnow)
-    end_date = db.Column(db.DateTime, nullable=True)
+    id = Column(Integer, primary_key=True)
+
+    start_date = Column(DateTime, default=datetime.utcnow)
+    end_date = Column(DateTime, nullable=True)
+
+    # Child Relationships
+    deleted_events = relationship('DeletedEvent', backref='scrape')
+    errors = relationship('Error', backref='scrape')
+    events = relationship('Event', backref='scrape')
 
     def __str__(self):
         return f'<Scrape on: {self.start_date}>'
 
 
-class Error(db.Model):
+class Error(Model):
     """ Keep track of failed scrapes for a given doi and origin. Only created
     when scrape task exceeds max retries.
+
+    Columns:
+    --------
+    description:
+        Description of error.
+    last_successful_scrape_at:
+        when last successful scrape occurred. Used when looking for new events.
     """
 
     __tablename__ = 'error'
 
-    id = db.Column(db.Integer, primary_key=True)
-    uri = db.Column(db.Integer, db.ForeignKey('uri.id'), nullable=False)
-    scrape = db.Column(db.Integer, db.ForeignKey('scrape.id'), nullable=False)
-    origin = db.Column(db.String(3))
-    description = db.Column(db.String(100))
+    id = Column(Integer, primary_key=True)
+
+    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+    scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
+
+    origin = Enum(Origins, nullable=False)
+    provider = Enum(StaticProviders, nullable=False)
+    description = Column(String(100))
+    last_successful_scrape_at = Column(DateTime, nullable=False)
 
     def __str__(self):
         return f'<Error: {self.id} - {self.description}>'
 
 
-class Event(db.Model):
+class Event(Model):
     """ Hold data related to the events.
 
-    A quick note on terminology:
-
-    provider: the service we are talking to in order to retrieve the event
-      (e.g. Crossref Event Data API).
-
-    origin: the service where the event originated (e.g. Twitter).
+    Columns:
+    --------
+    provider:
+        The service we are talking to in order to retrieve the event
+        (e.g. Crossref Event Data API).
+    origin:
+        The service where the event originated (e.g. Twitter).
+    external_id:
+        id of the event as specified by the provider.
+    created_at:
+        When this event occured on the origin service (specified by the
+        provider).
     """
 
     __tablename__ = 'event'
 
-    id = db.Column(db.Integer, primary_key=True)
-    uri = db.Column(db.Integer, db.ForeignKey('uri.id'), nullable=False)
-    external_id = db.Column(UUID, unique=True, nullable=False)
-    origin = db.Enum(Origins)
-    created_at = db.Column(db.DateTime)
-    scrape = db.Column(db.Integer, db.ForeignKey('scrape.id'), nullable=False)
+    id = Column(Integer, primary_key=True)
+
+    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+    scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
+
+    external_id = Column(UUID, unique=True, nullable=False)
+    origin = Enum(Origins, nullable=False)
+    provider = Enum(StaticProviders, nullable=False)
+    created_at = Column(DateTime, nullable=False)
 
     def __str__(self):
         return f'<Event: {self.id} - {self.uri}>'
 
 
-class DeletedEvent(db.Model):
+class DeletedEvent(Model):
     """ Hold data related to the events that have been deleted from their
     source/origin. Kept for historical purposes.
     """
 
     __tablename__ = 'deleted_event'
 
-    id = db.Column(db.Integer, primary_key=True)
-    uri = db.Column(db.Integer, db.ForeignKey('uri.id'), nullable=False)
-    external_id = db.Column(UUID, unique=True, nullable=False)
-    origin = db.Enum(Origins)
-    created_at = db.Column(db.DateTime)
-    deleted_at = db.Column(db.DateTime)
-    scrape = db.Column(db.Integer, db.ForeignKey('scrape.id'), nullable=False)
+    id = Column(Integer, primary_key=True)
+
+    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+    scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
+
+    external_id = Column(UUID, unique=True, nullable=False)
+    origin = Enum(Origins)
+    provider = Enum(StaticProviders)
+    created_at = Column(DateTime)
+    deleted_at = Column(DateTime)
 
     def __str__(self):
         return f'<Deleted Event: {self.id} - {self.uri}>'
 
 
-class Metric(db.Model):
+class Metric(Model):
     """Sum of events for a given doi for each origin."""
 
     __tablename__ = 'metric'
 
-    id = db.Column(db.Integer, primary_key=True)
-    uri = db.Column(db.Integer, db.ForeignKey('uri.id'), nullable=False)
-    data = db.Column(HSTORE)
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+    id = Column(Integer, primary_key=True)
+
+    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+
+    data = Column(HSTORE)
+    last_updated = Column(DateTime, default=datetime.utcnow)
 
     def __str__(self):
         return f'<Metric: {self.uri}: {self.data}>'

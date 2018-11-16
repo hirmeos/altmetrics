@@ -7,17 +7,24 @@ from marshmallow.exceptions import ValidationError
 class EventSchema(Schema):
     """ Turn a CrossRefEventData event into an HIRMEOS metrics Event """
 
-    uri = fields.Method('get_uri', attribute="uri")
+    uri_id = fields.Method('get_uri', attribute="uri")
     external_id = fields.UUID(attribute="id")
-    origin = fields.String(attribute="source_id")
+    origin = fields.Method('get_origin')
+    provider = fields.Method('get_provider')
     created_at = fields.Method('get_created')
-    scrape = fields.Method('get_scrape', deserialize='get_scrape')
+    scrape_id = fields.Method('get_scrape', deserialize='get_scrape')
+
+    def get_origin(self, obj):
+        return self.context['origin']
+
+    def get_provider(self, obj):
+        return self.context['provider']
 
     def get_scrape(self, obj):
-        return self.context['scrape']
+        return self.context['scrape_id']
 
     def get_uri(self, obj):
-        return self.context['uri']
+        return self.context['uri_id']
 
     @staticmethod
     def get_created(obj):

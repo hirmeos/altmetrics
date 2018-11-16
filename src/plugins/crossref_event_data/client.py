@@ -1,6 +1,6 @@
-from entity_fishing_client.client import ApiClient
+from flask import current_app
 
-from django.conf import settings
+from generic.client import ApiClient
 
 
 class CrossRefEventDataClient(ApiClient):
@@ -21,11 +21,11 @@ class CrossRefEventDataClient(ApiClient):
         Returns:
             dict: Ready to use value to be added to the parameters.
         """
-        values.update({'mailto': settings.TECH_EMAIL})
+        values.update(mailto=current_app.config.get("TECH_EMAIL"))
 
         return values
 
-    def get_doi(self, doi, origin):
+    def get_doi(self, **parameters):
         """ Get results for a specific DOI.
 
         Args:
@@ -35,19 +35,10 @@ class CrossRefEventDataClient(ApiClient):
         Returns:
             dict: JSON containing CrossRef Event API information about the DOI.
         """
-        filters = self._build_filters({'obj-id': doi, 'source': origin})
-        response, status = self.get(self.api_base, params=filters)
+        filters = self._build_filters(parameters)
+        return self.get(self.api_base, params=filters)
 
-        result = self.decode(response), None
-        if status != 200:  # TODO: Check status and handle error if not 200
-            return None, result
-
-        return result, None
-
-
-
-
-    def get_events(self, doi, origin):
+    def get_events(self, **parameters):
         """ Get list of CrossRef Event Data API events.
 
         Args:
@@ -57,4 +48,10 @@ class CrossRefEventDataClient(ApiClient):
         Returns:
             list: An iterable of event dictionaries.
         """
-        return self.get_doi(doi, origin).get('message', {}).get('events', [])
+        response, status = self.get_doi(**parameters)
+
+        result = self.decode(response)
+        if status != 200:  # TODO: Check status and handle error if not 200
+            return None, result
+
+        return result.get('message', {}).get('events', []), None

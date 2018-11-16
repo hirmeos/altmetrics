@@ -1,19 +1,19 @@
 import datetime
 import uuid
 
-from django.conf import settings
-from django.utils import timezone
-
 from bs4 import BeautifulSoup
+from flask import current_app
 import requests
 
 from generic.mount_point import GenericDataProvider
+from core.settings import Origins, StaticProviders
 
 
 class CrossrefCitedByDataProvider(GenericDataProvider):
     """ Implements Crossref Cited-by API integration. """
 
-    supported_origins = ['citation']
+
+    supported_origins = [Origins.citation]
 
     def process(self, uri, test_data=None):
         """ Pull citation data from API and create Event models.
@@ -31,8 +31,8 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
             'usr={user}&pwd={password}&doi={doi}'
             '&startDate=1900-01-01&endDate={end_date}'
         ).format(
-            user=settings.CROSSREF_TEST_USER,
-            password=settings.CROSSREF_TEST_PASSWORD,
+            user=current_app.CROSSREF_TEST_USER,
+            password=current_app.CROSSREF_TEST_PASSWORD,
             doi=uri.raw,
             end_date='{}-12-31'.format(datetime.datetime.now().year)
         )
@@ -63,7 +63,7 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
                     'external_id': str(uuid.uuid4()), # No external ID supplied.
                     'source_id': item.find('doi').text,
                     'source': 'crossref_cited_by',
-                    'created_at': timezone.now(),
+                    'created_at': datetime.datetime.now(),
                     'content': content,
                     'doi': uri
                 }]

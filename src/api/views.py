@@ -62,13 +62,12 @@ class UriViewSet(MethodView):
         return json.dumps(uri_data)
 
     def post(self):
-        schema = self.serializer_class(only='raw')
         json_input = request.get_json()
 
         doi_list = json_input.get("doi_list")
 
         for raw_uri in doi_list:
-            new_uri = Uri(raw=raw_uri)
+            new_uri = Uri(raw=raw_uri, last_checked=None)
             db.session.add(new_uri)
 
         db.session.commit()

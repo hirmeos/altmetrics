@@ -2,11 +2,33 @@
 Common settings for the HIRMEOS Metrics project.
 """
 
+from enum import IntEnum
 import os
 
 import raven
 
 from generic import utils
+
+
+# ## Enums used to keep track of origins and providers ##
+
+class Origins(IntEnum):
+    twitter = 1
+    citation = 2
+    wikipedia = 3
+    hypothesis = 4
+    facebook = 5
+    wordpress = 6
+
+
+class StaticProviders(IntEnum):
+    """Used to keep track of the provider of a given event. Used by Plugins
+    to provide a link to the full event record, based on the external event ID.
+    """
+    crossref_cited_by = 1
+    crossref_event_data = 2
+    facebook = 3
+    twitter = 4
 
 
 class Config(object):
@@ -56,9 +78,15 @@ class Config(object):
     #
     PLUGINS, ORIGINS = utils.load_plugins(
         folder='plugins',
-        ignore=['generic', '__pycache__']
+        ignore=[
+            'generic',
+            '__pycache__',
+            "crossref_cited_by",
+            "facebook",
+            "twitter",
+        ]
     )
-
+    TECH_EMAIL = os.getenv('TECH_EMAIL', 'example@example.org')
     # ## BEHAVIOUR #
 
     DAYS_BEFORE_REFRESH = 7

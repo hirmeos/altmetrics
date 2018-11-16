@@ -75,10 +75,7 @@ def load_plugins(folder, **kwargs):
     for addon in names:
 
         if addon in ignored_plugins:
-            logging.info(
-                "Plugin {addon}s not loaded because it is disabled".format(
-                    addon=addon
-                ))
+            logging.info(f"Plugin {addon}s not loaded because it is disabled")
             continue
 
         if addon in loaded_plugins:
@@ -100,10 +97,11 @@ def load_plugins(folder, **kwargs):
                     module.__author__
                 )
             )
-        except:
+        except Exception as e:
             if file:
                 file.close()
 
+            # sys.exit(f'Failed to load {addon} beacuse {e}')
             logging.info(sys.exc_info()[1])
 
     return loaded_plugins, load_origins(loaded_plugins)
