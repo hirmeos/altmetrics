@@ -1,22 +1,29 @@
 import datetime
+from itertools import chain
+import logging
 import uuid
 
+from models import Event, Error, RawEvent
+
 from bs4 import BeautifulSoup
-from flask import current_app
 import requests
 
 from generic.mount_point import GenericDataProvider
+from core.logic import get_credentials
 from core.settings import Origins, StaticProviders
+
+
+logger = logging.getLogger(__name__)
 
 
 class CrossrefCitedByDataProvider(GenericDataProvider):
     """ Implements Crossref Cited-by API integration. """
 
-
+    provider = StaticProviders.crossref_event_data
     supported_origins = [Origins.citation]
 
-    def process(self, uri, test_data=None):
-        """ Pull citation data from API and create Event models.
+    def process(self, uri, origin, scrape, last_check, test_data=None):
+        """ Pull citation data from API and create Events.
 
         Args:
             uri (Uri): A Uri object from the ORM.
@@ -26,46 +33,58 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
             list: Contains results.
         """
 
+        # For now just run for UP DOIs
+        try:
+            user, password = get_credentials(uri.raw)
+        except ValueError:
+            logger.warning(
+                f'skipping doi "{uri.raw}" - no credentials available.'
+            )
+            return
+
         api_url = (
-            'http://doi.crossref.org/servlet/getForwardLinks?'
+            'https://doi.crossref.org/servlet/getForwardLinks?'
             'usr={user}&pwd={password}&doi={doi}'
             '&startDate=1900-01-01&endDate={end_date}'
         ).format(
-            user=current_app.CROSSREF_TEST_USER,
-            password=current_app.CROSSREF_TEST_PASSWORD,
+            user=user,
+            password=password,
             doi=uri.raw,
-            end_date='{}-12-31'.format(datetime.datetime.now().year)
-        )
+            end_date=datetime.datetime.today().strftime('%Y-%m-%d')
+        )  # may be worth last scrape for this uri to assign a start_date.
 
-        if test_data:
-            request_content = open(test_data, 'r').read()
-        else:
-            request_content = requests.get(api_url).text
+        request_content = requests.get(api_url).text
 
         xml_data = BeautifulSoup(request_content, 'xml')
         xml_journal_citations = xml_data.find_all('journal_cite')
+        xml_book_citations = xml_data.find_all('book_cite')
 
-        if xml_journal_citations:
-            for item in xml_journal_citations:
-                content = {
-                    'journal_title': item.find('journal_title').text,
-                    'article_title': item.find('article_title').text
-                    if item.find('article_title') else '[Title not found]',
-                    'volume': item.find('volume').text
-                    if item.find('volume') else None,
-                    'issue': item.find('issue').text
-                    if item.find('issue') else None,
-                    'year': item.find('year').text
-                    if item.find('year') else None
-                }
+        citations = {}
+        for item in chain.from_iterable([
+                xml_journal_citations,
+                xml_book_citations
+        ]):
+            subj = item.find('doi').text
+            if Event.query.filter_by(uri_id=uri.id, subject_id=subj).first():
+                continue
 
-                return [{
-                    'external_id': str(uuid.uuid4()), # No external ID supplied.
-                    'source_id': item.find('doi').text,
-                    'source': 'crossref_cited_by',
-                    'created_at': datetime.datetime.now(),
-                    'content': content,
-                    'doi': uri
-                }]
+            year = int(item.find('year').text)
+            event = Event(
+                uri_id=uri.id,
+                subject_id=subj,
+                origin=origin,
+                created_at=datetime.date(year, 1, 1)
+            )
 
-        return []
+            citations[event] = [
+                RawEvent(
+                    event=event,
+                    scrape_id=scrape.id,
+                    external_id=None,
+                    origin=origin,
+                    provider=self.provider,
+                    created_at=datetime.date(year, 1, 1)
+                )
+            ]
+
+        return citations

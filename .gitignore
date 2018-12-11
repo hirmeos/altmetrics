@@ -8,3 +8,6 @@ src/static
 
 # docs
 docs/build
+
+# instance-specific files
+src/xref.csv

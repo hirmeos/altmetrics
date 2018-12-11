@@ -18,7 +18,7 @@ class Origins(IntEnum):
     wikipedia = 3
     hypothesis = 4
     facebook = 5
-    wordpress = 6
+    wordpressdotcom = 6
 
 
 class StaticProviders(IntEnum):
@@ -81,7 +81,6 @@ class Config(object):
         ignore=[
             'generic',
             '__pycache__',
-            "crossref_cited_by",
             "facebook",
             "twitter",
         ]
@@ -90,6 +89,10 @@ class Config(object):
     # ## BEHAVIOUR #
 
     DAYS_BEFORE_REFRESH = 7
+
+    # ## Temporary solution to cref cited-by credentials
+
+    CITED_BY_FILE = os.getenv('CITED_BY_FILE', 'xref.csv')
 
 
 class DevConfig(Config):

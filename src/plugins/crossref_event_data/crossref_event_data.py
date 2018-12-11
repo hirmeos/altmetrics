@@ -1,6 +1,6 @@
 from generic.mount_point import GenericDataProvider
 
-from models import Event, Error
+from models import Event, Error, RawEvent
 
 from .client import CrossRefEventDataClient
 from processor.schemas import EventSchema
@@ -19,7 +19,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
         Origins.twitter,
         Origins.wikipedia,
         Origins.hypothesis,
-        Origins.wordpress,
+        Origins.wordpressdotcom,
     ]
 
     def _add_validator_context(self, **kwargs):
@@ -36,16 +36,54 @@ class CrossrefEventDataProvider(GenericDataProvider):
         """
         return (self.validator.dump(event) for event in events)
 
-    def _build(self, event_data):
+    def _build(self, event_data, uri_id, origin):
         """ Build a target Event object using the defined schema.
 
         Args:
             event_data (iter): list of Event dicts as coming from the client.
+            uri_id (int): id or uri being queried
+            origin (Enum): Service which originated the event we are fetching.
 
         Returns:
             iter: iter of HIRMEOS metrics' ORM Events.
         """
-        return (Event(**data) for data, errors in event_data if not errors)
+
+        data = (data for data, errors in event_data if not errors)
+        events_dict = {}
+        for entry in data:
+            events_dict.setdefault(entry['subject_id'], []).append(entry)
+
+        events = {}
+        for subj, event_list in events_dict.items():
+            event = Event.query.filter_by(  # like get_or_create()
+                uri_id=uri_id,
+                subject_id=subj
+            ).first()
+
+            if not event:
+                min_date = min((
+                    entry['created_at'] for entry in event_list
+                ))
+                event = Event(
+                    uri_id=uri_id,
+                    subject_id=subj,
+                    origin=origin,
+                    created_at=min_date
+                )
+
+            events[event] = (
+                RawEvent(
+                    event=event,
+                    scrape_id=entry['scrape_id'],
+                    external_id=entry['external_id'],
+                    origin=entry['origin'],
+                    provider=entry['provider'],
+                    created_at=entry['created_at']
+                ) for entry in event_list
+            )
+
+        return events
+        # return (Event(**data) for data, errors in event_data if not errors)
 
     def process(self, uri, origin, scrape, last_check):
         """ Implement processing of an URI to get events.
@@ -68,9 +106,11 @@ class CrossrefEventDataProvider(GenericDataProvider):
         )
 
         parameters = {'obj-id': uri.raw, 'source': origin.name}
-        if uri.last_checked:
-            parameters.update()
-
+        if last_check:
+            print('last checked:', last_check)
+            parameters.update(
+                {'from-collected-date': last_check.date().isoformat()}
+            )
         events, errors = self.client.get_events(**parameters)
 
         if errors:
@@ -86,6 +126,6 @@ class CrossrefEventDataProvider(GenericDataProvider):
             ]
 
         valid = self._validate(events)
-        events = self._build(valid)
-
+        events = self._build(event_data=valid, uri_id=uri.id, origin=origin)
+        print(len(events))
         return events

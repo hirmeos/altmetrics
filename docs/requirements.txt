@@ -11,6 +11,7 @@ Fabric3==1.13.1.post1
 idna==2.5
 imagesize==0.7.1
 Jinja2==2.9.6
+lxml==4.2.5
 MarkupSafe==1.0
 paramiko==2.2.1
 pyasn1==0.2.3

@@ -1,8 +1,26 @@
-from enum import IntEnum
+from csv import DictReader
+from flask import current_app
+import logging
 
 
-# TODO: NOT USED SO PROB GET RID OF IT.
-# Create Enums from ORIGINS/PLUGINS
-def create_enum(name, items_iterable):
-    items = " ".join([item for item in items_iterable])
-    return IntEnum(name, items, module=__name__)
+logger = logging.getLogger(__name__)
+
+
+def get_doi_prefix(doi):
+    return doi[:doi.index('/')]
+
+
+def get_credentials(doi):
+
+    xref_file = current_app.config.get('CITED_BY_FILE')
+    try:
+        doi_prefix = get_doi_prefix(doi)
+    except ValueError as e:
+        logger.error(f'Invalid DOI: "{doi}"')
+        raise e
+
+    with open(xref_file, 'r') as f:
+        reader = DictReader(f)
+        for entry in reader:
+            if entry['doi_prefix'] == doi_prefix:
+                return entry['user'], entry['password']

@@ -3,7 +3,8 @@ from datetime import datetime
 import re
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.postgresql import HSTORE, UUID
+from sqlalchemy.dialects.postgresql import HSTORE, UUID, ENUM
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import validates
 from validators import url as url_validator
 
@@ -16,7 +17,6 @@ db = SQLAlchemy(app)
 # alias common db types
 Column = db.Column
 DateTime = db.DateTime
-Enum = db.Enum
 ForeignKey = db.ForeignKey
 Integer = db.Integer
 Model = db.Model
@@ -96,9 +96,8 @@ class Scrape(Model):
     end_date = Column(DateTime, nullable=True)
 
     # Child Relationships
-    deleted_events = relationship('DeletedEvent', backref='scrape')
     errors = relationship('Error', backref='scrape')
-    events = relationship('Event', backref='scrape')
+    raw_events = relationship('RawEvent', backref='scrape')
 
     def __str__(self):
         return f'<Scrape on: {self.start_date}>'
@@ -123,8 +122,8 @@ class Error(Model):
     uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
     scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
 
-    origin = Enum(Origins, nullable=False)
-    provider = Enum(StaticProviders, nullable=False)
+    origin = Column(ENUM(Origins), nullable=False)
+    provider = Column(ENUM(StaticProviders), nullable=False)
     description = Column(String(100))
     last_successful_scrape_at = Column(DateTime, nullable=False)
 
@@ -133,7 +132,43 @@ class Error(Model):
 
 
 class Event(Model):
-    """ Hold data related to the events.
+    """ Hold data related to the events with unique subject ids.
+
+    Columns:
+    --------
+    origin:
+        The service where the event originated (e.g. Twitter).
+    subject_id:
+        identifier of the event, e.g. url of a tweet, doi of citing article.
+    created_at:
+        When this event first occurred on the origin service (specified by
+        the provider).
+    """
+
+    __tablename__ = 'event'
+
+    id = Column(Integer, primary_key=True)
+    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+
+    subject_id = Column(String, nullable=False)
+    origin = Column(ENUM(Origins), nullable=False)
+    created_at = Column(DateTime, nullable=False)
+
+    raw_events = relationship('RawEvent', backref='event')
+
+    __table_args__ = (
+        UniqueConstraint('uri_id', 'subject_id'),
+    )
+
+    def __str__(self):
+        return f'<Event: {self.id} - {self.uri}>'
+
+
+class RawEvent(Model):  # May want to rename this (and the Event table)
+    """ Hold raw event data. This may be duplicated for what we would consider
+    to be a single 'event'. For example, if a Wikipedia page is updated it
+    creates an event on Crossref Event Data, but this should not add to the
+    metrics count.
 
     Columns:
     --------
@@ -143,26 +178,27 @@ class Event(Model):
     origin:
         The service where the event originated (e.g. Twitter).
     external_id:
-        id of the event as specified by the provider.
+        id of the event as specified by the provider (e.g. UUID of Crossref
+        Event data event)
     created_at:
-        When this event occured on the origin service (specified by the
+        When this event occurred on the origin service (specified by the
         provider).
     """
 
-    __tablename__ = 'event'
+    __tablename__ = 'raw_event'
 
     id = Column(Integer, primary_key=True)
 
-    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+    event_id = Column(Integer, ForeignKey('event.id'), nullable=False)
     scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
 
-    external_id = Column(UUID, unique=True, nullable=False)
-    origin = Enum(Origins, nullable=False)
-    provider = Enum(StaticProviders, nullable=False)
+    external_id = Column(String, unique=True, nullable=True)
+    origin = Column(ENUM(Origins), nullable=False)
+    provider = Column(ENUM(StaticProviders), nullable=False)
     created_at = Column(DateTime, nullable=False)
 
     def __str__(self):
-        return f'<Event: {self.id} - {self.uri}>'
+        return f'<Raw Event: {self.id} - {self.uri}>'
 
 
 class DeletedEvent(Model):
@@ -175,13 +211,15 @@ class DeletedEvent(Model):
     id = Column(Integer, primary_key=True)
 
     uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
-    scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
 
-    external_id = Column(UUID, unique=True, nullable=False)
-    origin = Enum(Origins)
-    provider = Enum(StaticProviders)
-    created_at = Column(DateTime)
+    subject_id = Column(String, nullable=False)
+    origin = Column(ENUM(Origins), nullable=False)
+    created_at = Column(DateTime, nullable=False)
     deleted_at = Column(DateTime)
+
+    __table_args__ = (
+        UniqueConstraint('uri_id', 'subject_id'),
+    )
 
     def __str__(self):
         return f'<Deleted Event: {self.id} - {self.uri}>'

@@ -9,6 +9,7 @@ class EventSchema(Schema):
 
     uri_id = fields.Method('get_uri', attribute="uri")
     external_id = fields.UUID(attribute="id")
+    subject_id = fields.Method('get_subject_id')
     origin = fields.Method('get_origin')
     provider = fields.Method('get_provider')
     created_at = fields.Method('get_created')
@@ -25,6 +26,13 @@ class EventSchema(Schema):
 
     def get_uri(self, obj):
         return self.context['uri_id']
+
+    @staticmethod
+    def get_subject_id(obj):
+        if 'oldid=' in obj.get('subj').get('pid'):
+            return obj.get('subj').get('url')
+        return obj.get('subj').get('pid')
+
 
     @staticmethod
     def get_created(obj):

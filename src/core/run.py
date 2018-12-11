@@ -1,8 +1,10 @@
-if __name__ == "__main__":
-    from app import app as application
-    from api.views import bp as api_blueprint
+from app import app
+from api.views import bp as api_blueprint
 
-    application.register_blueprint(api_blueprint)
+app.register_blueprint(api_blueprint)
+application = app
+
+if __name__ == "__main__":
     application.run()
 
 # from __future__ import absolute_import, unicode_literals

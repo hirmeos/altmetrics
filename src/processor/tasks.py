@@ -7,7 +7,8 @@ from flask import current_app
 
 # from core.celery import celery_app
 
-from models import db, Event, Scrape, Uri
+from models import db, Scrape, Uri, Event
+from core.settings import Origins, StaticProviders
 
 from .utils import event_generator
 
@@ -36,17 +37,27 @@ def pull_metrics():
 
     for uri in uri_unprocessed_or_refreshable:
 
+        print('processing', uri.raw)
         last_check = uri.last_checked
         uri.last_checked = datetime.utcnow()
         events = event_generator(uri=uri, scrape=scrape, last_check=last_check)
 
-        flatten = chain.from_iterable(events)
+        flatten, flatten_raw = [], []
+        for event_dict in events:
+            flatten.extend(event_dict.keys())
+            flatten_raw.extend(
+                chain.from_iterable(event_dict.values())
+            )
 
-        try:
-            db.session.bulk_save_objects(flatten)
-            print('bulk save success')
-        except Exception as e:
-            logger.exception(e)
+        for entry in flatten:
+            db.session.add(entry)
+        db.session.commit()
+        print('bulk Event save success')
+
+        for raw_event in flatten_raw:
+            db.session.add(raw_event)
+        db.session.commit()
+        print('bulk RawEvent save success')
 
     scrape.end_date = datetime.utcnow()
     db.session.commit()

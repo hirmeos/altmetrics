@@ -13,7 +13,6 @@ RUN apk add --no-cache \
     supervisor
 
 RUN pip install --upgrade pip
-RUN pip install gunicorn gevent
 
 ADD requirements.txt .
 RUN pip install -r requirements.txt && rm requirements.txt
@@ -29,7 +28,7 @@ RUN apk del \
     openssh-client && \
     rm -rf /var/cache/apk/*
 
-COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
+COPY supervisord.conf /etc/supervisor/supervisord.conf
 
 EXPOSE 80
 ENTRYPOINT  ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
