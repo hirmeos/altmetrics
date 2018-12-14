@@ -1,12 +1,11 @@
-from generic.mount_point import GenericDataProvider
-
-from models import Event, Error, RawEvent
-
-from .client import CrossRefEventDataClient
-from processor.schemas import EventSchema
-
+from datetime import date
 
 from core.settings import StaticProviders, Origins
+from generic.mount_point import GenericDataProvider
+from models import Event, Error, RawEvent
+from processor.schemas import EventSchema
+
+from .client import CrossRefEventDataClient
 
 
 class CrossrefEventDataProvider(GenericDataProvider):
@@ -114,16 +113,16 @@ class CrossrefEventDataProvider(GenericDataProvider):
         events, errors = self.client.get_events(**parameters)
 
         if errors:
-            return [
+            return {
                 Error(
                     uri_id=uri.id,
                     scrape_id=scrape.id,
                     origin=origin,
                     provider=self.provider,
-                    description=errors,
-                    last_successful_scrape_at=last_check
-                )
-            ]
+                    description=errors['message'][0]['message'][:100],
+                    last_successful_scrape_at=last_check or date(1900, 1, 1)
+                ): []
+            }
 
         valid = self._validate(events)
         events = self._build(event_data=valid, uri_id=uri.id, origin=origin)
