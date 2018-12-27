@@ -5,8 +5,6 @@ Common settings for the HIRMEOS Metrics project.
 from enum import IntEnum
 import os
 
-import raven
-
 from generic import utils
 
 
@@ -104,21 +102,3 @@ class LiveConfig(Config):
 
     DEBUG = False
     FLASK_ENV = "production"
-
-    # TODO: Sentry config
-    # SENTRY_RELEASE = (
-    #     '{main}-{sha}'.format(
-    #         main=Config.METRICS_VERSION,
-    #         sha=raven.fetch_git_sha(
-    #             os.path.join(
-    #                 '/',
-    #                 *os.path.dirname(os.path.realpath(__file__)).split('/')[:-2]
-    #             )
-    #         )
-    #     )
-    # )
-    #
-    # RAVEN_CONFIG = {
-    #     'dsn': os.getenv('SENTRY_DSN'),
-    #     'release': SENTRY_RELEASE
-    # }
