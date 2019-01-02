@@ -7,6 +7,7 @@ RUN apk update && apk -U upgrade
 RUN apk add --no-cache \
     openssh-client \
     git \
+    libffi-dev \
     postgresql-dev \
     build-base \
     nginx \
