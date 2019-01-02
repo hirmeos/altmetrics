@@ -11,7 +11,7 @@ from .serializers import (
     UriSerializer,
 )
 
-from models import db
+from core import db
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -53,12 +53,11 @@ class UriViewSet(MethodView):
 
     # permission_classes = (IsAuthenticated,)  # TODO
 
-    queryset = Uri.query.all()
     serializer_class = UriSerializer
 
     def get(self):
         schema = self.serializer_class(many=True, only=('raw', 'last_checked'))
-        uri_data, errors = schema.dump(self.queryset)
+        uri_data, errors = schema.dump(Uri.query.all())
         return json.dumps(uri_data)
 
     def post(self):

@@ -2,17 +2,13 @@ from datetime import datetime
 
 import re
 
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import HSTORE, UUID, ENUM
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import validates
 from validators import url as url_validator
 
-from app import app
+from core import db
 from core.settings import StaticProviders, Origins
-
-
-db = SQLAlchemy(app)
 
 # alias common db types
 Column = db.Column
@@ -52,7 +48,7 @@ class Uri(Model):
     # TODO: Add validator DOIs.
     @validates('raw')
     def valid_uri(self, key, uri):
-        pattern = re.compile('10.\d{4,9}/[-._;()/:A-Z0-9]+', re.I)
+        pattern = re.compile('10\.\d{4,9}/[-._;()/:A-Z0-9]+', re.I)
         assert pattern.match(uri)
         return uri
         # FIXME: this only validates DOIs.

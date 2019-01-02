@@ -3,7 +3,7 @@ Common settings for the HIRMEOS Metrics project.
 """
 
 from enum import IntEnum
-import os
+from os import getenv, pardir, path
 
 from generic import utils
 
@@ -31,16 +31,16 @@ class StaticProviders(IntEnum):
 
 class Config(object):
 
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'secret-key')
+    SECRET_KEY = getenv('SECRET_KEY', 'secret-key')
 
-    APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
+    APP_DIR = path.dirname(path.dirname(path.abspath(__file__)))
+    PROJECT_ROOT = path.abspath(path.join(APP_DIR, pardir))
 
     # ## CELERY
 
-    RMQ_USER = os.getenv('RMQ_USER')
-    RMQ_PASSWORD = os.getenv('RMQ_PASSWORD')
-    RMQ_URI = os.getenv('RMQ_URI')
+    RMQ_USER = getenv('RMQ_USER')
+    RMQ_PASSWORD = getenv('RMQ_PASSWORD')
+    RMQ_URI = getenv('RMQ_URI')
 
     CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
         user=RMQ_USER,
@@ -49,10 +49,10 @@ class Config(object):
     )
 
     # ## DATABASES ##
-    DB_USER = os.getenv('DB_USER')
-    DB_PASSWORD = os.getenv('DB_PASSWORD')
-    DB_HOST = os.getenv('DB_HOST')
-    DB_NAME = os.getenv('DB_NAME')
+    DB_USER = getenv('DB_USER')
+    DB_PASSWORD = getenv('DB_PASSWORD')
+    DB_HOST = getenv('DB_HOST')
+    DB_NAME = getenv('DB_NAME')
     PORT = '5432'
 
     SQLALCHEMY_DATABASE_URI = (
@@ -83,14 +83,18 @@ class Config(object):
             "twitter",
         ]
     )
-    TECH_EMAIL = os.getenv('TECH_EMAIL', 'example@example.org')
+    TECH_EMAIL = getenv('TECH_EMAIL', 'example@example.org')
     # ## BEHAVIOUR #
 
     DAYS_BEFORE_REFRESH = 7
 
     # ## Temporary solution to cref cited-by credentials
 
-    CITED_BY_FILE = os.getenv('CITED_BY_FILE', 'xref.csv')
+    CITED_BY_FILE = getenv('CITED_BY_FILE', 'xref.csv')
+
+    # ## SENTRY ##
+
+    SENTRY_DSN = getenv('SENTRY_DSN', None)
 
 
 class DevConfig(Config):
