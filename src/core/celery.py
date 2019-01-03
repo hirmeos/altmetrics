@@ -1,29 +1,31 @@
-import os
-
 from celery import Celery
-from celery.schedules import crontab
+from core import create_app
 
-from flask import current_app as app
+from .celery_config import configure_celery
 
-# TODO: Find a suitable way to do this
-os.environ.setdefault('FLASK_SETTINGS_MODULE', 'core.settings')
 
-celery_app = Celery(
-    app.import_name,
-    backend=app.config['CELERY_RESULT_BACKEND'],
-    broker=app.config['CELERY_BROKER_URL']
-)
+def make_celery(app):
+    celery_app = Celery(
+        app.import_name,
+        backend=app.config['RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery_app.conf.update(app.config)
 
-celery_app.conf.beat_schedule = {
-    'pull-metrics': {
-        'task': 'pull-metrics',
-        'schedule': crontab(minute=0, hour=12, day_of_week='monday')
-    }
-}
+    TaskBase = celery_app.Task
 
-celery_app.conf.task_routes = {
-    'register-doi': {'queue': 'metrics-register-dois'},
-    'pull-metrics': {'queue': 'metrics-gather'},
-}
+    class ContextTask(TaskBase):
+        abstract = True
 
-celery_app.autodiscover_tasks(['importer', 'processor'])
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+
+    celery_app.Task = ContextTask
+
+    return celery_app
+
+
+app = create_app()
+celery = make_celery(app)
+configure_celery(celery)

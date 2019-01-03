@@ -7,8 +7,11 @@ from os import getenv, pardir, path
 
 from generic import utils
 
+import re
+re._pattern_type = re.Pattern  # Py3.7 workaround for re module used by celery
 
 # ## Enums used to keep track of origins and providers ##
+
 
 class Origins(IntEnum):
     twitter = 1
@@ -39,7 +42,7 @@ class Config(object):
     # ## CELERY
 
     RMQ_USER = getenv('RMQ_USER')
-    RMQ_PASSWORD = getenv('RMQ_PASSWORD')
+    RMQ_PASSWORD = getenv('RMQ_PW')
     RMQ_URI = getenv('RMQ_URI')
 
     CELERY_BROKER_URL = 'amqp://{user}:{password}@{uri}'.format(
@@ -47,6 +50,7 @@ class Config(object):
         password=RMQ_PASSWORD,
         uri=RMQ_URI,
     )
+    RESULT_BACKEND = "amqp"
 
     # ## DATABASES ##
     DB_USER = getenv('DB_USER')
@@ -103,6 +107,5 @@ class DevConfig(Config):
 
 
 class LiveConfig(Config):
-
     DEBUG = False
     FLASK_ENV = "production"

@@ -5,17 +5,16 @@ from arrow import utcnow
 from celery.utils.log import get_task_logger
 from flask import current_app
 
-# from core.celery import celery_app
+from core.celery import celery as celery_app
 
-from models import db, Scrape, Uri, Event
-from core.settings import Origins, StaticProviders
+from models import db, Scrape, Uri
 
 from .utils import event_generator
 
 logger = get_task_logger(__name__)
 
 
-# @celery_app.task(name='pull-metrics')
+@celery_app.task(name='pull-metrics')
 def pull_metrics():
     """ Call a scrape for each enabled data source plugin. """
 

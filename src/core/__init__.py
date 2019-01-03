@@ -10,6 +10,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from .admin import init_admin
 
+
 db = SQLAlchemy()
 
 CONFIG = os.getenv('CONFIG', 'DevConfig')
