@@ -1,16 +1,13 @@
+from bs4 import BeautifulSoup
 import datetime
 from itertools import chain
 import logging
-import uuid
-
-from models import Event, Error, RawEvent
-
-from bs4 import BeautifulSoup
 import requests
 
-from generic.mount_point import GenericDataProvider
 from core.logic import get_credentials
 from core.settings import Origins, StaticProviders
+from generic.mount_point import GenericDataProvider
+from models import Event, Error, RawEvent
 
 
 logger = logging.getLogger(__name__)

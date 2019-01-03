@@ -4,14 +4,14 @@ Common settings for the HIRMEOS Metrics project.
 
 from enum import IntEnum
 from os import getenv, pardir, path
+import re
 
 from generic import utils
 
-import re
 re._pattern_type = re.Pattern  # Py3.7 workaround for re module used by celery
 
-# ## Enums used to keep track of origins and providers ##
 
+# ## Enums used to keep track of origins and providers ##
 
 class Origins(IntEnum):
     twitter = 1

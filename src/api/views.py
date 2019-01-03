@@ -3,6 +3,7 @@ import json
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 
+from core import db
 from models import (
     Uri,
 )
@@ -10,8 +11,6 @@ from models import (
 from .serializers import (
     UriSerializer,
 )
-
-from core import db
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 

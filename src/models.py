@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import re
 
 from sqlalchemy.dialects.postgresql import HSTORE, UUID, ENUM

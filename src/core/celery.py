@@ -1,4 +1,5 @@
 from celery import Celery
+
 from core import create_app
 
 from .celery_config import configure_celery
