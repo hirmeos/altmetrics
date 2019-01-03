@@ -1,7 +1,7 @@
 from datetime import datetime
 import re
 
-from sqlalchemy.dialects.postgresql import HSTORE, UUID, ENUM
+from sqlalchemy.dialects.postgresql import HSTORE, ENUM
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import validates
 from validators import url as url_validator
