@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, ValidationError, pre_load
+from core.settings import Origins
 
 
 class UriSerializer(Schema):
@@ -25,8 +26,8 @@ class EventSerializer(Schema):
 
     id = fields.Integer(dump_only=True)
     uri = fields.Nested(UriSerializer)
-    external_id = fields.UUID()
-    origin = fields.Integer(validate=name_of_validator)  # TODO: Add validator
+    subject_id = fields.String()
+    origin = fields.String()  # TODO: Add validator
     created_at = fields.DateTime()
     scrape = fields.Nested(ScrapeSerializer)
 

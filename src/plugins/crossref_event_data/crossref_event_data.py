@@ -70,7 +70,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
                     created_at=min_date
                 )
 
-            events[event] = (
+            events[event] = [
                 RawEvent(
                     event=event,
                     scrape_id=entry['scrape_id'],
@@ -79,7 +79,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
                     provider=entry['provider'],
                     created_at=entry['created_at']
                 ) for entry in event_list
-            )
+            ]
 
         return events
         # return (Event(**data) for data, errors in event_data if not errors)
@@ -106,7 +106,6 @@ class CrossrefEventDataProvider(GenericDataProvider):
 
         parameters = {'obj-id': uri.raw, 'source': origin.name}
         if last_check:
-            print('last checked:', last_check)
             parameters.update(
                 {'from-collected-date': last_check.date().isoformat()}
             )

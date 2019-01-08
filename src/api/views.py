@@ -6,9 +6,12 @@ from flask.views import MethodView
 from core import db
 from models import (
     Uri,
+    Event,
 )
 
+from .logic import get_origin_from_name
 from .serializers import (
+    EventSerializer,
     UriSerializer,
 )
 
@@ -74,6 +77,33 @@ class UriViewSet(MethodView):
 
 
 bp.add_url_rule('/uriset', view_func=UriViewSet.as_view('uri-set'))
+
+
+class EventViewSet(MethodView):
+    """ API endpoint to display Events. """
+
+    # permission_classes = (IsAuthenticated,)  # TODO
+
+    serializer_class = EventSerializer
+
+    def get(self):
+        origin = get_origin_from_name(request.args.get('origin').lower())
+        schema = self.serializer_class(
+            many=True,
+            only=('subject_id', 'origin', 'created_at', 'uri')
+        )
+        event_query = Event.query.filter(
+            Event.origin == origin,
+        )
+        uri = Uri.query.filter(Uri.raw == request.args.get('uri')).first()
+        if uri:
+            event_query = event_query.filter(Event.uri == uri)
+        event_data, errors = schema.dump(event_query)
+
+        return event_data
+
+
+bp.add_url_rule('/eventset/', view_func=EventViewSet.as_view('event-set'))
 
 
 # TODO: Update this

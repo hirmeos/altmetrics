@@ -49,13 +49,9 @@ def pull_metrics():
 
         for entry in flatten:
             db.session.add(entry)
-        db.session.commit()
-        print('bulk Event save success')
 
         for raw_event in flatten_raw:
             db.session.add(raw_event)
-        db.session.commit()
-        print('bulk RawEvent save success')
 
     scrape.end_date = datetime.utcnow()
     db.session.commit()

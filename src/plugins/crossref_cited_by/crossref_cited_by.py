@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class CrossrefCitedByDataProvider(GenericDataProvider):
     """ Implements Crossref Cited-by API integration. """
 
-    provider = StaticProviders.crossref_event_data
+    provider = StaticProviders.crossref_cited_by
     supported_origins = [Origins.citation]
 
     def process(self, uri, origin, scrape, last_check, test_data=None):

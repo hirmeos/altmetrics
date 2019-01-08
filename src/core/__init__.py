@@ -4,6 +4,8 @@ import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 from flask import Flask
+from flask_api import FlaskAPI
+
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -16,7 +18,8 @@ CONFIG = os.getenv('CONFIG', 'DevConfig')
 
 
 def create_app():
-    app = Flask(__name__)
+    # app = Flask(__name__)
+    app = FlaskAPI(__name__)
     app.config.from_object(f'core.settings.{CONFIG}')
 
     if app.config.get('SENTRY_DNS'):

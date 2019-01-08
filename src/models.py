@@ -194,6 +194,7 @@ class RawEvent(Model):  # May want to rename this (and the Event table)
 
     def __str__(self):
         return f'<Raw Event: {self.id} - {self.uri}>'
+        # TODO: Add raw_events to URI table
 
 
 class DeletedEvent(Model):

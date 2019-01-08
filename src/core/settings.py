@@ -30,6 +30,7 @@ class StaticProviders(IntEnum):
     crossref_event_data = 2
     facebook = 3
     twitter = 4
+    hypothesis = 5
 
 
 class Config(object):
@@ -87,6 +88,8 @@ class Config(object):
             '__pycache__',
             "facebook",
             "twitter",
+            "crossref_cited_by",
+            "crossref_event_data",
         ]
     )
     TECH_EMAIL = getenv('TECH_EMAIL', 'example@example.org')
