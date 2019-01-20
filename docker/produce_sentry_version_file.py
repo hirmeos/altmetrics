@@ -7,7 +7,7 @@ import os
 import raven
 
 
-BUILDBOT_PROJECT_FOLDER = '/buildbot/metrics/build'
+BUILDBOT_PROJECT_FOLDER = '/buildbot/hirmeos-metrics/build'
 
 config = ConfigParser()
 config.read('{base}/.bumpversion.cfg'.format(base=BUILDBOT_PROJECT_FOLDER))

@@ -15,7 +15,7 @@ RUN apk add --no-cache \
 
 RUN pip install --upgrade pip
 
-ADD requirements.txt .
+ADD ./requirements.txt .
 RUN pip install -r requirements.txt && rm requirements.txt
 
 RUN mkdir /app
@@ -29,7 +29,7 @@ RUN apk del \
     openssh-client && \
     rm -rf /var/cache/apk/*
 
-COPY supervisord.conf /etc/supervisor/supervisord.conf
+COPY ./docker/supervisord.conf /etc/supervisor/supervisord.conf
 
 EXPOSE 80
 ENTRYPOINT  ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
