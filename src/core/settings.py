@@ -77,7 +77,7 @@ class Config(object):
 
     # TODO: set up logging
 
-    METRICS_VERSION = "0.0.1"
+    METRICS_VERSION = "0.0.2"
 
     # # ## PLUGINS ##
     #
