@@ -40,7 +40,12 @@ class Config(object):
     APP_DIR = path.dirname(path.dirname(path.abspath(__file__)))
     PROJECT_ROOT = path.abspath(path.join(APP_DIR, pardir))
 
-    # ## CELERY
+    # ## Security ##
+
+    SECURITY_PASSWORD_SALT = getenv('SECURITY_PASSWORD_SALT')
+    SECURITY_REGISTERABLE = getenv('SECURITY_REGISTERABLE', True)
+
+    # ## CELERY ##
 
     RMQ_USER = getenv('RMQ_USER')
     RMQ_PASSWORD = getenv('RMQ_PW')
