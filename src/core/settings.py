@@ -94,7 +94,6 @@ class Config(object):
             "facebook",
             "twitter",
             "crossref_cited_by",
-            "crossref_event_data",
         ]
     )
     TECH_EMAIL = getenv('TECH_EMAIL', 'example@example.org')
