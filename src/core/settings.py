@@ -48,7 +48,7 @@ class Config(object):
     # ## CELERY ##
 
     RMQ_USER = getenv('RMQ_USER')
-    RMQ_PASSWORD = getenv('RMQ_PW')
+    RMQ_PASSWORD = getenv('RMQ_PASSWORD')
     RMQ_HOST = getenv('RMQ_HOST')
     RMQ_VHOST = getenv('RMQ_VHOST')
 
