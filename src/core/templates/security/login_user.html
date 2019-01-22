@@ -1,0 +1,33 @@
+{% extends 'forms_base.html' %}
+{% from 'security/_macros.html' import render_field, render_field_with_errors %}
+
+{% block body_class %}main main-register{% endblock %}
+
+{% block page_title %}
+  User Login
+{% endblock %}
+
+{% block form_heading %}
+  <h2>
+    User Login
+  </h2>
+{% endblock %}
+
+{% block instructions %}
+  <strong>
+    Please log in to view page content or
+    <a href="{{ url_for_security('register') }}">register</a> to crete an account.
+  </strong>
+{% endblock %}
+
+{% block form_body %}
+  <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+    {{ login_user_form.hidden_tag() }}
+
+    {{ render_field_with_errors(login_user_form.email) }}
+    {{ render_field_with_errors(login_user_form.password) }}
+    {{ render_field_with_errors(login_user_form.remember) }}
+    <input class="form-control btn btn-primary push-down-10" type="submit" value="Submit">
+  </form>
+{% endblock %}
+
