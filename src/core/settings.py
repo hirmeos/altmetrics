@@ -97,6 +97,15 @@ class Config(object):
         ]
     )
     TECH_EMAIL = getenv('TECH_EMAIL', 'example@example.org')
+
+    # ## Mail settings #
+
+    MAIL_SERVER = getenv('MAIL_SERVER', 'localhost')
+    MAIL_PORT = getenv('MAIL_PORT', '587')
+    MAIL_USERNAME = getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = getenv('MAIL_DEFAULT_SENDER')
+
     # ## BEHAVIOUR #
 
     DAYS_BEFORE_REFRESH = 7

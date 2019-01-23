@@ -5,6 +5,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from flask import Flask
 from flask_api import FlaskAPI
+from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -30,8 +31,12 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
+    # Set up mail
+    mail = Mail()
+    mail.init_app(app)
+
     from .security import init_security
-    security = init_security(app)
+    init_security(app)
 
     from api.views import bp as api_blueprint
     from processor.views import bp as processor_blueprint
