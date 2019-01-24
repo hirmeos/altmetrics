@@ -30,6 +30,11 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
     def log_new_events(uri, origin, provider, events):
         if events:
             logger.info(
-                f'{provider}-{origin}: Retrieved {len(events)} new events '
-                f'for URI: {uri.raw}'
+                '{plugin}-{source}: Retrieved {total} new events '
+                'for URI: {raw}'.format(
+                    raw=uri.raw,
+                    source=origin.name,
+                    plugin=provider.name,
+                    total=len(events),
+                )
             )
