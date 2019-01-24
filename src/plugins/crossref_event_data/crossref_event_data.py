@@ -131,10 +131,12 @@ class CrossrefEventDataProvider(GenericDataProvider):
             }
 
         valid = self._validate(events)
-        logger.info("Retrieved {len(events)} new events for URI: {uri.raw}")
-        return self._build(
+        event_dict, events = self._build(
             event_data=valid,
             uri_id=uri.id,
             origin=origin,
             event_dict=event_dict
         )
+
+        logger.info(f'Retrieved {len(events)} new events for URI: {uri.raw}')
+        return event_dict, events

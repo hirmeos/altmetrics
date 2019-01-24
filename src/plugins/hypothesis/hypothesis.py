@@ -74,5 +74,5 @@ class HypothesisDataProvider(GenericDataProvider):
                 )
             ]
 
-        logger.info("Retrieved {len(events)} new events for URI: {uri.raw}")
+        logger.info(f'Retrieved {len(events)} new events for URI: {uri.raw}')
         return event_dict, events
