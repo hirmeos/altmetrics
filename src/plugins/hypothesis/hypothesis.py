@@ -1,6 +1,6 @@
 import datetime
 import json
-import logging
+from logging import getLogger
 import requests
 
 from core.settings import Origins, StaticProviders
@@ -8,7 +8,7 @@ from generic.mount_point import GenericDataProvider
 from models import Event, Error, RawEvent
 
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class HypothesisDataProvider(GenericDataProvider):

@@ -8,7 +8,7 @@ from processor.schemas import EventSchema
 
 from .client import CrossRefEventDataClient
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class CrossrefEventDataProvider(GenericDataProvider):
