@@ -138,5 +138,5 @@ class CrossrefEventDataProvider(GenericDataProvider):
             event_dict=event_dict
         )
 
-        logger.info(f'Retrieved {len(events)} new events for URI: {uri.raw}')
+        self.log_new_events(uri, origin, self.provider, events)
         return event_dict, events

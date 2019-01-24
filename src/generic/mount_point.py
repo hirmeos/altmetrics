@@ -1,6 +1,11 @@
+from logging import getLogger
+
 from models import Event
 
 from . import utils
+
+
+logger = getLogger(__name__)
 
 
 class GenericDataProvider(object, metaclass=utils.MountPoint):
@@ -20,3 +25,11 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
             uri_id=uri_id,
             subject_id=subject_id
         ).first()  # like step 1 of get_or_create()
+
+    @staticmethod
+    def log_new_events(uri, origin, provider, events):
+        if events:
+            logger.info(
+                f'{provider}-{origin}: Retrieved {len(events)} new events '
+                f'for URI: {uri.raw}'
+            )
