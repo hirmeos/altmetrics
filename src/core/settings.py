@@ -106,6 +106,7 @@ class Config(object):
     MAIL_PASSWORD = getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = getenv('MAIL_DEFAULT_SENDER')
 
+    SECURITY_CONFIRMABLE = getenv('SECURITY_CONFIRMABLE', 'True') is 'True'
     # ## BEHAVIOUR #
 
     DAYS_BEFORE_REFRESH = 7

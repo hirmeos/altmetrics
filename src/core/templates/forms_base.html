@@ -23,13 +23,10 @@
       <div class="col-md-6">
         {% block form_heading %}{% endblock %}
         <hr />
+        {% include "security/_messages.html" %}
         <div class="panel panel-default">
           <div class="panel-heading">
-
-            {% block instructions %}
-              <!-- e.g. 'Please login to view page content' -->
-            {% endblock %}
-
+            {% block instructions %}{% endblock %}
           </div>
           <br />
 

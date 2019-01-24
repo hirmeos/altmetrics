@@ -3,7 +3,6 @@ import os
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
-from flask import Flask
 from flask_api import FlaskAPI
 from flask_mail import Mail
 from flask_migrate import Migrate
