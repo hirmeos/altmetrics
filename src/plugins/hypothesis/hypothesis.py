@@ -17,12 +17,16 @@ class HypothesisDataProvider(GenericDataProvider):
     provider = StaticProviders.crossref_event_data
     supported_origins = [Origins.hypothesis]
 
-    def process(self, uri, origin, scrape, last_check, test_data=None):
-        """ Pull citation data from API and create Events.
+    def process(self, uri, origin, scrape, last_check, event_dict):
+        """ Pull annotations from Hypothesis API, and create Events.
 
         Args:
-            uri (Uri): A Uri object from the ORM.
-            test_data: TODO.
+            uri (Uri): An Uri object.
+            origin (Enum): Service which originated the event we are fetching.
+            scrape (Scrape): Scrape from ORM, not saved to database (yet).
+            last_check (datetime): when this uri was last successfully scraped.
+            event_dict: dict of events not yet committed to the db in the form:
+                {subj-id: event-object}
 
         Returns:
             list: Contains results.
@@ -30,7 +34,7 @@ class HypothesisDataProvider(GenericDataProvider):
 
         api_url = 'https://hypothes.is/api/search'
         parameters = {
-            'any': uri.raw,
+            'uri': uri.raw,
             'order': 'asc',
         }
         if last_check:
@@ -41,11 +45,10 @@ class HypothesisDataProvider(GenericDataProvider):
         )
         results = request_content.get('rows')
 
-        annotations = {}
+        events = {}
         for result in results:
-
             subj = result.get('links', {}).get('html')
-            if Event.query.filter_by(uri_id=uri.id, subject_id=subj).first():
+            if self.get_event(uri.id, subj, event_dict):
                 continue
 
             created_at = datetime.datetime.fromisoformat(
@@ -58,8 +61,9 @@ class HypothesisDataProvider(GenericDataProvider):
                 origin=origin,
                 created_at=created_at
             )
+            event_dict.update(subj=event)
 
-            annotations[event] = [
+            events[event] = [
                 RawEvent(
                     event=event,
                     scrape_id=scrape.id,
@@ -70,4 +74,5 @@ class HypothesisDataProvider(GenericDataProvider):
                 )
             ]
 
-        return annotations
+        logger.info("Retrieved {len(events)} new events for URI: {uri.raw}")
+        return event_dict, events
