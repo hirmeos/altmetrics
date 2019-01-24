@@ -21,9 +21,9 @@ def create_app():
     app = FlaskAPI(__name__, template_folder='templates')
     app.config.from_object(f'core.settings.{CONFIG}')
 
-    if app.config.get('SENTRY_DNS'):
+    if app.config.get('SENTRY_DSN'):
         sentry_sdk.init(
-            dsn=app.config.get('SENTRY_DNS'),
+            dsn=app.config.get('SENTRY_DSN'),
             integrations=[FlaskIntegration()]
         )
 
