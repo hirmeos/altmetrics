@@ -1,8 +1,8 @@
-from arrow import utcnow
-from celery.utils.log import get_task_logger
 from datetime import datetime
 from itertools import chain
 
+from arrow import utcnow
+from celery.utils.log import get_task_logger
 from flask import current_app
 
 from core.celery import celery as celery_app

@@ -9,8 +9,7 @@ from validators import url as url_validator
 from core import db
 from core.settings import StaticProviders, Origins
 
-# alias common db types
-Column = db.Column
+Column = db.Column  # Alias common db types.
 DateTime = db.DateTime
 ForeignKey = db.ForeignKey
 Integer = db.Integer

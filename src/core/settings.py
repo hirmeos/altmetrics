@@ -14,6 +14,7 @@ re._pattern_type = re.Pattern  # Py3.7 workaround for re module used by celery
 # ## Enums used to keep track of origins and providers ##
 
 class Origins(IntEnum):
+
     twitter = 1
     citation = 2
     wikipedia = 3
@@ -26,6 +27,7 @@ class StaticProviders(IntEnum):
     """Used to keep track of the provider of a given event. Used by Plugins
     to provide a link to the full event record, based on the external event ID.
     """
+
     crossref_cited_by = 1
     crossref_event_data = 2
     facebook = 3
@@ -92,7 +94,7 @@ class Config(object):
             "crossref_event_data",
         ]
     )
-    TECH_EMAIL = getenv('TECH_EMAIL', 'example@example.org')
+    TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
     # ## BEHAVIOUR #
 
     DAYS_BEFORE_REFRESH = 7
@@ -107,10 +109,12 @@ class Config(object):
 
 
 class DevConfig(Config):
+
     DEBUG = True
     FLASK_ENV = "development"
 
 
 class LiveConfig(Config):
+
     DEBUG = False
     FLASK_ENV = "production"
