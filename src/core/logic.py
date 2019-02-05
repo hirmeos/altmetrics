@@ -1,6 +1,7 @@
 from csv import DictReader
-from flask import current_app
 import logging
+
+from flask import current_app
 
 
 logger = logging.getLogger(__name__)

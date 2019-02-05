@@ -1,5 +1,4 @@
-from marshmallow import Schema, fields, ValidationError, pre_load
-from core.settings import Origins
+from marshmallow import Schema, fields, ValidationError
 
 
 class UriSerializer(Schema):
@@ -16,12 +15,6 @@ class ScrapeSerializer(Schema):
     end_date = fields.DateTime()
 
 
-# Custom validator example
-def name_of_validator(data):
-    if not data:
-        raise ValidationError('Data not provided.')
-
-
 class EventSerializer(Schema):
 
     id = fields.Integer(dump_only=True)
@@ -36,3 +29,9 @@ class UrlSerializer(Schema):
 
     id = fields.Integer(dump_only=True)
     uri = scrape = fields.Nested(UriSerializer)
+
+
+def name_of_validator(data):
+    """ Custom validator example. """
+    if not data:
+        raise ValidationError('Data not provided.')

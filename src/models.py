@@ -15,8 +15,7 @@ from flask_security import RoleMixin, UserMixin
 from core import db
 from core.settings import StaticProviders, Origins
 
-# alias common db types
-Boolean = db.Boolean
+Boolean = db.Boolean  # Alias common db types.
 Column = db.Column
 DateTime = db.DateTime
 ForeignKey = db.ForeignKey

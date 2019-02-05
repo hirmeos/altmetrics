@@ -33,7 +33,6 @@ class EventSchema(Schema):
             return obj.get('subj').get('url')
         return obj.get('subj').get('pid')
 
-
     @staticmethod
     def get_created(obj):
         try:

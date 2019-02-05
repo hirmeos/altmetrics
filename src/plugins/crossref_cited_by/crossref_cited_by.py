@@ -1,8 +1,9 @@
-from bs4 import BeautifulSoup
 import datetime
 from itertools import chain
 import logging
 import requests
+
+from bs4 import BeautifulSoup
 
 from core.logic import get_credentials
 from core.settings import Origins, StaticProviders
