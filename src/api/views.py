@@ -6,6 +6,7 @@ from flask.views import MethodView
 from core import db
 from models import (
     Uri,
+    Url,
     Event,
 )
 
@@ -31,13 +32,42 @@ class UriViewSet(MethodView):
         return json.dumps(uri_data)
 
     def post(self):
+
+        """
+
+        !!! Need to authenticate user first and link their account to this
+        upload and doi.
+
+        Also, check if the doi exists and add user to this doi if that is the
+        case.
+
+        """
+
+        """New expected format of DOIs:
+            [
+                {
+                    doi: '10.123.xxxxx'
+                    url: ['www.xxx.com', www.yyy.com],
+                },
+                {
+                    doi: '10.456.aaaaa'
+                    url: ['www.aaa.com', www.bbb.com],
+                },
+                ... etc
+            ]
+        """
         json_input = request.get_json()
 
         doi_list = json_input.get("doi_list")
 
-        for raw_uri in doi_list:
+        for doi_dict in doi_list:
+            raw_uri = doi_dict['doi']
             new_uri = Uri(raw=raw_uri, last_checked=None)
             db.session.add(new_uri)
+
+            for raw_url in doi_dict.get('url', []):
+                associated_url = Url(url=raw_url, uri=new_uri)
+                db.session.add(associated_url)
 
         db.session.commit()
 
