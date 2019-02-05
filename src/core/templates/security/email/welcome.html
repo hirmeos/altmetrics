@@ -1,0 +1,13 @@
+<p>{{ _('Welcome ') }}
+  {% if user.username %}
+      {{ _('%(user)s!', user=user.username) }}
+  {% else %}
+      {{ _('%(email)s!', email=user.email) }}
+  {% endif %}
+</p>
+
+{% if security.confirmable %}
+    <p>{{ _('You can confirm your email through the link below:') }}</p>
+
+    <p><a href="{{ confirmation_link }}">{{ _('Confirm my account') }}</a></p>
+{% endif %}

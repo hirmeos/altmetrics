@@ -1,4 +1,5 @@
 from datetime import date
+from logging import getLogger
 
 from core.settings import StaticProviders, Origins
 from generic.mount_point import GenericDataProvider
@@ -6,6 +7,8 @@ from models import Event, Error, RawEvent
 from processor.schemas import EventSchema
 
 from .client import CrossRefEventDataClient
+
+logger = getLogger(__name__)
 
 
 class CrossrefEventDataProvider(GenericDataProvider):
@@ -35,29 +38,31 @@ class CrossrefEventDataProvider(GenericDataProvider):
         """
         return (self.validator.dump(event) for event in events)
 
-    def _build(self, event_data, uri_id, origin):
+    def _build(self, event_data, uri_id, origin, event_dict):
         """ Build a target Event object using the defined schema.
 
         Args:
             event_data (iter): list of Event dicts as coming from the client.
             uri_id (int): id or uri being queried
             origin (Enum): Service which originated the event we are fetching.
+            event_dict: dict of events not yet committed to the db
 
         Returns:
             iter: iter of HIRMEOS metrics' ORM Events.
         """
 
         data = (data for data, errors in event_data if not errors)
-        events_dict = {}
+        raw_events_dict = {}
         for entry in data:
-            events_dict.setdefault(entry['subject_id'], []).append(entry)
+            raw_events_dict.setdefault(entry['subject_id'], []).append(entry)
 
         events = {}
-        for subj, event_list in events_dict.items():
-            event = Event.query.filter_by(  # like get_or_create()
+        for subj, event_list in raw_events_dict.items():
+            event = self.get_event(
                 uri_id=uri_id,
-                subject_id=subj
-            ).first()
+                subject_id=subj,
+                event_dict=event_dict
+            )
 
             if not event:
                 min_date = min((
@@ -69,6 +74,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
                     origin=origin,
                     created_at=min_date
                 )
+                event_dict.update(subj=event)
 
             events[event] = [
                 RawEvent(
@@ -81,10 +87,9 @@ class CrossrefEventDataProvider(GenericDataProvider):
                 ) for entry in event_list
             ]
 
-        return events
-        # return (Event(**data) for data, errors in event_data if not errors)
+        return event_dict, events
 
-    def process(self, uri, origin, scrape, last_check):
+    def process(self, uri, origin, scrape, last_check, event_dict):
         """ Implement processing of an URI to get events.
 
         Args:
@@ -92,6 +97,8 @@ class CrossrefEventDataProvider(GenericDataProvider):
             origin (Enum): Service which originated the event we are fetching.
             scrape (Scrape): Scrape from ORM, not saved to database (yet).
             last_check (datetime): when this uri was last successfully scraped.
+            event_dict: dict of events not yet committed to the db in the form:
+                {subj-id: event-object}
 
         Returns:
             generator: Contains events found for the given URI, as dictionaries.
@@ -124,6 +131,12 @@ class CrossrefEventDataProvider(GenericDataProvider):
             }
 
         valid = self._validate(events)
-        events = self._build(event_data=valid, uri_id=uri.id, origin=origin)
-        print(len(events))
-        return events
+        event_dict, events = self._build(
+            event_data=valid,
+            uri_id=uri.id,
+            origin=origin,
+            event_dict=event_dict
+        )
+
+        self.log_new_events(uri, origin, self.provider, events)
+        return event_dict, events

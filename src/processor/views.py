@@ -1,15 +1,13 @@
-from django.views.generic import ListView
+from flask import Blueprint, render_template, redirect
+from flask_security import login_required, logout_user
 
-from .models import Uri
+
+bp = Blueprint('processor', __name__, url_prefix='/')
 
 
-class DoisView(ListView):
+# Views - mostly just testing login functionality for now
+@bp.route('/')
+@login_required
+def home():
+    return render_template('index.html')
 
-    model = Uri
-    template_name = 'dois.html'
-    context_object_name = 'dois'
-
-    def get_queryset(self):
-        return self.model.objects.filter(
-            last_upload__user=self.request.user
-        )

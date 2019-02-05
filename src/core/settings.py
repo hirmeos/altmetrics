@@ -42,10 +42,15 @@ class Config(object):
     APP_DIR = path.dirname(path.dirname(path.abspath(__file__)))
     PROJECT_ROOT = path.abspath(path.join(APP_DIR, pardir))
 
-    # ## CELERY
+    # ## Security ##
+
+    SECURITY_PASSWORD_SALT = getenv('SECURITY_PASSWORD_SALT')
+    SECURITY_REGISTERABLE = getenv('SECURITY_REGISTERABLE', True)
+
+    # ## CELERY ##
 
     RMQ_USER = getenv('RMQ_USER')
-    RMQ_PASSWORD = getenv('RMQ_PW')
+    RMQ_PASSWORD = getenv('RMQ_PASSWORD')
     RMQ_HOST = getenv('RMQ_HOST')
     RMQ_VHOST = getenv('RMQ_VHOST')
 
@@ -79,7 +84,7 @@ class Config(object):
 
     # TODO: set up logging
 
-    METRICS_VERSION = "0.0.2"
+    METRICS_VERSION = "0.0.18"
 
     # # ## PLUGINS ##
     #
@@ -91,10 +96,21 @@ class Config(object):
             "facebook",
             "twitter",
             "crossref_cited_by",
-            "crossref_event_data",
         ]
     )
+
     TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
+
+    # ## Mail settings #
+
+    MAIL_SERVER = getenv('MAIL_SERVER', 'localhost')
+    MAIL_PORT = getenv('MAIL_PORT', '587')
+    MAIL_USERNAME = getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = getenv('MAIL_DEFAULT_SENDER')
+
+    SECURITY_CONFIRMABLE = getenv('SECURITY_CONFIRMABLE', 'True') is 'True'
+
     # ## BEHAVIOUR #
 
     DAYS_BEFORE_REFRESH = 7

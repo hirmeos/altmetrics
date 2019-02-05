@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>
+      {% block title %}Altmetrics{% endblock title %}
+    </title>
+    
+    {% block head %}{% endblock head %}
+
+    <!--CSS-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href={{ url_for('static', filename='css/base.css') }}>
+    <!--JavaScript-->
+    {% block jQuery %}{% endblock %}
+
+    {% block css %}
+      <style>
+        .right-padding-10 {
+          padding-right: 10px;
+        }
+      </style>
+    {% endblock %}
+  </head>
+
+  <body>
+  
+    <!-- Static navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href=#>Altmetrics</a>
+      <button onclick="toggleTarget(this)" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"  aria-expanded="false"  aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li id="home-page" class="nav-item">
+            <a class="nav-link" href=#>Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href=/admin>Admin</a>
+          </li>
+        </ul>
+        <div id="login-details" class="right-padding-10">
+          {% if current_user.is_authenticated %}
+            <a class="btn btn-outline-dark btn-sm" href="{{ url_for('security.logout') }}">Logout</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      {% block body %}
+      {% endblock body %}
+    </div>
+      
+  </body>
+  
+  {% block js %}{% endblock %}
+
+</html>

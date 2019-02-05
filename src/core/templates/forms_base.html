@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% block page_title %}
+    <!-- Add specific page title here-->
+  {% endblock %}
+{% endblock title %}
+
+{% block css %}
+  <style>
+    .push-down-10 {
+      margin-top: 10px;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="container-fluid">
+    <br />
+    <div class="row center-block">
+      <div class="col-md-3">
+      </div>
+      <div class="col-md-6">
+        {% block form_heading %}{% endblock %}
+        <hr />
+        {% include "security/_messages.html" %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            {% block instructions %}{% endblock %}
+          </div>
+          <br />
+
+          {% block additional_form_content %}{% endblock %}
+
+          <div class="panel-body">
+            {% block form_body %}
+              <form method="POST">
+
+                {% if register_user_form.errors %}
+                  <div class="alert alert-danger">
+                    {{ register_user_form.errors }}
+                  </div>
+                {% endif %}
+
+                {{ register_user_form.as_p }}
+
+                {% block form_extentions %}{% endblock %}
+
+                <input class="form-control btn btn-primary push-down-10" type="submit" value="
+                  {% block button_name %}
+                    Submit
+                  {% endblock %}
+                ">
+              </form>
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock body %}
+
+{% block js %}
+  <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+{% endblock %}

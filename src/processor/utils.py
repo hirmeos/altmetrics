@@ -39,6 +39,14 @@ def event_generator(uri, scrape, last_check):
             generator: yields a generator of events for each plugin, which if
             turned into a list will be a list of lists of events.
     """
+    event_dict = {}     # keep track of events across plugins
     for origin, plugins in current_app.config.get("ORIGINS").items():
         for plugin in plugins:
-            yield plugin.PROVIDER.process(uri, origin, scrape, last_check)
+            event_dict, events = plugin.PROVIDER.process(
+                uri,
+                origin,
+                scrape,
+                last_check,
+                event_dict
+            )
+            yield events

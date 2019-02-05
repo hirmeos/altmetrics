@@ -1,4 +1,11 @@
+from logging import getLogger
+
+from models import Event
+
 from . import utils
+
+
+logger = getLogger(__name__)
 
 
 class GenericDataProvider(object, metaclass=utils.MountPoint):
@@ -10,3 +17,24 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
 
     def __str__(self):
         return self.__class__.__name__
+
+    @staticmethod
+    def get_event(uri_id, subject_id, event_dict):
+        """Tries to get an event to prevent duplicates from being created. """
+        return event_dict.get(subject_id) or Event.query.filter_by(
+            uri_id=uri_id,
+            subject_id=subject_id
+        ).first()  # like step 1 of get_or_create()
+
+    @staticmethod
+    def log_new_events(uri, origin, provider, events):
+        if events:
+            logger.info(
+                '{plugin}-{source}: Retrieved {total} new events '
+                'for URI: {raw}'.format(
+                    raw=uri.raw,
+                    source=origin.name,
+                    plugin=provider.name,
+                    total=len(events),
+                )
+            )
