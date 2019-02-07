@@ -8,8 +8,8 @@ This will be adapted as needed.
 from datetime import datetime, timedelta
 
 import jwt
-from jwt.exceptions import DecodeError
 from jwt import ExpiredSignatureError, InvalidTokenError
+from jwt.exceptions import DecodeError
 
 from flask import current_app, g
 
@@ -39,7 +39,7 @@ def issue_token(email, lifespan=None):
         payload,
         jwt_key,
         algorithm='HS256'
-    ).decode("utf-8")
+    ).decode('utf-8')
 
 
 def validate_token(token):
@@ -62,8 +62,8 @@ def validate_token(token):
 
 
 def validate_account(token_payload):
-    """Checks that the user specified in JWT has an account. Sets the request
-    user if True.
+    """ Set the user for the request based on the JWT. Returns a boolean
+    value indicating whether or not the user has an Altmetrics account.
 
     Args:
         token_payload (dict): payload returned after JWT has been decoded
@@ -74,6 +74,4 @@ def validate_account(token_payload):
     email = token_payload.get('email')
     g.user = User.query.filter(User.email == email).first()
 
-    if g.user:
-        return True
-    return False
+    return bool(g.user)

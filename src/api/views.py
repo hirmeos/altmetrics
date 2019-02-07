@@ -52,7 +52,7 @@ class UriViewSet(MethodView):
             many=True,
             only=('raw', 'urls', 'last_checked')
         )
-        uri_data, errors = schema.dump(
+        uri_data, _ = schema.dump(
             Uri.query.filter(Uri.users.contains(g.user))
         )
         return uri_data
@@ -79,10 +79,15 @@ class UriViewSet(MethodView):
 
         for doi_dict in doi_list:
 
-            uri = Uri.query.filter(Uri.raw == doi_dict['doi']).first()
+            try:
+                doi_value = doi_dict['doi']
+            except KeyError:
+                abort(500, 'Error: Identifier "doi" is required for each entry')
+
+            uri = Uri.query.filter(Uri.raw == doi_value).first()
 
             if not uri:
-                uri = Uri(raw=doi_dict['doi'], last_checked=None)
+                uri = Uri(raw=doi_value, last_checked=None)
                 uri.users.append(g.user)
                 db.session.add(uri)
 

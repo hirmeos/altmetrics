@@ -19,6 +19,7 @@ def utf8(bytes_value):
 
 
 class AltmetricsClient(ApiClient):
+
     API_BASE = 'https://altmetrics.ubiquity.press/api'
 
     def __init__(self, email, password, api_base=API_BASE):
@@ -68,7 +69,7 @@ class AltmetricsClient(ApiClient):
             doi_list (list): list of dicts containing dois to be sent
 
         Returns:
-            Response returned by API
+            object: Response returned by API
         """
         response = requests.post(
             self.doi_url,
