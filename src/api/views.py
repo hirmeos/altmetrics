@@ -1,6 +1,4 @@
-import json
-
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, abort, g, jsonify, request
 from flask.views import MethodView
 
 from core import db
@@ -8,66 +6,98 @@ from models import (
     Uri,
     Url,
     Event,
+    User,
 )
+from user.decorators import token_authenticated
+from user.tokens import issue_token
 
-from .logic import get_origin_from_name
+from .logic import get_origin_from_name, queryset_exists
 from .serializers import (
     EventSerializer,
     UriSerializer,
 )
 
+
 bp = Blueprint('api', __name__, url_prefix='/api')
 
 
-class UriViewSet(MethodView):
-    """ API endpoint to display URIs. """
+class TokensViewSet(MethodView):
+    """ API endpoint to get JWT a API token. """
 
-    # permission_classes = (IsAuthenticated,)  # TODO
+    def post(self):
+        request_data = request.get_json()
+        user = User.query.filter_by(
+            email=request_data.get('email'),
+        ).first()
+
+        password = request_data.get('password')
+        if not (user and user.verify_and_update_password(password)):
+            abort(401, "Invalid user credentials")
+
+        return issue_token(email=user.email)
+
+
+bp.add_url_rule('/get_token', view_func=TokensViewSet.as_view('get-token'))
+
+
+class UriViewSet(MethodView):
+    """ API endpoint to post and display URIs. """
+
+    decorators = [token_authenticated]
 
     serializer_class = UriSerializer
 
     def get(self):
-        schema = self.serializer_class(many=True, only=('raw', 'last_checked'))
-        uri_data, errors = schema.dump(Uri.query.all())
-        return json.dumps(uri_data)
+        schema = self.serializer_class(
+            many=True,
+            only=('raw', 'urls', 'last_checked')
+        )
+        uri_data, _ = schema.dump(
+            Uri.query.filter(Uri.users.contains(g.user))
+        )
+        return uri_data
 
     def post(self):
+        """ Register DOIs in the Altmetrics service. Also check if the URLs
+        provided, as well as the user making the request, need to be associated
+        with the DOI if it already exists.
 
-        """
-
-        !!! Need to authenticate user first and link their account to this
-        upload and doi.
-
-        Also, check if the doi exists and add user to this doi if that is the
-        case.
-
-        """
-
-        """New expected format of DOIs:
+        Expected format of DOIs:
             [
                 {
-                    doi: '10.123.xxxxx'
-                    url: ['www.xxx.com', www.yyy.com],
+                    doi: '10.123/xxxxx'
+                    url: ['www.site.com/booklink', 'www.press.co.za/read'],
                 },
                 {
-                    doi: '10.456.aaaaa'
-                    url: ['www.aaa.com', www.bbb.com],
+                    doi: '10.456/aaaaa'
+                    url: ['www.site.org/book/doi', 'www.books.gov.uk/read/doi'],
                 },
                 ... etc
             ]
         """
-        json_input = request.get_json()
-
-        doi_list = json_input.get("doi_list")
+        doi_list = request.get_json()
 
         for doi_dict in doi_list:
-            raw_uri = doi_dict['doi']
-            new_uri = Uri(raw=raw_uri, last_checked=None)
-            db.session.add(new_uri)
+
+            try:
+                doi_value = doi_dict['doi']
+            except KeyError:
+                abort(500, 'Error: Identifier "doi" is required for each entry')
+
+            uri = Uri.query.filter(Uri.raw == doi_value).first()
+
+            if not uri:
+                uri = Uri(raw=doi_value, last_checked=None)
+                uri.users.append(g.user)
+                db.session.add(uri)
+
+            elif not queryset_exists(uri.users.filter_by(id=g.user.id)):
+                uri.users.append(g.user)
 
             for raw_url in doi_dict.get('url', []):
-                associated_url = Url(url=raw_url, uri=new_uri)
-                db.session.add(associated_url)
+                if not queryset_exists(Url.query.filter_by(url=raw_url)):
+                    associated_url = Url(url=raw_url, uri=uri)
+                    db.session.add(associated_url)
 
         db.session.commit()
 
@@ -80,7 +110,7 @@ bp.add_url_rule('/uriset', view_func=UriViewSet.as_view('uri-set'))
 class EventViewSet(MethodView):
     """ API endpoint to display Events. """
 
-    # permission_classes = (IsAuthenticated,)  # TODO
+    decorators = [token_authenticated]
 
     serializer_class = EventSerializer
 

@@ -5,6 +5,7 @@ class UriSerializer(Schema):
 
     id = fields.Integer()
     raw = fields.String()
+    urls = fields.List(fields.String)
     last_checked = fields.DateTime()
 
 
@@ -23,12 +24,6 @@ class EventSerializer(Schema):
     origin = fields.String()  # TODO: Add validator
     created_at = fields.DateTime()
     scrape = fields.Nested(ScrapeSerializer)
-
-
-class UrlSerializer(Schema):
-
-    id = fields.Integer(dump_only=True)
-    uri = scrape = fields.Nested(UriSerializer)
 
 
 def name_of_validator(data):

@@ -60,7 +60,7 @@ class Config(object):
         host=RMQ_HOST,
         vhost=RMQ_VHOST
     )
-    RESULT_BACKEND = "amqp"
+    RESULT_BACKEND = 'amqp'
 
     # ## DATABASES ##
     DB_USER = getenv('DB_USER')
@@ -84,7 +84,7 @@ class Config(object):
 
     # TODO: set up logging
 
-    METRICS_VERSION = "0.0.18"
+    METRICS_VERSION = '0.0.18'
 
     # # ## PLUGINS ##
     #
@@ -93,9 +93,9 @@ class Config(object):
         ignore=[
             'generic',
             '__pycache__',
-            "facebook",
-            "twitter",
-            "crossref_cited_by",
+            'facebook',
+            'twitter',
+            'crossref_cited_by',
         ]
     )
 
@@ -127,10 +127,12 @@ class Config(object):
 class DevConfig(Config):
 
     DEBUG = True
-    FLASK_ENV = "development"
+    FLASK_ENV = 'development'
+    JWT_KEY = getenv('JWT_KEY', 'dev-key-ok-as-is')
 
 
 class LiveConfig(Config):
 
     DEBUG = False
-    FLASK_ENV = "production"
+    FLASK_ENV = 'production'
+    JWT_KEY = getenv('JWT_KEY', 'LIVE KEY - PLEASE SET THIS!')
