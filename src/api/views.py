@@ -65,17 +65,20 @@ class UriViewSet(MethodView):
         Expected format of DOIs:
             [
                 {
-                    doi: '10.123/xxxxx'
-                    url: ['www.site.com/booklink', 'www.press.co.za/read'],
+                    'doi': '10.123/xxxxx'
+                    'url': ['www.site.com/booklink', 'www.press.co.za/read'],
                 },
                 {
-                    doi: '10.456/aaaaa'
-                    url: ['www.site.org/book/doi', 'www.books.gov.uk/read/doi'],
+                    'doi': '10.456/aaaaa'
+                    'url': ['www.site.org/book/doi', 'www.books.gov.uk/read'],
                 },
                 ... etc
             ]
         """
         doi_list = request.get_json()
+
+        if not doi_list:
+            abort(500, 'Error: DOI list not found. Please check input format.')
 
         for doi_dict in doi_list:
 
@@ -95,6 +98,7 @@ class UriViewSet(MethodView):
                 uri.users.append(g.user)
 
             for raw_url in doi_dict.get('url', []):
+                raw_url = raw_url.rstrip('/')  # Avoid duplicates
                 if not queryset_exists(Url.query.filter_by(url=raw_url)):
                     associated_url = Url(url=raw_url, uri=uri)
                     db.session.add(associated_url)
