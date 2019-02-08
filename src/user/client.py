@@ -10,15 +10,14 @@ TODO:   separate installable Python package.
 """
 
 import requests  # I can't seem to get flask to work with regular post data
-
-from generic.client import ApiClient
+from requests.auth import HTTPBasicAuth
 
 
 def utf8(bytes_value):
     return bytes_value.decode('utf-8')
 
 
-class AltmetricsClient(ApiClient):
+class AltmetricsClient(object):
 
     API_BASE = 'https://altmetrics.ubiquity.press/api'
 
@@ -30,7 +29,7 @@ class AltmetricsClient(ApiClient):
             password (str): password for user login on the altmetrics system
             api_base (str): url for the altmetrics API
         """
-        super().__init__(base_url=api_base)
+        self.base_url = api_base
         self.email = email
         self.password = password
         self.api_base = api_base.rstrip('/')
@@ -51,8 +50,10 @@ class AltmetricsClient(ApiClient):
             return
 
         token_url = f'{self.api_base}/get_token'
-        credentials = {'email': self.email, 'password': self.password}
-        response = requests.post(token_url, json=credentials)
+        response = requests.get(
+            token_url,
+            auth=HTTPBasicAuth(self.email, self.password)
+        )
 
         if response.status_code == 200:
             self.token = utf8(response.content)

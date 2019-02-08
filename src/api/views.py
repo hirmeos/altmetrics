@@ -1,12 +1,13 @@
 from flask import Blueprint, abort, g, jsonify, request
 from flask.views import MethodView
+from flask_login import current_user
+from flask_security.decorators import http_auth_required
 
 from core import db
 from models import (
     Uri,
     Url,
     Event,
-    User,
 )
 from user.decorators import token_authenticated
 from user.tokens import issue_token
@@ -24,14 +25,10 @@ bp = Blueprint('api', __name__, url_prefix='/api')
 class TokensViewSet(MethodView):
     """ API endpoint to get JWT a API token. """
 
-    def post(self):
-        request_data = request.get_json()
-        user = User.query.filter_by(
-            email=request_data.get('email'),
-        ).first()
-
-        password = request_data.get('password')
-        if not (user and user.verify_and_update_password(password)):
+    @http_auth_required
+    def get(self):
+        user = current_user
+        if not user:
             abort(401, "Invalid user credentials")
 
         return issue_token(email=user.email)
