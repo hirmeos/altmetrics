@@ -5,7 +5,7 @@ import requests
 
 from core.settings import Origins, StaticProviders
 from generic.mount_point import GenericDataProvider
-from models import Event, RawEvent
+from processor.models import Event, RawEvent
 
 
 logger = getLogger(__name__)

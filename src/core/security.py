@@ -7,7 +7,8 @@ from flask_security.forms import (
 )
 from flask_security import Security, SQLAlchemyUserDatastore
 
-from models import User, Role, db
+from core import db
+from user.models import User, Role
 
 
 class ExtendedRegisterForm(RegisterForm):

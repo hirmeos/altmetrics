@@ -1,27 +1,4 @@
 from flask import current_app
-# from models import User   # TODO: Add user model
-
-
-# def users_from_uploads(doi):
-#     """ Generate a list of users that uploaded a csv that created the DOI.
-#
-#       Parameters:
-#         doi (Doi): the doi used to generate a list of users from
-#
-#       Returns:
-#         list: Users that uploaded a CSV with the doi in it.
-#     """
-#
-#     uploads = [doiup.upload for doiup in UriUpload.objects.filter(doi=doi)]
-#     users = None
-#
-#     for upload in uploads:
-#         if users:
-#             users |= User.objects.filter(csvupload=upload)
-#         else:
-#             users = User.objects.filter(csvupload=upload)
-#
-#     return users
 
 
 def event_generator(uri, scrape, last_check):

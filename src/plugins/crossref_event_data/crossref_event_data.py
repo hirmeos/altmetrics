@@ -3,7 +3,7 @@ from logging import getLogger
 
 from core.settings import StaticProviders, Origins
 from generic.mount_point import GenericDataProvider
-from models import Event, Error, RawEvent
+from processor.models import Event, Error, RawEvent
 from processor.schemas import EventSchema
 
 from .client import CrossRefEventDataClient

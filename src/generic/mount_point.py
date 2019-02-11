@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from models import Event
+from processor.models import Event
 
 from . import utils
 

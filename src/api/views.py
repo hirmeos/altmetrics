@@ -4,7 +4,7 @@ from flask_login import current_user
 from flask_security.decorators import http_auth_required
 
 from core import db
-from models import (
+from processor.models import (
     Uri,
     Url,
     Event,

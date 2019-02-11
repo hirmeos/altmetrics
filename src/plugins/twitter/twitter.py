@@ -1,5 +1,5 @@
 from generic.mount_point import GenericDataProvider
-from models import Origins
+from processor.models import Origins
 
 
 class TwitterProvider(GenericDataProvider):

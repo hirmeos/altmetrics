@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from core.logic import get_credentials
 from core.settings import Origins, StaticProviders
 from generic.mount_point import GenericDataProvider
-from models import Event, Error, RawEvent
+from processor.models import Event, RawEvent
 
 
 logger = logging.getLogger(__name__)

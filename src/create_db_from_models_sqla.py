@@ -10,7 +10,7 @@ import os
 
 from sqlalchemy import create_engine
 
-from models import db as Base
+from core import db as Base
 
 # ## DATABASE ##
 DB_USER = os.getenv('DB_USER')
@@ -30,6 +30,5 @@ SQLALCHEMY_DATABASE_URI = (
     )
 )
 
-print(SQLALCHEMY_DATABASE_URI)
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 Base.metadata.create_all(engine)

@@ -6,12 +6,10 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from flask_api import FlaskAPI
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
 
 from .admin import init_admin
+from .database import db
 
-
-db = SQLAlchemy()
 
 CONFIG = os.getenv('CONFIG', 'DevConfig')
 

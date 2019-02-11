@@ -13,7 +13,7 @@ from jwt.exceptions import DecodeError
 
 from flask import current_app, g
 
-from models import User
+from .models import User
 
 
 def issue_token(email, lifespan=None):

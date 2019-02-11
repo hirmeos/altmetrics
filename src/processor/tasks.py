@@ -5,8 +5,9 @@ from arrow import utcnow
 from celery.utils.log import get_task_logger
 from flask import current_app
 
+from core import db
 from core.celery import celery as celery_app
-from models import db, Scrape, Uri
+from processor.models import Scrape, Uri
 
 from .utils import event_generator
 
