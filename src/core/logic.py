@@ -1,7 +1,9 @@
 from csv import DictReader
 import logging
 
-from flask import current_app
+from flask import current_app, render_template
+
+from core import db
 
 
 logger = logging.getLogger(__name__)
@@ -25,3 +27,25 @@ def get_credentials(doi):
         for entry in reader:
             if entry['doi_prefix'] == doi_prefix:
                 return entry['user'], entry['password']
+
+
+def get_or_create(model, **filter_parameters):
+    instance = model.query.filter_by(**filter_parameters).first()
+    if not instance:
+        instance = model(**filter_parameters)
+        db.session.add(instance)
+        db.session.commit()
+
+    return instance
+
+
+def configure_mail_body(msg, template_name, context):
+    """Set mail body based on text and html templates.
+
+    Args:
+        msg (object): flask_mail.Message instance used to send mail
+        template_name (str): name of mail body templates (without the extension)
+        context (dict): Any variables needed within the mail templates
+    """
+    msg.body = render_template(f'mail/{template_name}.txt', **context)
+    msg.html = render_template(f'mail/{template_name}.html', **context)

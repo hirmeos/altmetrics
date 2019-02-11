@@ -7,11 +7,11 @@ from flask_api import FlaskAPI
 from flask_mail import Mail
 from flask_migrate import Migrate
 
-from .admin import init_admin
 from .database import db
 
 
 CONFIG = os.getenv('CONFIG', 'DevConfig')
+mail = Mail()
 
 
 def create_app():
@@ -29,7 +29,6 @@ def create_app():
     Migrate(app, db)
 
     # Set up mail
-    mail = Mail()
     mail.init_app(app)
 
     from .security import init_security
@@ -43,6 +42,7 @@ def create_app():
 
     app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
 
+    from .admin import init_admin
     init_admin(app, db)
 
     return app

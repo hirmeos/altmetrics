@@ -40,6 +40,9 @@ class Role(Model, RoleMixin):
     name = Column(String(80), unique=True)
     description = Column(String(255))
 
+    def __repr__(self):
+        return self.name
+
 
 class User(Model, UserMixin):
     """Users who upload DOIs."""
@@ -51,7 +54,12 @@ class User(Model, UserMixin):
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255))
 
+    first_name = Column(String(255), nullable=False)
+    last_name = Column(String(255), nullable=False)
+    institution = Column(String(255), nullable=False)
+
     active = Column(Boolean())
+    approved = Column(Boolean(), default=False)
     confirmed_at = Column(DateTime())
     roles = relationship(
         'Role',
@@ -71,6 +79,14 @@ class User(Model, UserMixin):
     def valid_uri(self, key, email):
         assert email_validator(email)
         return email
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+    @property
+    def is_approved(self):
+        return self.approved
 
     def __repr__(self):
         return f'<User {self.id}: {self.username}>'
