@@ -1,6 +1,7 @@
 from flask import current_app, request
 from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user
 
 from processor.models import Uri
 from user.models import Role, User
@@ -27,13 +28,16 @@ def approve_users(user_ids):
 def init_admin(app, db):
 
     admin = Admin(app, name='Altmetrics', template_mode='bootstrap3')
-    admin.add_view(ModelView(Role, db.session))
+    admin.add_view(RoleAdmin(db.session))
     admin.add_view(UserAdmin(db.session))
-    admin.add_view(ModelView(Uri, db.session))
+    admin.add_view(UriAdmin(db.session))
 
     # ## Custom views ##
     admin.add_view(ApproveUserView(name='Approve Users', endpoint='approve'))
 
+
+# These will need to be tidied up at some point. Right now we're just
+# 'securing' the admin interface.
 
 class UserAdmin(ModelView):
 
@@ -43,11 +47,40 @@ class UserAdmin(ModelView):
     def __init__(self, session):
         super().__init__(User, session)
 
-    def edit_form(self, obj=None):
-        return super().edit_form(obj)
+    def is_accessible(self):
+        return current_user.has_role('Admin')
+
+
+class RoleAdmin(ModelView):
+
+    def __init__(self, session):
+        super().__init__(Role, session)
+
+    def is_accessible(self):
+        return current_user.has_role('Admin')
+
+
+class UriAdmin(ModelView):
+
+    form_excluded_columns = [
+        'deleted_events',
+        'errors',
+        'users',
+        'metrics',
+        'events',
+    ]
+
+    def __init__(self, session):
+        super().__init__(Uri, session)
+
+    def is_accessible(self):
+        return current_user.has_role('Admin') or current_user.has_role('User')
 
 
 class ApproveUserView(BaseView):
+
+    def is_accessible(self):
+        return current_user.has_role('Admin')
 
     @expose('/', methods=('GET', 'POST'))
     def index(self):
