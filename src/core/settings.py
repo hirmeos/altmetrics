@@ -63,6 +63,7 @@ class Config(object):
     RESULT_BACKEND = 'amqp'
 
     # ## DATABASES ##
+
     DB_USER = getenv('DB_USER')
     DB_PASSWORD = getenv('DB_PASSWORD')
     DB_HOST = getenv('DB_HOST')
@@ -80,10 +81,6 @@ class Config(object):
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # ## LOGGING ##
-
-    # TODO: set up logging
-
     METRICS_VERSION = '0.0.23'
 
     # # ## PLUGINS ##
@@ -94,14 +91,14 @@ class Config(object):
             'generic',
             '__pycache__',
             'facebook',
-            'twitter',
             'crossref_cited_by',
         ]
     )
 
-    TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
-
     # ## Mail settings #
+
+    TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
+    TECH_NAME = getenv('TECH_NAME', 'tech')
 
     MAIL_SERVER = getenv('MAIL_SERVER', 'localhost')
     MAIL_PORT = getenv('MAIL_PORT', '587')
@@ -110,10 +107,11 @@ class Config(object):
     MAIL_DEFAULT_SENDER = getenv('MAIL_DEFAULT_SENDER')
 
     SECURITY_CONFIRMABLE = getenv('SECURITY_CONFIRMABLE', 'True') is 'True'
+    SECURITY_POST_REGISTER_VIEW = '/account/confirmation'
 
     # ## BEHAVIOUR #
 
-    DAYS_BEFORE_REFRESH = 7
+    DAYS_BEFORE_REFRESH = 1
 
     # ## Temporary solution to cref cited-by credentials
 

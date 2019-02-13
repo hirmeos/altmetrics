@@ -17,6 +17,9 @@ class ExtendedRegisterForm(RegisterForm):
 
 class ExtendedConfirmRegisterForm(ConfirmRegisterForm):
     username = StringField('Username', [Required()])
+    first_name = StringField('First Name', [Required()])
+    last_name = StringField('Last Name', [Required()])
+    institution = StringField('Institution', [Required()])
     password_confirm = PasswordField()
 
 

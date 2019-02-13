@@ -9,7 +9,7 @@ from processor.models import (
     Url,
     Event,
 )
-from user.decorators import token_authenticated
+from user.decorators import account_approved, token_authenticated
 from user.tokens import issue_token
 
 from .logic import get_origin_from_name, queryset_exists
@@ -26,6 +26,7 @@ class TokensViewSet(MethodView):
     """ API endpoint to get JWT a API token. """
 
     @http_auth_required
+    @account_approved
     def get(self):
         user = current_user
         if not user:

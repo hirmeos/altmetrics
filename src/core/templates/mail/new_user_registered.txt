@@ -1,0 +1,7 @@
+Dear {{ user_name }}
+
+A new user has registered to use the Altmetrics system, and is waiting for their account to be approved.
+This can be done on the admin interface.
+
+Regard,
+Altmail

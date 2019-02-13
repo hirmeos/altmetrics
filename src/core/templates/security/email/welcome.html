@@ -1,6 +1,6 @@
 <p>{{ _('Welcome ') }}
-  {% if user.username %}
-      {{ _('%(user)s!', user=user.username) }}
+  {% if user.first_name %}
+      {{ _('%(user)s!', user=user.first_name) }}
   {% else %}
       {{ _('%(email)s!', email=user.email) }}
   {% endif %}

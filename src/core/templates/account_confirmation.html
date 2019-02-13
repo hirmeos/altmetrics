@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <h3>Registration Complete</h3>
+  <p>Thank you for registering. You should receive a confirmation email shortly.</p>
+  <p>Please note, as a security measure, we will need to approve your account before you can use this service. This should not take long.</p>
+
+  <strong>
+    If your account has already been approved, you may
+    <a href="{{ url_for_security('login') }}">log in</a> here.
+  </strong>
+{% endblock %}
