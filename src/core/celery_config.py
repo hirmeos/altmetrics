@@ -2,7 +2,27 @@ from celery import Celery
 from celery.schedules import crontab
 
 
+def init_celery(app, celery_app):
+    """ Used to instantiate celery in the main application."""
+
+    celery_app.__init__(
+        main=app.import_name,
+        backend=app.config['RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery_app.conf.update(app.config)
+
+    celery_app.conf.task_routes = {
+        'approve-user': {'queue': 'altmetrics.approve-user'},
+        'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
+    }
+
+    celery_app.autodiscover_tasks(['user'])
+
+
 def make_celery(app):
+    """Used to instantiate celery in the workers."""
+
     celery_app = Celery(
         app.import_name,
         backend=app.config['RESULT_BACKEND'],
@@ -40,4 +60,4 @@ def configure_celery(celery_app):
         'pull-metrics': {'queue': 'altmetrics.pull-metrics'},
     }
 
-    celery_app.autodiscover_tasks(['processor, user'])
+    celery_app.autodiscover_tasks(['processor'])

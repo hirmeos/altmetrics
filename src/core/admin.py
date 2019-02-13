@@ -16,8 +16,7 @@ def approve_users(user_ids):
     context = {'tech_email': current_app.config.get('TECH_EMAIL')}
 
     for user_id in user_ids:
-        # approve_user.delay(  # TODO (can't get celery tasks to work)
-        approve_user(
+        approve_user.delay(
             user_id=user_id,
             awaiting_role_id=awaiting_role.id,
             new_role_id=user_role.id,
@@ -55,8 +54,6 @@ class ApproveUserView(BaseView):
 
         if request.method == 'POST':
             user_ids = request.form.getlist('users')
-            if not isinstance(user_ids, list):
-                user_ids = [user_ids]
             approve_users(user_ids)
 
         pending_users = User.query.filter(User.roles.contains(

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
+
+from celery import Celery
+from .celery_config import init_celery
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -11,6 +14,7 @@ from .database import db
 
 
 CONFIG = os.getenv('CONFIG', 'DevConfig')
+celery_app = Celery()
 mail = Mail()
 
 
@@ -44,6 +48,8 @@ def create_app():
 
     from .admin import init_admin
     init_admin(app, db)
+
+    init_celery(app, celery_app)
 
     return app
 

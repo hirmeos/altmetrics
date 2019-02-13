@@ -2,12 +2,12 @@ from flask import (
     Blueprint,
     render_template,
 )
-from flask_login import current_user
 from flask_security import login_required
 
+from api.logic import queryset_exists
 from core import db
 from core.logic import get_or_create
-from user.models import Role
+from user.models import Role, User
 from user.tasks import send_approval_request
 
 bp = Blueprint('processor', __name__, url_prefix='/')
@@ -25,11 +25,12 @@ def account_confirmation():
 
     awaiting = get_or_create(Role, name='Awaiting Confirmation')
 
-    if current_user and not (current_user.is_anonymous or current_user.roles):
-        # send_approval_request.delay()  # TODO (can't get celery tasks to work)
-        send_approval_request()
+    if queryset_exists(User.query.filter_by(roles=None)):
+        send_approval_request.delay()
 
-        current_user.roles.append(awaiting)
+        for user in User.query.filter_by(roles=None):
+            user.roles.append(awaiting)
+
         db.session.commit()
 
     return render_template('account_confirmation.html')
