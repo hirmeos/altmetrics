@@ -81,7 +81,7 @@ class Config(object):
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    METRICS_VERSION = '0.0.24'
+    METRICS_VERSION = '0.0.25'
 
     # # ## PLUGINS ##
     #
