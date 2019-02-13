@@ -5,7 +5,7 @@ Thank you for registering to use the Altmetrics service.
 This email is to let you know that your account has been approved.
 {% if tech_email %}
 
-    If you have any questions, please feel free to contact our support team at {{ tech_email }}.
+If you have any questions, please feel free to contact our support team at {{ tech_email }}.
 {% endif %}
 
 Regards,

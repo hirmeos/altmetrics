@@ -11,7 +11,7 @@ from user.models import Role, User
 logger = get_task_logger(__name__)
 
 
-@celery_app.task(name='approve-user')  # TODO (can't get celery tasks to work)
+@celery_app.task(name='approve-user')
 def approve_user(user_id, awaiting_role_id, new_role_id, mail_context):
     """ Sets user to 'approved' and emails them to let them know.
 
