@@ -70,7 +70,7 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
             event = Event(
                 uri_id=uri.id,
                 subject_id=subj,
-                origin=origin,
+                origin=origin.value,
                 created_at=datetime.date(year, 1, 1)
             )
 
@@ -79,8 +79,8 @@ class CrossrefCitedByDataProvider(GenericDataProvider):
                     event=event,
                     scrape_id=scrape.id,
                     external_id=None,
-                    origin=origin,
-                    provider=self.provider,
+                    origin=origin.value,
+                    provider=self.provider.value,
                     created_at=datetime.date(year, 1, 1)
                 )
             ]

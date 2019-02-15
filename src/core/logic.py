@@ -49,3 +49,35 @@ def configure_mail_body(msg, template_name, context):
     """
     msg.body = render_template(f'mail/{template_name}.txt', **context)
     msg.html = render_template(f'mail/{template_name}.html', **context)
+
+
+def get_enum_by_value(enum_class, value):
+    """ Fetch enum object by its integer value.
+
+    Args:
+        enum_class (Enum): Any defined Enum class
+        value (int): Integer value of the enum
+
+    Returns:
+        object: enum object or None
+    """
+    try:
+        return enum_class(value)
+    except ValueError:
+        return None
+
+
+def get_enum_by_name(enum_class, name):
+    """  Fetch enum object by its name.
+
+    Args:
+        enum_class (Enum): Any defined Enum class
+        name (str): name of the enum object
+
+    Returns:
+        object: enum object or None
+    """
+    try:
+        return enum_class[name]
+    except KeyError:
+        return None

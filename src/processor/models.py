@@ -1,7 +1,7 @@
 from datetime import datetime
 import re
 
-from sqlalchemy.dialects.postgresql import HSTORE, ENUM
+from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import validates
 
@@ -9,6 +9,7 @@ from validators import url as url_validator
 
 from core.database import (
     relationship,
+    Boolean,
     Column,
     DateTime,
     ForeignKey,
@@ -16,7 +17,6 @@ from core.database import (
     Model,
     String,
 )
-from core.settings import StaticProviders, Origins
 
 
 class Uri(Model):
@@ -33,11 +33,10 @@ class Uri(Model):
     __tablename__ = 'uri'
 
     id = Column(Integer, primary_key=True)
-    raw = Column(String(50), unique=True, nullable=False)
+    raw = Column(String, unique=True, nullable=False)
     last_checked = Column(DateTime)
 
     # Child Relationships
-    deleted_events = relationship('DeletedEvent', backref='uri')
     errors = relationship('Error', backref='uri')
     events = relationship('Event', backref='uri')
     urls = relationship('Url', backref='uri')
@@ -55,10 +54,9 @@ class Uri(Model):
     def __str__(self):
         return self.raw
 
-    # TODO
-    # @property
-    # def owners(self):
-    #     return self.users.all()
+    @property
+    def owners(self):
+        return self.users.all()
 
 
 class Url(Model):
@@ -117,8 +115,8 @@ class Error(Model):
     uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
     scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
 
-    origin = Column(ENUM(Origins), nullable=False)
-    provider = Column(ENUM(StaticProviders), nullable=False)
+    origin = Column(Integer, nullable=False)
+    provider = Column(Integer, nullable=False)
     description = Column(String(100))
     last_successful_scrape_at = Column(DateTime, nullable=False)
 
@@ -146,8 +144,9 @@ class Event(Model):
     uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
 
     subject_id = Column(String, nullable=False)
-    origin = Column(ENUM(Origins), nullable=False)
+    origin = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
+    is_deleted = Column(Boolean, default=False)
 
     raw_events = relationship('RawEvent', backref='event')
 
@@ -163,7 +162,7 @@ class RawEvent(Model):  # May want to rename this (and the Event table)
     """ Hold raw event data. This may be duplicated for what we would consider
     to be a single 'event'. For example, if a Wikipedia page is updated it
     creates an event on Crossref Event Data, but this should not add to the
-    metrics count.
+    metrics count. This will also store data related to event deletions.
 
     Columns:
     --------
@@ -178,6 +177,9 @@ class RawEvent(Model):  # May want to rename this (and the Event table)
     created_at:
         When this event occurred on the origin service (specified by the
         provider).
+    reason_for_deletion:
+        Description of why the event was deleted (applies only to RawEvent
+        entries that mark an Event deletion).
     """
 
     __tablename__ = 'raw_event'
@@ -188,37 +190,13 @@ class RawEvent(Model):  # May want to rename this (and the Event table)
     scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
 
     external_id = Column(String, unique=True, nullable=True)
-    origin = Column(ENUM(Origins), nullable=False)
-    provider = Column(ENUM(StaticProviders), nullable=False)
+    origin = Column(Integer, nullable=False)
+    provider = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
+    reason_for_deletion = Column(String, nullable=True)
 
     def __str__(self):
-        return f'<Raw Event: {self.id} - {self.uri}>'
-        # TODO: Add raw_events to URI table
-
-
-class DeletedEvent(Model):
-    """ Hold data related to the events that have been deleted from their
-    source/origin. Kept for historical purposes.
-    """
-
-    __tablename__ = 'deleted_event'
-
-    id = Column(Integer, primary_key=True)
-
-    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
-
-    subject_id = Column(String, nullable=False)
-    origin = Column(ENUM(Origins), nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    deleted_at = Column(DateTime)
-
-    __table_args__ = (
-        UniqueConstraint('uri_id', 'subject_id'),
-    )
-
-    def __str__(self):
-        return f'<Deleted Event: {self.id} - {self.uri}>'
+        return f'<Raw Event: {self.id} - {self.event.uri}>'
 
 
 class Metric(Model):

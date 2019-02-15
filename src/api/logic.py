@@ -1,12 +1,11 @@
 from core import db
+from core.logic import get_enum_by_name
 from core.settings import Origins
 
 
 def get_origin_from_name(name):
     """ Get Origin (enum), based on string name of the origin."""
-    for origin in Origins:
-        if origin.name == name:
-            return origin
+    return get_enum_by_name(Origins, name)
 
 
 def queryset_exists(queryset):

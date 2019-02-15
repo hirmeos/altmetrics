@@ -12,8 +12,8 @@ from .logic import get_or_create
 
 def approve_users(user_ids):
 
-    user_role = get_or_create(Role, name='User')
-    awaiting_role = Role.query.filter_by(name='Awaiting Confirmation').first()
+    user_role = get_or_create(Role, name='user')
+    awaiting_role = Role.query.filter_by(name='awaiting-confirmation').first()
     context = {'tech_email': current_app.config.get('TECH_EMAIL')}
 
     for user_id in user_ids:
@@ -48,7 +48,7 @@ class UserAdmin(ModelView):
         super().__init__(User, session)
 
     def is_accessible(self):
-        return current_user.has_role('Admin')
+        return current_user.has_role('admin')
 
 
 class RoleAdmin(ModelView):
@@ -57,7 +57,7 @@ class RoleAdmin(ModelView):
         super().__init__(Role, session)
 
     def is_accessible(self):
-        return current_user.has_role('Admin')
+        return current_user.has_role('admin')
 
 
 class UriAdmin(ModelView):
@@ -74,13 +74,13 @@ class UriAdmin(ModelView):
         super().__init__(Uri, session)
 
     def is_accessible(self):
-        return current_user.has_role('Admin') or current_user.has_role('User')
+        return current_user.has_role('admin') or current_user.has_role('user')
 
 
 class ApproveUserView(BaseView):
 
     def is_accessible(self):
-        return current_user.has_role('Admin')
+        return current_user.has_role('admin')
 
     @expose('/', methods=('GET', 'POST'))
     def index(self):
@@ -90,7 +90,7 @@ class ApproveUserView(BaseView):
             approve_users(user_ids)
 
         pending_users = User.query.filter(User.roles.contains(
-            Role.query.filter_by(name='Awaiting Confirmation').first()
+            Role.query.filter_by(name='awaiting-confirmation').first()
         ))
 
         return self.render('admin/approve_user.html', users=pending_users)
