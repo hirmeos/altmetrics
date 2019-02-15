@@ -7,7 +7,9 @@ from flask import current_app
 
 from core import db
 from core.celery import celery as celery_app
-from processor.models import Scrape, Uri
+from core.settings import Origins, StaticProviders
+from processor.logic import check_wikipedia_event
+from processor.models import Event, RawEvent, Scrape, Uri
 
 from .utils import event_generator
 
@@ -59,4 +61,53 @@ def pull_metrics():
             db.session.add(raw_event)
 
     scrape.end_date = datetime.utcnow()
+    db.session.commit()
+
+
+@celery_app.task(name='check-wikipedia-references')
+def check_wikipedia_references():
+    """ Check all Wikipedia events to see that DOIs are still referenced."""
+
+    for event in Event.query.filter_by(
+            origin=Origins.wikipedia.value,
+            is_deleted=False
+    ):
+
+        if not check_wikipedia_event(event):
+            db.session.add(
+                RawEvent(
+                    event=event,
+                    origin=Origins.wikipedia.value,
+                    provider=StaticProviders.hirmeos_altmetrics.value,
+                    created_at=datetime.utcnow(),
+                    reason_for_deletion='Entry DOI is no longer referenced on '
+                                        'the specified Wikipedia page.'
+                )
+            )
+            event.is_deleted = True
+
+    db.session.commit()
+
+
+@celery_app.task(name='check-deleted-wikipedia-references')
+def check_deleted_wikipedia_references():
+    """ Check deleted Wikipedia events to see that DOIs have been
+    re-referenced, and un-delete the event if this happens.
+    """
+
+    for event in Event.query.filter_by(
+            origin=Origins.wikipedia.value,
+            is_deleted=True
+    ):
+        if check_wikipedia_event(event):
+            db.session.add(
+                RawEvent(
+                    event=event,
+                    origin=Origins.wikipedia.value,
+                    provider=StaticProviders.hirmeos_altmetrics.value,
+                    created_at=datetime.utcnow(),
+                )
+            )
+            event.is_deleted = False
+
     db.session.commit()

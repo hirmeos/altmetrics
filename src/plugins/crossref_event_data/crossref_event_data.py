@@ -93,6 +93,9 @@ class CrossrefEventDataProvider(GenericDataProvider):
                 if entry['external_id'] not in existing_raw_ids
             ]
 
+            if events[event] and event.is_deleted:
+                event.is_deleted = False
+
         return event_dict, events
 
     def process(self, uri, origin, scrape, last_check, event_dict):

@@ -40,5 +40,6 @@ WTForms==2.2.1
 zenlog==1.1
 Flask-Mail==0.9.1
 PyJWT==1.7.1
+wikipedia==1.4.0
 
 -e git+https://github.com/mattupstate/flask-security.git@develop#egg=Flask-Security
