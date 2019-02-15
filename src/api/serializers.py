@@ -21,7 +21,7 @@ class EventSerializer(Schema):
     id = fields.Integer(dump_only=True)
     uri = fields.Nested(UriSerializer)
     subject_id = fields.String()
-    origin = fields.String()  # TODO: Add validator
+    origin = fields.Integer()  # TODO: Add validator
     created_at = fields.DateTime()
     scrape = fields.Nested(ScrapeSerializer)
 

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3d2acabdde47
+Revision ID: 8b5f58e10869
 Revises: 
-Create Date: 2019-01-22 10:24:41.708205
+Create Date: 2019-02-15 18:50:48.558590
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '3d2acabdde47'
+revision = '8b5f58e10869'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,7 +33,7 @@ def upgrade():
     )
     op.create_table('uri',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('raw', sa.String(length=50), nullable=False),
+    sa.Column('raw', sa.String(), nullable=False),
     sa.Column('last_checked', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('raw')
@@ -43,7 +43,11 @@ def upgrade():
     sa.Column('username', sa.String(length=100), nullable=True),
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password', sa.String(length=255), nullable=True),
+    sa.Column('first_name', sa.String(length=255), nullable=False),
+    sa.Column('last_name', sa.String(length=255), nullable=False),
+    sa.Column('institution', sa.String(length=255), nullable=False),
     sa.Column('active', sa.Boolean(), nullable=True),
+    sa.Column('approved', sa.Boolean(), nullable=True),
     sa.Column('confirmed_at', sa.DateTime(), nullable=True),
     sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.Column('last_updated', sa.DateTime(), nullable=True),
@@ -51,23 +55,12 @@ def upgrade():
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
     )
-    op.create_table('deleted_event',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('uri_id', sa.Integer(), nullable=False),
-    sa.Column('subject_id', sa.String(), nullable=False),
-    sa.Column('origin', postgresql.ENUM('twitter', 'citation', 'wikipedia', 'hypothesis', 'facebook', 'wordpressdotcom', name='origins'), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('deleted_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['uri_id'], ['uri.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('uri_id', 'subject_id')
-    )
     op.create_table('error',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('uri_id', sa.Integer(), nullable=False),
     sa.Column('scrape_id', sa.Integer(), nullable=False),
-    sa.Column('origin', postgresql.ENUM('twitter', 'citation', 'wikipedia', 'hypothesis', 'facebook', 'wordpressdotcom', name='origins'), nullable=False),
-    sa.Column('provider', postgresql.ENUM('crossref_cited_by', 'crossref_event_data', 'facebook', 'twitter', 'hypothesis', name='staticproviders'), nullable=False),
+    sa.Column('origin', sa.Integer(), nullable=False),
+    sa.Column('provider', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=100), nullable=True),
     sa.Column('last_successful_scrape_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['scrape_id'], ['scrape.id'], ),
@@ -78,8 +71,9 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('uri_id', sa.Integer(), nullable=False),
     sa.Column('subject_id', sa.String(), nullable=False),
-    sa.Column('origin', postgresql.ENUM('twitter', 'citation', 'wikipedia', 'hypothesis', 'facebook', 'wordpressdotcom', name='origins'), nullable=False),
+    sa.Column('origin', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['uri_id'], ['uri.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('uri_id', 'subject_id')
@@ -118,9 +112,10 @@ def upgrade():
     sa.Column('event_id', sa.Integer(), nullable=False),
     sa.Column('scrape_id', sa.Integer(), nullable=False),
     sa.Column('external_id', sa.String(), nullable=True),
-    sa.Column('origin', postgresql.ENUM('twitter', 'citation', 'wikipedia', 'hypothesis', 'facebook', 'wordpressdotcom', name='origins'), nullable=False),
-    sa.Column('provider', postgresql.ENUM('crossref_cited_by', 'crossref_event_data', 'facebook', 'twitter', 'hypothesis', name='staticproviders'), nullable=False),
+    sa.Column('origin', sa.Integer(), nullable=False),
+    sa.Column('provider', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('reason_for_deletion', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['event_id'], ['event.id'], ),
     sa.ForeignKeyConstraint(['scrape_id'], ['scrape.id'], ),
     sa.PrimaryKeyConstraint('id'),
@@ -138,7 +133,6 @@ def downgrade():
     op.drop_table('metric')
     op.drop_table('event')
     op.drop_table('error')
-    op.drop_table('deleted_event')
     op.drop_table('user')
     op.drop_table('uri')
     op.drop_table('scrape')

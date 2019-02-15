@@ -29,7 +29,7 @@ https://github.com/hirmeos/altmetrics/tree/master/docs/postman.
 Getting a token
 ...............
 
-Most requests to the Altmetrics API will need to validated with a JSON web Token
+Most requests to the Altmetrics API will need to validated with a JSON Web Token
 (JWT). The process of acquiring and using a JWT will be explained below.
 **Please note: Your account will need to be approved before you can be issued
 a JWT**.
@@ -48,13 +48,13 @@ Example: Assuming a user registers with the following credentials
 
 With `curl`, this can be done as either
 
-    .. code-block::
+    .. code-block:: bash
 
         curl -u test.user@gmail.com:test-password-123 https://altmetrics.ubiquity.press/api/get_token
 
 or using the base64 encoding of `username`:`password`
 
-    .. code-block::
+    .. code-block:: bash
 
         curl --header "Authorization: Basic dGVzdC51c2VyQGdtYWlsLmNvbTp0ZXN0LXBhc3N3b3JkLTEyMw==" https://altmetrics.ubiquity.press/api/get_token
 
@@ -66,17 +66,17 @@ Once you have a token, all requests to the Altmetrics API will require you to
 use this token to authenticate yourself. To do this, simply add the token to
 your request header, as follows.
 
-    .. code-block::
+    .. code-block:: bash
 
         Authorization: Bearer [token]
 
-Where `[token]` is the represents your JWT.
+Where `[token]` represents your JWT.
 
 
 Registering DOIs
 ................
 
-You can post the DOIs of works to the Altmetrics API using this end point.
+You can post the DOIs of works to the Altmetrics API.
 
 **API endpoint:** https://altmetrics.ubiquity.press/api/uriset
 
@@ -86,7 +86,7 @@ You can post the DOIs of works to the Altmetrics API using this end point.
 of DOIs in the format shown below. Each DOI can be registered with zero or more
 URLs.
 
-    .. code-block::
+    .. code-block:: python
 
         [
             {

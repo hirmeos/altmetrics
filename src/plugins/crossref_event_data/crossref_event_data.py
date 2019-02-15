@@ -71,7 +71,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
                 event = Event(
                     uri_id=uri_id,
                     subject_id=subj,
-                    origin=origin,
+                    origin=origin.value,
                     created_at=min_date
                 )
                 event_dict.update(subj=event)
@@ -81,8 +81,8 @@ class CrossrefEventDataProvider(GenericDataProvider):
                     event=event,
                     scrape_id=entry['scrape_id'],
                     external_id=entry['external_id'],
-                    origin=entry['origin'],
-                    provider=entry['provider'],
+                    origin=origin.value,
+                    provider=self.provider.value,
                     created_at=entry['created_at']
                 ) for entry in event_list
             ]
@@ -106,8 +106,8 @@ class CrossrefEventDataProvider(GenericDataProvider):
 
         self._add_validator_context(
             uri_id=uri.id,
-            origin=origin,
-            provider=self.provider,
+            origin=origin.value,
+            provider=self.provider.value,
             scrape_id=scrape.id
         )
 
@@ -123,8 +123,8 @@ class CrossrefEventDataProvider(GenericDataProvider):
                 Error(
                     uri_id=uri.id,
                     scrape_id=scrape.id,
-                    origin=origin,
-                    provider=self.provider,
+                    origin=origin.value,
+                    provider=self.provider.value,
                     description=errors['message'][0]['message'][:100],
                     last_successful_scrape_at=last_check or date(1900, 1, 1)
                 ): []

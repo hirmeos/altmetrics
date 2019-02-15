@@ -122,15 +122,13 @@ class EventViewSet(MethodView):
             many=True,
             only=('subject_id', 'origin', 'created_at', 'uri')
         )
-        event_query = Event.query.filter(
-            Event.origin == origin,
-        )
+        event_query = Event.query.filter_by(origin=origin.value)
         uri = Uri.query.filter(Uri.raw == request.args.get('uri')).first()
         if uri:
             event_query = event_query.filter(Event.uri == uri)
         event_data, errors = schema.dump(event_query)
 
-        return event_data
+        return jsonify(event_data)
 
 
 bp.add_url_rule('/eventset/', view_func=EventViewSet.as_view('event-set'))

@@ -58,7 +58,7 @@ class HypothesisDataProvider(GenericDataProvider):
             event = Event(
                 uri_id=uri.id,
                 subject_id=subj,
-                origin=origin,
+                origin=origin.value,
                 created_at=created_at
             )
             event_dict.update(subj=event)
@@ -68,8 +68,8 @@ class HypothesisDataProvider(GenericDataProvider):
                     event=event,
                     scrape_id=scrape.id,
                     external_id=result.get('id'),
-                    origin=origin,
-                    provider=self.provider,
+                    origin=origin.value,
+                    provider=self.provider.value,
                     created_at=created_at
                 )
             ]

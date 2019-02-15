@@ -1,5 +1,5 @@
 """
-Common settings for the HIRMEOS Metrics project.
+Common settings for the HIRMEOS Altetrics project.
 """
 
 from enum import IntEnum
@@ -33,6 +33,7 @@ class StaticProviders(IntEnum):
     facebook = 3
     twitter = 4
     hypothesis = 5
+    hirmeos_altmetrics = 6
 
 
 class Config(object):
@@ -91,6 +92,7 @@ class Config(object):
             'generic',
             '__pycache__',
             'facebook',
+            'twitter',
             'crossref_cited_by',
         ]
     )
