@@ -1,8 +1,10 @@
+from itertools import chain
+
 from core import db
 
 
 def check_existing_entries(model_column, column_values):
-    """ Get a list of values from a model, where entries with those values
+    """ Get a tuple of values from a model, where entries with those values
     already exist in the database.
 
         Args:
@@ -11,12 +13,14 @@ def check_existing_entries(model_column, column_values):
                 should ideally be unique for the model.
 
         Returns:
-            list: Values of entries that are already in the database
+            tuple: Values of entries that are already in the database
     """
-    return [
-        value[0] for value in db.session.query(
-            model_column
-        ).filter(
-            model_column.in_(column_values)
-        ).all()
-    ]
+    return tuple(
+        chain.from_iterable(
+            db.session.query(
+                model_column
+            ).filter(
+                model_column.in_(column_values)
+            ).all()
+        )
+    )
