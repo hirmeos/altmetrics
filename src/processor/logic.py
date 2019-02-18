@@ -12,7 +12,6 @@ def check_existing_entries(model_column, column_values):
 
         Returns:
             list: Values of entries that are already in the database
-
     """
     return [
         value[0] for value in db.session.query(
