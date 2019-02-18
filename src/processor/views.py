@@ -23,7 +23,7 @@ def home():
 @bp.route('/account/confirmation')
 def account_confirmation():
 
-    awaiting = get_or_create(Role, name='Awaiting Confirmation')
+    awaiting = get_or_create(Role, name='awaiting-confirmation')
 
     if queryset_exists(User.query.filter_by(roles=None)):
         send_approval_request.delay()

@@ -34,33 +34,29 @@ def pull_metrics():
     db.session.add(scrape)
     db.session.commit()
 
-    try:
-        for uri in uri_unprocessed_or_refreshable:
+    for uri in uri_unprocessed_or_refreshable:
 
-            logger.info(f'processing {uri.raw}')
-            last_check = uri.last_checked
-            uri.last_checked = datetime.utcnow()
-            events = event_generator(
-                uri=uri,
-                scrape=scrape,
-                last_check=last_check
+        logger.info(f'processing {uri.raw}')
+        last_check = uri.last_checked
+        uri.last_checked = datetime.utcnow()
+        events = event_generator(
+            uri=uri,
+            scrape=scrape,
+            last_check=last_check
+        )
+
+        flatten, flatten_raw = [], []
+        for event_dict in events:
+            flatten.extend(event_dict.keys())
+            flatten_raw.extend(
+                chain.from_iterable(event_dict.values())
             )
 
-            flatten, flatten_raw = [], []
-            for event_dict in events:
-                flatten.extend(event_dict.keys())
-                flatten_raw.extend(
-                    chain.from_iterable(event_dict.values())
-                )
+        for entry in flatten:
+            db.session.add(entry)
 
-            for entry in flatten:
-                db.session.add(entry)
+        for raw_event in flatten_raw:
+            db.session.add(raw_event)
 
-            for raw_event in flatten_raw:
-                db.session.add(raw_event)
-
-        scrape.end_date = datetime.utcnow()
-        db.session.commit()
-
-    except Exception as e:  # Capture raw exceptions for now
-        logger.exception(f'Error while processing URIs: {e}')
+    scrape.end_date = datetime.utcnow()
+    db.session.commit()
