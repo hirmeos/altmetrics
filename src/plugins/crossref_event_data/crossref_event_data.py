@@ -3,6 +3,7 @@ from logging import getLogger
 
 from core.settings import StaticProviders, Origins
 from generic.mount_point import GenericDataProvider
+from processor.logic import check_existing_entries
 from processor.models import Event, Error, RawEvent
 from processor.schemas import EventSchema
 
@@ -76,6 +77,10 @@ class CrossrefEventDataProvider(GenericDataProvider):
                 )
                 event_dict.update(subj=event)
 
+            existing_raw_ids = check_existing_entries(
+                RawEvent.external_id,
+                [entry['external_id'] for entry in event_list]
+            )
             events[event] = [
                 RawEvent(
                     event=event,
@@ -85,6 +90,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
                     provider=self.provider.value,
                     created_at=entry['created_at']
                 ) for entry in event_list
+                if entry['external_id'] not in existing_raw_ids
             ]
 
         return event_dict, events
