@@ -56,7 +56,7 @@ def check_wikipedia_event(event):
     """ Check a Wikipedia page to see if a DOI is still referenced.
 
     Args:
-        event (object): instance of an Event instance with origin wikipedia.
+        event (object): instance of an Event with origin wikipedia.
 
     Returns:
         bool: True if doi is referenced in the Wikipedia page, else False.

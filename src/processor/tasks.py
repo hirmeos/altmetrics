@@ -8,6 +8,7 @@ from flask import current_app
 from core import db
 from core.celery import celery as celery_app
 from core.settings import Origins, StaticProviders
+from processor.collections.reasons import doi_not_on_wikipedia_page
 from processor.logic import check_wikipedia_event
 from processor.models import Event, RawEvent, Scrape, Uri
 
@@ -72,7 +73,6 @@ def check_wikipedia_references():
             origin=Origins.wikipedia.value,
             is_deleted=False
     ):
-
         if not check_wikipedia_event(event):
             db.session.add(
                 RawEvent(
@@ -80,8 +80,7 @@ def check_wikipedia_references():
                     origin=Origins.wikipedia.value,
                     provider=StaticProviders.hirmeos_altmetrics.value,
                     created_at=datetime.utcnow(),
-                    reason_for_deletion='Entry DOI is no longer referenced on '
-                                        'the specified Wikipedia page.'
+                    reason_for_deletion=doi_not_on_wikipedia_page.value
                 )
             )
             event.is_deleted = True
