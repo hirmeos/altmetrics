@@ -51,13 +51,26 @@ def configure_celery(celery_app):
         'pull-metrics-every-day': {
             'task': 'pull-metrics',
             'schedule': crontab(minute=0, hour=12, day_of_week='*')
-        }
+        },
+        'check-wikipedia-references-every-day': {
+            'task': 'check-wikipedia-references',
+            'schedule': crontab(minute=0, hour=10, day_of_week='*')
+        },
+        'check-deleted-wikipedia-references-every-day': {
+            'task': 'check-deleted-wikipedia-references',
+            'schedule': crontab(minute=0, hour=11, day_of_week='*')
+        },
     }
 
     celery_app.conf.task_routes = {
         'approve-user': {'queue': 'altmetrics.approve-user'},
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
         'pull-metrics': {'queue': 'altmetrics.pull-metrics'},
+        'check-wikipedia-references': {'queue': 'altmetrics.plugin-admin'},
+        'check-deleted-wikipedia-references': {
+            'queue': 'altmetrics.plugin-admin'
+        },
+
     }
 
     celery_app.autodiscover_tasks(['processor'])

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from configparser import ConfigParser
 import os
 
 from celery import Celery
@@ -19,13 +20,18 @@ mail = Mail()
 
 
 def create_app():
-    # app = Flask(__name__)
     app = FlaskAPI(__name__, template_folder='templates')
     app.config.from_object(f'core.settings.{CONFIG}')
 
     if app.config.get('SENTRY_DSN'):
+        config_file = ConfigParser()
+        config_file.read('sentry_version.ini')
+        sentry_release = config_file.get('sentry', 'version', fallback='ERROR')
+
         sentry_sdk.init(
             dsn=app.config.get('SENTRY_DSN'),
+            release=sentry_release,
+            environment=os.getenv('SENTRY_ENV', 'production'),
             integrations=[FlaskIntegration()]
         )
 

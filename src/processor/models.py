@@ -187,7 +187,7 @@ class RawEvent(Model):  # May want to rename this (and the Event table)
     id = Column(Integer, primary_key=True)
 
     event_id = Column(Integer, ForeignKey('event.id'), nullable=False)
-    scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
+    scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=True)
 
     external_id = Column(String, unique=True, nullable=True)
     origin = Column(Integer, nullable=False)
