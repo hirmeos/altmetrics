@@ -32,23 +32,49 @@ class HypothesisDataProvider(GenericDataProvider):
             list: Contains results.
         """
 
-        api_url = 'https://hypothes.is/api/search'
-        parameters = {
+        events = {}
+
+        default_params = {
             'uri': uri.raw,
             'order': 'asc',
         }
         if last_check:
-            parameters.update(search_after=last_check.isoformat())
+            default_params.update(search_after=last_check.isoformat())
         
+        # 1) Process DOI
+        self.query_h(uri, origin, scrape, event_dict, events, default_params)
+
+        for url in uri.urls:  # 2) Process urls
+            parameters = default_params.copy()
+            parameters.update(uri=url.url)
+            self.query_h(uri, origin, scrape, event_dict, events, parameters)
+
+            del(parameters['uri'])
+            parameters.update(wildcard_uri=f'{url.url}/?loc=*')
+            self.query_h(uri, origin, scrape, event_dict, events, parameters)
+
+        self.log_new_events(uri, origin, self.provider, events)
+        return event_dict, events
+
+    def query_h(self, uri, origin, scrape, event_dict, events, parameters):
+        """ Query the h API, and update the current set of Hypothes.is
+        events with the results.
+
+        *h is web app for hypoths.is.
+        """
+        api_url = 'https://hypothes.is/api/search'
         request_content = json.loads(
             requests.get(api_url, params=parameters).content
         )
         results = request_content.get('rows')
 
-        events = {}
         for result in results:
             subj = result.get('links', {}).get('html')
-            if self.get_event(uri.id, subj, event_dict):
+
+            if (
+                    self.get_event(uri.id, subj, event_dict)
+                    or not result.get('text')
+            ):
                 continue
 
             created_at = datetime.datetime.fromisoformat(
@@ -73,6 +99,3 @@ class HypothesisDataProvider(GenericDataProvider):
                     created_at=created_at
                 )
             ]
-
-        self.log_new_events(uri, origin, self.provider, events)
-        return event_dict, events
