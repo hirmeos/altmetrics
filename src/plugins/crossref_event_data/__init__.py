@@ -3,7 +3,6 @@ __version__ = 0.1
 __desc__ = "Provides DOI-based CrossRef Event Data as a source for metrics."
 
 from core.settings import StaticProviders, Origins
-
 from processor.schemas import EventSchema
 
 from . import crossref_event_data

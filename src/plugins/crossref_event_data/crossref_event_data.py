@@ -5,6 +5,7 @@ from generic.mount_point import GenericDataProvider
 from processor.logic import check_existing_entries
 from processor.models import Event, Error, RawEvent
 
+
 logger = getLogger(__name__)
 
 
