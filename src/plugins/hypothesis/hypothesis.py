@@ -3,7 +3,6 @@ import json
 from logging import getLogger
 import requests
 
-from core.settings import Origins, StaticProviders
 from generic.mount_point import GenericDataProvider
 from processor.models import Event, RawEvent
 
@@ -12,13 +11,12 @@ logger = getLogger(__name__)
 
 
 class HypothesisDataProvider(GenericDataProvider):
-    """ Implements Crossref Cited-by API integration. """
-
-    provider = StaticProviders.crossref_event_data
-    supported_origins = [Origins.hypothesis]
+    """ Implements Hypothes.is API integration. """
 
     def process(self, uri, origin, scrape, last_check, event_dict):
-        """ Pull annotations from Hypothesis API, and create Events.
+        """ Pull annotations from Hypothesis API, and create Events. Note:
+        this uses the wildcard_uri search option, which is subject to change;
+        see https://h.readthedocs.io/en/latest/api-reference/#operation/search.
 
         Args:
             uri (Uri): An Uri object.
@@ -32,23 +30,41 @@ class HypothesisDataProvider(GenericDataProvider):
             list: Contains results.
         """
 
-        api_url = 'https://hypothes.is/api/search'
         parameters = {
-            'uri': uri.raw,
+            'uri': [uri.raw],
             'order': 'asc',
         }
+        events = {}
+
         if last_check:
             parameters.update(search_after=last_check.isoformat())
-        
-        request_content = json.loads(
-            requests.get(api_url, params=parameters).content
-        )
-        results = request_content.get('rows')
 
-        events = {}
+        if uri.urls:
+            parameters.update(wildcard_uri=[])
+        
+        for url in uri.urls:  # 2) Process urls
+            parameters['uri'].append(url.url)
+            parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
+
+        response = requests.get(self.api_base, params=parameters)
+
+        if not response.content:
+            logger.error(
+                f'Unexpected: No response from request using request '
+                f'parameters: {parameters}. Reason: {response.reason}.'
+            )
+            results = []
+        else:
+            response_content = json.loads(response.content)
+            results = response_content.get('rows')
+
         for result in results:
             subj = result.get('links', {}).get('html')
-            if self.get_event(uri.id, subj, event_dict):
+
+            if (
+                    self.get_event(uri.id, subj, event_dict)
+                    or not result.get('text')
+            ):
                 continue
 
             created_at = datetime.datetime.fromisoformat(

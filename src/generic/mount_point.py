@@ -11,12 +11,28 @@ logger = getLogger(__name__)
 class GenericDataProvider(object, metaclass=utils.MountPoint):
     """ Plugins can inherit this mount point to add a data provider. """
 
-    def __init__(self, program):
-        # Nothing is implemented here.
-        pass
+    def __init__(
+            self,
+            provider,
+            supported_origins,
+            api_base=None,
+            client_class=None,
+            validator=None
+    ):
+        self.provider = provider
+        self.supported_origins = supported_origins
+        self.api_base = api_base
+        self.validator = validator
+        self.client_class = client_class
+
+        if client_class and api_base:
+            self.client = self.instantiate_client()
 
     def __str__(self):
         return self.__class__.__name__
+
+    def instantiate_client(self):
+        return self.client_class(self.api_base)
 
     @staticmethod
     def get_event(uri_id, subject_id, event_dict):
