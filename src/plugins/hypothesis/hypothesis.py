@@ -18,7 +18,9 @@ class HypothesisDataProvider(GenericDataProvider):
     supported_origins = [Origins.hypothesis]
 
     def process(self, uri, origin, scrape, last_check, event_dict):
-        """ Pull annotations from Hypothesis API, and create Events.
+        """ Pull annotations from Hypothesis API, and create Events. Note:
+        this uses the wildcard_uri search option, which is subject to change;
+        see https://h.readthedocs.io/en/latest/api-reference/#operation/search.
 
         Args:
             uri (Uri): An Uri object.
@@ -32,40 +34,27 @@ class HypothesisDataProvider(GenericDataProvider):
             list: Contains results.
         """
 
-        events = {}
-
-        default_params = {
-            'uri': uri.raw,
+        api_url = 'https://hypothes.is/api/search'
+        parameters = {
+            'uri': [uri.raw],
             'order': 'asc',
         }
+        events = {}
+
         if last_check:
-            default_params.update(search_after=last_check.isoformat())
+            parameters.update(search_after=last_check.isoformat())
+
+        if uri.urls:
+            parameters.update(wildcard_uri=[])
         
-        # 1) Process DOI
-        self.query_h(uri, origin, scrape, event_dict, events, default_params)
-
         for url in uri.urls:  # 2) Process urls
-            parameters = default_params.copy()
-            parameters.update(uri=url.url)
-            self.query_h(uri, origin, scrape, event_dict, events, parameters)
+            parameters['uri'].append(url.url)
+            parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
 
-            del(parameters['uri'])
-            parameters.update(wildcard_uri=f'{url.url}/?loc=*')
-            self.query_h(uri, origin, scrape, event_dict, events, parameters)
-
-        self.log_new_events(uri, origin, self.provider, events)
-        return event_dict, events
-
-    def query_h(self, uri, origin, scrape, event_dict, events, parameters):
-        """ Query the h API, and update the current set of Hypothes.is
-        events with the results.
-
-        *h is web app for hypoths.is.
-        """
-        api_url = 'https://hypothes.is/api/search'
         request_content = json.loads(
             requests.get(api_url, params=parameters).content
         )
+
         results = request_content.get('rows')
 
         for result in results:
@@ -99,3 +88,6 @@ class HypothesisDataProvider(GenericDataProvider):
                     created_at=created_at
                 )
             ]
+
+        self.log_new_events(uri, origin, self.provider, events)
+        return event_dict, events
