@@ -3,7 +3,6 @@ import json
 from logging import getLogger
 import requests
 
-from core.settings import Origins, StaticProviders
 from generic.mount_point import GenericDataProvider
 from processor.models import Event, RawEvent
 
@@ -13,9 +12,6 @@ logger = getLogger(__name__)
 
 class HypothesisDataProvider(GenericDataProvider):
     """ Implements Hypothes.is API integration. """
-
-    provider = StaticProviders.crossref_event_data
-    supported_origins = [Origins.hypothesis]
 
     def process(self, uri, origin, scrape, last_check, event_dict):
         """ Pull annotations from Hypothesis API, and create Events. Note:
@@ -34,7 +30,6 @@ class HypothesisDataProvider(GenericDataProvider):
             list: Contains results.
         """
 
-        api_url = 'https://hypothes.is/api/search'
         parameters = {
             'uri': [uri.raw],
             'order': 'asc',
@@ -51,7 +46,7 @@ class HypothesisDataProvider(GenericDataProvider):
             parameters['uri'].append(url.url)
             parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
 
-        response = requests.get(api_url, params=parameters)
+        response = requests.get(self.api_base, params=parameters)
 
         if not response.content:
             logger.error(

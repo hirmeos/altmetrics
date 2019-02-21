@@ -90,6 +90,7 @@ class Config(object):
         folder='plugins',
         ignore=[
             'generic',
+            '__init__.py',
             '__pycache__',
             'facebook',
             'twitter',

@@ -6,11 +6,6 @@ from generic.client import ApiClient
 class CrossRefEventDataClient(ApiClient):
     """ Dedicated CrossRef Event Data API client. """
 
-    api_base = 'https://api.eventdata.crossref.org/v1/events'
-
-    def __init__(self):
-        super().__init__(base_url=self.api_base)
-
     @staticmethod
     def _build_filters(values):
         """ Helper to create filters to be used when querying the API.

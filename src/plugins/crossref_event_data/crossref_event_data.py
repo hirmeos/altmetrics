@@ -1,29 +1,15 @@
 from datetime import date
 from logging import getLogger
 
-from core.settings import StaticProviders, Origins
 from generic.mount_point import GenericDataProvider
 from processor.logic import check_existing_entries
 from processor.models import Event, Error, RawEvent
-from processor.schemas import EventSchema
-
-from .client import CrossRefEventDataClient
 
 logger = getLogger(__name__)
 
 
 class CrossrefEventDataProvider(GenericDataProvider):
     """ Implements Crossref Event Data API integration. """
-
-    client = CrossRefEventDataClient()
-    validator = EventSchema()
-    provider = StaticProviders.crossref_event_data
-    supported_origins = [
-        Origins.twitter,
-        Origins.wikipedia,
-        Origins.hypothesis,
-        Origins.wordpressdotcom,
-    ]
 
     def _add_validator_context(self, **kwargs):
         self.validator.context = kwargs
