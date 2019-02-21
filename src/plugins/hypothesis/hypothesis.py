@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 
 class HypothesisDataProvider(GenericDataProvider):
-    """ Implements Crossref Cited-by API integration. """
+    """ Implements Hypothes.is API integration. """
 
     provider = StaticProviders.crossref_event_data
     supported_origins = [Origins.hypothesis]
@@ -51,11 +51,17 @@ class HypothesisDataProvider(GenericDataProvider):
             parameters['uri'].append(url.url)
             parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
 
-        request_content = json.loads(
-            requests.get(api_url, params=parameters).content
-        )
+        response = requests.get(api_url, params=parameters)
 
-        results = request_content.get('rows')
+        if not response.content:
+            logger.error(
+                f'Unexpected: No response from request using request '
+                f'parameters: {parameters}. Reason: {response.reason}.'
+            )
+            results = []
+        else:
+            response_content = json.loads(response.content)
+            results = response_content.get('rows')
 
         for result in results:
             subj = result.get('links', {}).get('html')
