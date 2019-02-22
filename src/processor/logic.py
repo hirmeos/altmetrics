@@ -4,6 +4,7 @@ from itertools import chain
 from urllib.parse import unquote
 
 import wikipedia
+from wikipedia import PageError
 
 from core import db
 
@@ -68,9 +69,11 @@ def check_wikipedia_event(event):
     page_title = os.path.basename(url)
 
     wikipedia.set_lang(page_language)
-    page_obj = wikipedia.page(
-        title=unquote(page_title)
-    )
+
+    try:
+        page_obj = wikipedia.WikipediaPage(title=unquote(page_title))
+    except PageError:
+        page_obj = wikipedia.page(title=unquote(page_title))
 
     return is_in_references(page_obj.references, doi)
 
