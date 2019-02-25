@@ -12,7 +12,7 @@ from core import db
 
 
 logger = getLogger(__name__)
-WIKI_PATTERN = re.compile('[a-z]{2}[.]wikipedia[.]org/.*')
+WIKI_PATTERN = re.compile('//[a-z]{2}[.]wikipedia[.]org/.*')
 
 
 def check_existing_entries(model_column, column_values):
@@ -53,9 +53,10 @@ def get_wiki_page_title(url):
     )
 
 
-def get_wiki_call_info(url):
+def get_wikimedia_call_info(url):
     """ Determine the URL and parameters to use query the Wikimedia API about
-    info on a specific page.
+    info on a specific page. Used for non-Wikipedia pages where the wikipedia
+    client cannot be used to fetch info.
 
     Args:
         url (str): url of Wikimedia page.
@@ -110,7 +111,7 @@ def get_non_wikipedia_references(url):
     Returns:
         list: references/external links from the wikimedia page.
     """
-    call_url, call_params = get_wiki_call_info(url)
+    call_url, call_params = get_wikimedia_call_info(url)
     response = requests.get(call_url, params=call_params)
 
     try:
@@ -189,6 +190,6 @@ def get_language_from_wiki_url(url, default_language='en'):
     """
     match = WIKI_PATTERN.search(url)
     if match:
-        return match.group()[:2]
+        return match.group()[2:4]
 
     return default_language
