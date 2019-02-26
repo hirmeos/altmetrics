@@ -36,7 +36,7 @@ class StaticProviders(IntEnum):
     hirmeos_altmetrics = 6
 
 
-class Config(object):
+class Config:
 
     SECRET_KEY = getenv('SECRET_KEY', 'secret-key')
 
