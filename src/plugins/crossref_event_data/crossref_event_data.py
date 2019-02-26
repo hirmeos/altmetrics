@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from datetime import date
 from logging import getLogger
 
@@ -30,7 +31,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
         """ Build a target Event object using the defined schema.
 
         Args:
-            event_data (iter): list of Event dicts as coming from the client.
+            event_data (Iterable): list of Event dicts as coming from the client.
             uri_id (int): id or uri being queried
             origin (Enum): Service which originated the event we are fetching.
             event_dict: dict of events not yet committed to the db

@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from logging import getLogger
 import os
 import re
@@ -128,7 +129,7 @@ def is_in_references(references, doi):
     """ Search for a doi in a list of references.
 
     Args:
-        references (iter): References to loop through.
+        references (Iterable): References to loop through.
         doi (str): DOI of work to search for.
 
     Returns:

@@ -17,7 +17,7 @@ def utf8(bytes_value):
     return bytes_value.decode('utf-8')
 
 
-class AltmetricsClient(object):
+class AltmetricsClient:
 
     API_BASE = 'https://altmetrics.ubiquity.press/api'
 

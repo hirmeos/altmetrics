@@ -9,7 +9,16 @@ from processor.logic import (
     get_language_from_wiki_url,
     get_non_wikipedia_references,
     get_wikimedia_call_info,
+    is_in_references,
     is_wikipedia_url,
+)
+from .variables import (
+    wiki_json,
+    wiki_reference_simple,
+    wiki_reference_encoded,
+    MockEvent,
+    MockUri,
+    MockWikipediaPage,
 )
 
 
@@ -20,19 +29,6 @@ class WikipediaTestCase(unittest.TestCase):
 
     page_title = 'Festival_Romanistica'  # Page titles
     page_title_encoded = 'Fanny_Ambj%C3%B6rnsson'
-
-    class MockUri(object):
-        def __init__(self, raw):
-            self.raw = raw
-
-    class MockEvent(object):
-        def __init__(self, subject_id, uri):
-            self.subject_id = subject_id
-            self.uri = uri
-
-    class MockWikipediaPage(object):
-        def __init__(self, references):
-            self.references = references
 
     def test_get_wiki_page_title(self):
         """ Check function returns the title of a wikipedia page, based on
@@ -119,29 +115,7 @@ class WikipediaTestCase(unittest.TestCase):
         """ Check that requests library is called when getting non-wikipedia
         references.
         """
-        # This will need to be moved somewhere more suitable - and simplified.
-        mock_requests.get().json.return_value = {
-            'batchcomplete': '',
-            'query': {
-                'normalized': [
-                    {
-                        'from': 'The_battle_for_open',
-                        'to': 'The battle for open'
-                    }
-                ],
-                'pages': {
-                    '1950647': {
-                        'pageid': 1950647,
-                        'ns': 0,
-                        'title': 'The battle for open',
-                        'extlinks': [
-                            {'*': 'http://dx.doi.org/10.5334/bam'},
-                            {'*': 'http://creativecommons.org/licenses/by/3.0/'}
-                        ]
-                    }
-                }
-            }
-        }
+        mock_requests.get().json.return_value = wiki_json
         url = 'https://wikisource.org/wiki/Index:Anything.pdf'
         get_non_wikipedia_references(url)
 
@@ -157,10 +131,10 @@ class WikipediaTestCase(unittest.TestCase):
         """ Check that get_wikipedia_references() function is called if a
         wikipedia URL is passed.
         """
-        wiki_client.WikipediaPage.return_value = self.MockWikipediaPage([])
+        wiki_client.WikipediaPage.return_value = MockWikipediaPage([])
         page_url = f'{self.base_url}/{self.page_title}'
-        uri_obj = self.MockUri(raw='10.5334/baj')
-        event_obj = self.MockEvent(
+        uri_obj = MockUri(raw='10.5334/baj')
+        event_obj = MockEvent(
             subject_id=page_url,
             uri=uri_obj
         )
@@ -178,13 +152,45 @@ class WikipediaTestCase(unittest.TestCase):
         """ Check that get_non_wikipedia_references() function is called if a
         non-wikipedia URL is passed.
         """
-        wiki_client.WikipediaPage.return_value = self.MockWikipediaPage([])
+        wiki_client.WikipediaPage.return_value = MockWikipediaPage([])
         page_url = f'https://commons.wikimedia.org/{self.page_title}'
-        uri_obj = self.MockUri(raw='10.5334/baj')
-        event_obj = self.MockEvent(
+        uri_obj = MockUri(raw='10.5334/baj')
+        event_obj = MockEvent(
             subject_id=page_url,
             uri=uri_obj
         )
         check_wikipedia_event(event_obj)
 
         refs_function.assert_called_with(page_url)
+
+    def test_is_in_references_simple(self):
+        """ Check that function can identify doi inside a reference list."""
+        self.assertTrue(
+            is_in_references(
+                references=wiki_reference_simple.references,
+                doi=wiki_reference_simple.doi
+            )
+        )
+        self.assertFalse(  # Check the function does not always return True
+            is_in_references(
+                references=wiki_reference_simple.references,
+                doi='10.21401/not/a/doi'
+            )
+        )
+
+    def test_is_in_references_encoded(self):
+        """ Check that function can identify doi inside a reference
+        list, where the doi is encoded for a URL.
+        """
+        self.assertTrue(
+            is_in_references(
+                references=wiki_reference_encoded.references,
+                doi=wiki_reference_encoded.doi
+            )
+        )
+        self.assertFalse(  # Check the function does not always return True
+            is_in_references(
+                references=wiki_reference_encoded.references,
+                doi='10.21401/not/a/doi'
+            )
+        )
