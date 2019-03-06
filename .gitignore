@@ -3,6 +3,7 @@
 *local.ini*
 src/static
 *__pycache__*
+*.pyc
 *~
 .tox
 
