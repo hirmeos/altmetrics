@@ -114,7 +114,10 @@ class TwitterProvider(GenericDataProvider):
             scrape_id=scrape.id
         )
 
-        start_datetime = last_check or get_doi_deposit_date(uri.raw)
+        start_datetime = last_check or get_doi_deposit_date(
+            uri.raw,
+            datetime(2006, 3, 22)
+        )
         results = self.client.query_twitter_history(
             doi=uri.raw,
             start_datetime=start_datetime

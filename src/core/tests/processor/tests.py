@@ -4,11 +4,13 @@ from urllib.parse import unquote
 
 from processor.logic import (
     check_wikipedia_event,
-    get_wiki_page_title,
-    get_wikipedia_references,
+    get_doi_deposit_date,
     get_language_from_wiki_url,
+    get_mailto,
     get_non_wikipedia_references,
+    get_wiki_page_title,
     get_wikimedia_call_info,
+    get_wikipedia_references,
     is_in_references,
     is_wikipedia_url,
     set_generic_twitter_link,
@@ -210,3 +212,19 @@ class WikipediaTestCase(unittest.TestCase):
             set_generic_twitter_link(twitter_url),
             'https://twitter.com/i/web/status/123456789'
         )
+
+    # @patch('flask.current_app')
+    # def test_get_mailto_returns_app_context_email(self, flask_app):
+    #     """ Test that function returns the default email inside app context."""
+    #     flask_app.config.return_value = {'TECH_EMAIL': 'admin.user@mail.org'}
+    #     test_mail = get_mailto(default_email='test.user@mail.org')
+    #     self.assertEqual(test_mail, 'admin.user@mail.org')
+
+    def test_get_mailto_returns_correct_default(self):
+        """ Test that function returns the default email outside app context."""
+        test_mail = get_mailto(default_email='test.user@mail.org')
+        self.assertEqual(test_mail, 'test.user@mail.org')
+
+    # @patch('requests.get')
+    # def test_get_doi_deposit_date(self, get_request):
+

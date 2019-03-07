@@ -209,7 +209,7 @@ def get_mailto(default_email='example@example.org'):
         return default_email
 
 
-def get_doi_deposit_date(doi, default_datetime=None):
+def get_doi_deposit_date(doi, default_datetime):
     """  Query the CrossRef API to get the day a book/article was deposited.
 
     Args:
@@ -226,16 +226,16 @@ def get_doi_deposit_date(doi, default_datetime=None):
     response = requests.get(url, params=parameters)
 
     if response.status_code != 200:
-        return default_datetime  # datetime(2006, 4, 1) for twitter
+        return default_datetime
 
     try:
-        return get_timestamp(response.json())
+        return get_tweet_timestamp(response.json())
     except (KeyError, Exception) as e:
         logger.error(f'Error occurred when getting timestamp for DOI: {doi}')
         raise e
 
 
-def get_timestamp(json_response): 
+def get_tweet_timestamp(json_response):
     iso_datetime = json_response['message']['deposited']['date-time']
     iso_datetime = iso_datetime.rstrip('Z')
     return datetime.fromisoformat(iso_datetime)
