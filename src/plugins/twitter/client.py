@@ -9,7 +9,7 @@ class TwitterClient:
 
     Please note, this uses the Premium Twitter search API. For more details
     visit https://developer.twitter.com/en/docs/tweets/search/api-reference
-    /premium-search.html
+    /premium-search.html.
     """
 
     verify_url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
@@ -27,11 +27,11 @@ class TwitterClient:
         """ Instantiate the Twitter client.
 
         Args:
-            app_key (str): key for your twitter app
-            app_key_secret (str): key secret for your twitter app
-            access_token (str): access token for your twitter app
-            access_token_secret (str): access token secret for your twitter app
-            label (str): label for your full-archive twitter dev environment
+            app_key (str): key for your twitter app.
+            app_key_secret (str): key secret for your twitter app.
+            access_token (str): access token for your twitter app.
+            access_token_secret (str): access token secret for your twitter app.
+            label (str): label for your full-archive twitter dev environment.
         """
 
         self.app_key = app_key
@@ -65,7 +65,7 @@ class TwitterClient:
         return datetime_obj.strftime('%Y%m%d%H%M')
 
     @staticmethod
-    def get_end_date(start_datetime_obj, days=30):
+    def calculate_end_date(start_datetime_obj, days=30):
         """ Add a specific number of days to a given a start datetime.
 
         Args:
@@ -86,16 +86,16 @@ class TwitterClient:
 
         Args:
             doi (str): DOI of book/article to be queried.
-            start_datetime: Start date of the query
+            start_datetime: Start date of the query.
 
         Returns:
-            dict: parameters to passed to the Twitter API
+            dict: parameters to passed to the Twitter API.
         """
         return {
             'query': doi,
             'fromDate': self.twitter_date_format(start_datetime),
             'toDate': self.twitter_date_format(
-                self.get_end_date(start_datetime)
+                self.calculate_end_date(start_datetime)
             ),
         }
 
@@ -123,7 +123,7 @@ class TwitterClient:
 
         Args:
             doi (str): DOI to search for.
-            start_datetime (datetime): starting day when tweets occur
+            start_datetime (datetime): starting day when tweets occur.
 
         Returns:
             list: List of responses from the Twitter API.
@@ -136,6 +136,6 @@ class TwitterClient:
             results.append(
                 self.query_twitter_api(parameters)
             )
-            start_datetime = self.get_end_date(start_datetime)
+            start_datetime = self.calculate_end_date(start_datetime)
 
         return results

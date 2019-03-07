@@ -32,14 +32,14 @@ class TwitterClientTestCase(unittest.TestCase):
         """ Test that the function returns the correct date."""
         start_date = datetime(2000, 1, 1, 0, 0)
         expected_end_date = datetime(2000, 1, 31, 0, 0)
-        end_date = self.client.get_end_date(start_date)
+        end_date = self.client.calculate_end_date(start_date)
         self.assertEqual(end_date, expected_end_date)
 
     def test_get_end_date_does_does_not_go_beyond_now(self):
         """ Test that the function does not return an end date that is
         beyond the current datetime."""
         start_date = datetime.now()
-        end_date = self.client.get_end_date(start_date)
+        end_date = self.client.calculate_end_date(start_date)
         self.assertLess(end_date, datetime.now())
 
     def test_set_parameters(self):
