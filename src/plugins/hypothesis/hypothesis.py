@@ -77,7 +77,7 @@ class HypothesisDataProvider(GenericDataProvider):
                 origin=origin.value,
                 created_at=created_at
             )
-            event_dict.update(subj=event)
+            event_dict[subj] = event
 
             events[event] = [
                 RawEvent(

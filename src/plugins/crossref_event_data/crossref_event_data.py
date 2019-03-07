@@ -2,8 +2,9 @@ from collections.abc import Iterable
 from datetime import date
 from logging import getLogger
 
+from core.settings import Origins
 from generic.mount_point import GenericDataProvider
-from processor.logic import check_existing_entries
+from processor.logic import check_existing_entries, set_generic_twitter_link
 from processor.models import Event, Error, RawEvent
 
 
@@ -12,9 +13,6 @@ logger = getLogger(__name__)
 
 class CrossrefEventDataProvider(GenericDataProvider):
     """ Implements Crossref Event Data API integration. """
-
-    def _add_validator_context(self, **kwargs):
-        self.validator.context = kwargs
 
     def _validate(self, events):
         """ Make sure event passes validation.
@@ -31,13 +29,13 @@ class CrossrefEventDataProvider(GenericDataProvider):
         """ Build a target Event object using the defined schema.
 
         Args:
-            event_data (Iterable): list of Event dicts as coming from the client.
+            event_data (Iterable): list of Event dicts coming from the client.
             uri_id (int): id or uri being queried
             origin (Enum): Service which originated the event we are fetching.
             event_dict: dict of events not yet committed to the db
 
         Returns:
-            iter: iter of HIRMEOS metrics' ORM Events.
+            tuple: The input event_dict and an Iterable of Event objects
         """
 
         data = (data for data, errors in event_data if not errors)
@@ -47,6 +45,9 @@ class CrossrefEventDataProvider(GenericDataProvider):
 
         events = {}
         for subj, event_list in raw_events_dict.items():
+            if origin == Origins.twitter:
+                subj = set_generic_twitter_link(subj)
+
             event = self.get_event(
                 uri_id=uri_id,
                 subject_id=subj,
@@ -63,7 +64,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
                     origin=origin.value,
                     created_at=min_date
                 )
-                event_dict.update(subj=event)
+                event_dict[subj] = event
 
             existing_raw_ids = check_existing_entries(
                 RawEvent.external_id,

@@ -13,7 +13,7 @@ class TwitterClient:
     """
 
     verify_url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
-    search_url_base = 'https://api.twitter.com/1.1/tweets/search'
+    api_base = 'https://api.twitter.com/1.1/tweets/search'
 
     def __init__(
             self,
@@ -21,8 +21,8 @@ class TwitterClient:
             app_key_secret,
             access_token,
             access_token_secret,
-            label
-
+            label,
+            api_base=None
     ):
         """ Instantiate the Twitter client.
 
@@ -39,7 +39,8 @@ class TwitterClient:
         self.access_token = access_token
         self.access_token_secret = access_token_secret
 
-        self.search_url = f'{self.search_url_base}/fullarchive/{label}.json'
+        self.api_base = api_base or self.api_base
+        self.search_url = f'{self.api_base}/fullarchive/{label}.json'
         self.auth = self.set_authentication()
 
     def set_authentication(self):
@@ -111,7 +112,7 @@ class TwitterClient:
 
         """
         return requests.get(
-            self.search_url_base,
+            self.search_url,
             params=parameters,
             auth=self.auth
         )

@@ -11,6 +11,7 @@ from processor.logic import (
     get_wikimedia_call_info,
     is_in_references,
     is_wikipedia_url,
+    set_generic_twitter_link,
 )
 from .variables import (
     wiki_json,
@@ -193,4 +194,19 @@ class WikipediaTestCase(unittest.TestCase):
                 references=wiki_reference_encoded.references,
                 doi='10.21401/not/a/doi'
             )
+        )
+
+    def test_set_generic_twitter_link_with_id(self):
+        """ Check that function converts twitter ID to correct URL."""
+        self.assertEqual(
+            set_generic_twitter_link('123456789'),
+            'https://twitter.com/i/web/status/123456789'
+        )
+
+    def test_set_generic_twitter_link_with_url(self):
+        """ Check that function converts twitter URL to correct URL."""
+        twitter_url = 'https://twitter.com/AnyUserAccount/status/123456789'
+        self.assertEqual(
+            set_generic_twitter_link(twitter_url),
+            'https://twitter.com/i/web/status/123456789'
         )

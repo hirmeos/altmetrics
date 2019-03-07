@@ -1,6 +1,7 @@
 from collections.abc import Iterable
+from datetime import datetime
 from logging import getLogger
-import os
+from os import path
 import re
 import requests
 from itertools import chain
@@ -8,6 +9,8 @@ from urllib.parse import unquote, urlsplit
 
 import wikipedia
 from wikipedia import PageError
+
+from flask import current_app
 
 from core import db
 
@@ -50,7 +53,7 @@ def get_wiki_page_title(url):
     """
     url_obj = urlsplit(url)
     return unquote(
-        os.path.basename(url_obj.path)
+        path.basename(url_obj.path)
     )
 
 
@@ -194,3 +197,60 @@ def get_language_from_wiki_url(url, default_language='en'):
         return match.group()[2:4]
 
     return default_language
+
+
+def get_mailto(default_email='example@example.org'):
+    """ Get the 'mailto' email to be used on API requests. If this function
+    is used outside of a flask app, a default value will be returned, instead.
+    """
+    try:
+        return current_app.config.get('TECH_EMAIL')
+    except RuntimeError:
+        return default_email
+
+
+def get_doi_deposit_date(doi, default_datetime=None):
+    """  Query the CrossRef API to get the day a book/article was deposited.
+
+    Args:
+        doi (str): doi of book/article to look up
+        default_datetime (datetime): datetime returned if the lookup fails.
+
+    Returns:
+        datetime: datetime book/article was deposited or default_datetime
+    """
+    parameters = {'mailto': get_mailto()}
+    api_base = 'https://api.crossref.org/works'
+
+    url = f'{api_base}/{doi}' 
+    response = requests.get(url, params=parameters)
+
+    if response.status_code != 200:
+        return default_datetime  # datetime(2006, 4, 1) for twitter
+
+    try:
+        return get_timestamp(response.json())
+    except (KeyError, Exception) as e:
+        logger.error(f'Error occurred when getting timestamp for DOI: {doi}')
+        raise e
+
+
+def get_timestamp(json_response): 
+    iso_datetime = json_response['message']['deposited']['date-time']
+    iso_datetime = iso_datetime.rstrip('Z')
+    return datetime.fromisoformat(iso_datetime)
+
+
+def set_generic_twitter_link(tweet_id):
+    """ Convert tweet ID or URL to a generic URL to view the tweet.
+
+    Args:
+        tweet_id (str): ID/URL of a tweet
+
+    Returns:
+        str: url to view the tweet
+    """
+    if not tweet_id.isdigit():
+        tweet_id = path.basename(tweet_id)
+
+    return f'https://twitter.com/i/web/status/{tweet_id}'

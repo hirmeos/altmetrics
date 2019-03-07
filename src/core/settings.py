@@ -98,6 +98,15 @@ class Config:
         ]
     )
 
+    # ## Twitter ##
+    TWITTER_APP_KEY = getenv('TWITTER_APP_KEY')
+    TWITTER_APP_KEY_SECRET = getenv('TWITTER_APP_KEY_SECRET')
+    TWITTER_ACCESS_TOKEN = getenv('TWITTER_ACCESS_TOKEN')
+    TWITTER_ACCESS_TOKEN_SECRET = getenv(
+        'TWITTER_ACCESS_TOKEN_SECRET'
+    )
+    TWITTER_LABEL = getenv('TWITTER_LABEL')
+
     # ## Mail settings #
 
     TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
