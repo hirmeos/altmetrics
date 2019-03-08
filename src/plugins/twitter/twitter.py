@@ -1,12 +1,13 @@
 from collections.abc import Iterable
 from datetime import datetime
 from logging import getLogger
-from itertools import chain
+
+from TwitterSearch import TwitterSearchOrder
 
 from flask import current_app
 
 from generic.mount_point import GenericDataProvider
-from processor.logic import get_doi_deposit_date, set_generic_twitter_link
+from processor.logic import set_generic_twitter_link
 from processor.models import Event, RawEvent
 
 
@@ -18,30 +19,27 @@ class TwitterProvider(GenericDataProvider):
     def instantiate_client(self):
         try:
             return self.client_class(
-                app_key=current_app.config.get('TWITTER_APP_KEY'),
-                app_key_secret=current_app.config.get('TWITTER_APP_KEY_SECRET'),
+                consumer_key=current_app.config.get('TWITTER_APP_KEY'),
+                consumer_secret=current_app.config.get(
+                    'TWITTER_APP_KEY_SECRET'
+                ),
                 access_token=current_app.config.get('TWITTER_ACCESS_TOKEN'),
                 access_token_secret=current_app.config.get(
                     'TWITTER_ACCESS_TOKEN_SECRET'
                 ),
-                label=current_app.config.get('TWITTER_LABEL'),
-                api_base=self.api_base
             )
         except RuntimeError:
             logger.error('App not found - skipping client instantiation')
             return None
 
     def _validate(self, results):
-        schema = self.client(many=True)
-        iter_results = chain.from_iterable(results)
-
-        return schema.dumps(iter_results)
+        return self.validator.dump(results)
 
     @staticmethod
     def _convert_to_python(event_entry):
         """ Parse data from twitter API and convert them to Python types."""
         date_string = event_entry.pop('created_at_str')
-        created_at = datetime.strptime(date_string, format='%a %b %d %X %z %Y')
+        created_at = datetime.strptime(date_string, '%a %b %d %X %z %Y')
 
         twitter_id = event_entry.pop('twitter_id')
         subject_id = set_generic_twitter_link(twitter_id)
@@ -107,6 +105,9 @@ class TwitterProvider(GenericDataProvider):
             generator: Contains events found for the given URI, as dictionaries.
         """
 
+        if not self.client:
+            self.client = self.instantiate_client()
+
         self._add_validator_context(
             uri_id=uri.id,
             origin=origin.value,
@@ -114,16 +115,15 @@ class TwitterProvider(GenericDataProvider):
             scrape_id=scrape.id
         )
 
-        start_datetime = last_check or get_doi_deposit_date(
-            uri.raw,
-            datetime(2006, 3, 22)
-        )
-        results = self.client.query_twitter_history(
-            doi=uri.raw,
-            start_datetime=start_datetime
-        )
+        tso = TwitterSearchOrder()
+        tso.set_keywords([f'"{uri.raw}"'])
+        tso.set_include_entities(False)  # set True for retweet info
 
-        valid, errors = self._validate(results)
+        if last_check:
+            tso.set_since = last_check.date()
+
+        results_generator = self.client.search_tweets_iterable(tso)
+        valid, errors = self._validate(results_generator)
         event_dict, events = self._build(
             event_data=valid,
             uri_id=uri.id,

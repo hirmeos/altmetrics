@@ -1,35 +1,27 @@
-from marshmallow import Schema, fields
+from dateutil.parser import parse as parse_date_string
+
+from marshmallow import fields
+from marshmallow.exceptions import ValidationError
+
+from processor.schemas import EventSchema
 
 
-class CrossRefEventDataObject(Schema):
+class CrossRefEventSchema(EventSchema):
+    """ Turn a CrossRefEventData event into an HIRMEOS metrics Event """
 
-    pid = fields.URL()
-    url = fields.URL()
+    external_id = fields.UUID(attribute="id")
+    subject_id = fields.Method('get_subject_id')
+    created_at = fields.Method('get_created')
 
+    @staticmethod
+    def get_subject_id(obj):
+        if 'oldid=' in obj.get('subj').get('pid'):
+            return obj.get('subj').get('url')
+        return obj.get('subj').get('pid')
 
-class CrossRefEventDataSubject(Schema):
-
-    pid = fields.URL()
-    json_url = fields.URL(data_key='json-url')
-    url = fields.URL()
-    type = fields.String()
-    title = fields.String()
-    issued = fields.DateTime()
-
-
-class CrossRefEventDataEventSchema(Schema):
-
-    license = fields.Url()
-    obj_id = fields.Url()
-    source_token = fields.UUID()
-    occurred_at = fields.DateTime()
-    subj_id = fields.URL()
-    id = fields.UUID()
-    evidence_record = fields.URL()
-    terms = fields.URL()
-    action = fields.String()
-    subj = fields.Nested(CrossRefEventDataSubject)
-    source_id = fields.String()
-    obj = fields.Nested(CrossRefEventDataObject)
-    timestamp = fields.DateTime()
-    relation_type_id = fields.String()
+    @staticmethod
+    def get_created(obj):
+        try:
+            return parse_date_string(obj.get('occurred_at'))
+        except ValueError:
+            raise ValidationError('Not a valid datetime string.')
