@@ -1,0 +1,14 @@
+AMQP_URI: !raw_env_var 'amqp://${NAMEKO_USER}:${NAMEKO_PASSWORD}@${RMQ_HOST}:5672/${NAMEKO_VHOST}'
+WEB_SERVER_ADDRESS: '${RMQ_HOST}:15672'
+rpc_exchange: 'nameko-rpc'
+max_workers: 10
+parent_calls_tracked: 10
+
+LOGGING:
+    version: 1
+    handlers:
+        console:
+            class: logging.StreamHandler
+    root:
+        level: DEBUG
+        handlers: [console]

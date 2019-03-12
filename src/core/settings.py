@@ -1,10 +1,12 @@
 """
-Common settings for the HIRMEOS Altetrics project.
+Common settings for the HIRMEOS Altmetrics project.
 """
 
 from enum import IntEnum
 from os import getenv, pardir, path
 import re
+
+from nameko.standalone.rpc import ClusterRpcProxy
 
 from generic import utils
 
@@ -55,13 +57,37 @@ class Config:
     RMQ_HOST = getenv('RMQ_HOST')
     RMQ_VHOST = getenv('RMQ_VHOST')
 
-    CELERY_BROKER_URL = 'amqp://{user}:{password}@{host}:5672/{vhost}'.format(
+    AMQ_URL = 'amqp://{user}:{password}@{host}:5672/{vhost}'
+    CELERY_BROKER_URL = AMQ_URL.format(
         user=RMQ_USER,
         password=RMQ_PASSWORD,
         host=RMQ_HOST,
         vhost=RMQ_VHOST
     )
     RESULT_BACKEND = 'amqp'
+
+    # ## Nameiko
+
+    NAMEKO_USER = getenv('NAMEKO_USER')
+    NAMEKO_PASSWORD = getenv('NAMEKO_PASSWORD')
+    NAMEKO_VHOST = getenv('NAMEKO_VHOST')
+
+    NAMEKO_BROKER_URL = AMQ_URL.format(
+        user=NAMEKO_USER,
+        password=NAMEKO_PASSWORD,
+        host=RMQ_HOST,
+        vhost=NAMEKO_VHOST
+    )
+
+    NAMEKO_CONFIG = {
+        'AMQP_URI': NAMEKO_BROKER_URL,
+        'WEB_SERVER_ADDRESS': '{host}:15672'.format(host=RMQ_HOST),
+        'rpc_exchange': 'nameko-rpc',
+        'max_workers': 10,
+        'parent_calls_tracked': 10,
+    }
+
+    CLUSTER_RPC = ClusterRpcProxy(NAMEKO_CONFIG)
 
     # ## DATABASES ##
 
