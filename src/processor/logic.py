@@ -212,8 +212,9 @@ def set_generic_twitter_link(tweet_id):
         if split_url.query:
             try:  # extract tweet ID from URL paramters
                 tweet_id = parse_qs(split_url.query)['id'][0]
-            except (KeyError, IndexError):
+            except (KeyError, IndexError) as e:
                 logger.error(f'Error with tweet ID: {tweet_id}')
+                raise e
 
         else:
             tweet_id = path.basename(tweet_id)

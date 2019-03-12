@@ -47,16 +47,16 @@ class TwitterProvider(GenericDataProvider):
         return subject_id, created_at
 
     def _build(self, event_data, uri_id, origin, event_dict):
-        """ Build a Event objects using the defined schema.
+        """ Build Event objects using the defined schema.
 
         Args:
             event_data (Iterable): list of Event dicts coming from the schema.
-            uri_id (int): id or uri being queried
+            uri_id (int): id or uri being queried.
             origin (Enum): Service which originated the event we are fetching.
-            event_dict: dict of events not yet committed to the db
+            event_dict: dict of events not yet committed to the db.
 
         Returns:
-            tuple: The input event_dict and an Iterable of Event objects
+            tuple: The input event_dict and an Iterable of Event objects.
         """
 
         events = {}
@@ -102,7 +102,7 @@ class TwitterProvider(GenericDataProvider):
                 {subj-id: event-object}
 
         Returns:
-            generator: Contains events found for the given URI, as dictionaries.
+            tuple: The input event_dict and an Iterable of Event objects.
         """
 
         if not self.client:

@@ -11,7 +11,7 @@ class CrossRefEventSchema(EventSchema):
 
     external_id = fields.UUID(attribute="id")
     subject_id = fields.Method('get_subject_id')
-    created_at = fields.Method('get_created')
+    created_at = fields.Method('get_datetime_created_at')
 
     @staticmethod
     def get_subject_id(obj):
@@ -20,7 +20,7 @@ class CrossRefEventSchema(EventSchema):
         return obj.get('subj').get('pid')
 
     @staticmethod
-    def get_created(obj):
+    def get_datetime_created_at(obj):
         try:
             return parse_date_string(obj.get('occurred_at'))
         except ValueError:

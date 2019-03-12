@@ -26,16 +26,16 @@ class CrossrefEventDataProvider(GenericDataProvider):
         return (self.validator.dump(event) for event in events)
 
     def _build(self, event_data, uri_id, origin, event_dict):
-        """ Build a target Event object using the defined schema.
+        """ Build Event objects using the defined schema.
 
         Args:
             event_data (Iterable): list of Event dicts coming from the schema.
-            uri_id (int): id or uri being queried
+            uri_id (int): id or uri being queried.
             origin (Enum): Service which originated the event we are fetching.
-            event_dict: dict of events not yet committed to the db
+            event_dict (dict): Event objects not yet committed to the db.
 
         Returns:
-            tuple: The input event_dict and an Iterable of Event objects
+            tuple: The input event_dict and an Iterable of new Event objects.
         """
 
         data = (data for data, errors in event_data if not errors)
@@ -99,7 +99,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
                 {subj-id: event-object}
 
         Returns:
-            generator: Contains events found for the given URI, as dictionaries.
+            tuple: The input event_dict and an Iterable of new Event objects.
         """
 
         self._add_validator_context(
