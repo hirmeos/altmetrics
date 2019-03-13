@@ -34,6 +34,9 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
     def instantiate_client(self):
         return self.client_class(self.api_base)
 
+    def _add_validator_context(self, **kwargs):
+        self.validator.context = kwargs
+
     @staticmethod
     def get_event(uri_id, subject_id, event_dict):
         """Tries to get an event to prevent duplicates from being created. """

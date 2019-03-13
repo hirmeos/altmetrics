@@ -1,10 +1,10 @@
 from collections.abc import Iterable
 from logging import getLogger
-import os
+from os import path
 import re
 import requests
 from itertools import chain
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urlsplit, parse_qs
 
 import wikipedia
 from wikipedia import PageError
@@ -50,7 +50,7 @@ def get_wiki_page_title(url):
     """
     url_obj = urlsplit(url)
     return unquote(
-        os.path.basename(url_obj.path)
+        path.basename(url_obj.path)
     )
 
 
@@ -194,3 +194,29 @@ def get_language_from_wiki_url(url, default_language='en'):
         return match.group()[2:4]
 
     return default_language
+
+
+def set_generic_twitter_link(tweet_id):
+    """ Convert tweet ID or URL to a generic URL to view the tweet. If tweet_id
+    is given as a URL, the function will try to determine what form of URL is
+    given and extract the tweet ID accordingly.
+
+    Args:
+        tweet_id (str): ID/URL of a tweet
+
+    Returns:
+        str: url to view the tweet
+    """
+    if not tweet_id.isdigit():
+        split_url = urlsplit(tweet_id)
+        if split_url.query:
+            try:  # extract tweet ID from URL paramters
+                tweet_id = parse_qs(split_url.query)['id'][0]
+            except (KeyError, IndexError) as e:
+                logger.error(f'Error with tweet ID: {tweet_id}')
+                raise e
+
+        else:
+            tweet_id = path.basename(tweet_id)
+
+    return f'https://twitter.com/i/web/status/{tweet_id}'

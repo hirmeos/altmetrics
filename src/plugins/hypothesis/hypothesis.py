@@ -27,7 +27,7 @@ class HypothesisDataProvider(GenericDataProvider):
                 {subj-id: event-object}
 
         Returns:
-            list: Contains results.
+            tuple: The input event_dict and an Iterable of new Event objects.
         """
 
         parameters = {
@@ -77,7 +77,7 @@ class HypothesisDataProvider(GenericDataProvider):
                 origin=origin.value,
                 created_at=created_at
             )
-            event_dict.update(subj=event)
+            event_dict[subj] = event
 
             events[event] = [
                 RawEvent(

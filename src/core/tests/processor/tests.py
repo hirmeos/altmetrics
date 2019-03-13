@@ -4,13 +4,14 @@ from urllib.parse import unquote
 
 from processor.logic import (
     check_wikipedia_event,
-    get_wiki_page_title,
-    get_wikipedia_references,
     get_language_from_wiki_url,
     get_non_wikipedia_references,
+    get_wiki_page_title,
     get_wikimedia_call_info,
+    get_wikipedia_references,
     is_in_references,
     is_wikipedia_url,
+    set_generic_twitter_link,
 )
 from .variables import (
     wiki_json,
@@ -193,4 +194,30 @@ class WikipediaTestCase(unittest.TestCase):
                 references=wiki_reference_encoded.references,
                 doi='10.21401/not/a/doi'
             )
+        )
+
+
+class LogicTestCase(unittest.TestCase):
+
+    def test_set_generic_twitter_link_with_id(self):
+        """ Check that function converts twitter ID to correct URL."""
+        self.assertEqual(
+            set_generic_twitter_link('123456789'),
+            'https://twitter.com/i/web/status/123456789'
+        )
+
+    def test_set_generic_twitter_link_with_url(self):
+        """ Check that function converts twitter URL to correct URL."""
+        twitter_url = 'https://twitter.com/AnyUserAccount/status/123456789'
+        self.assertEqual(
+            set_generic_twitter_link(twitter_url),
+            'https://twitter.com/i/web/status/123456789'
+        )
+
+    def test_set_generic_twitter_link_with_path_and_id(self):
+        """ Check that function converts twitter path to correct URL."""
+        twitter_url = 'twitter://status?id=123456789'
+        self.assertEqual(
+            set_generic_twitter_link(twitter_url),
+            'https://twitter.com/i/web/status/123456789'
         )
