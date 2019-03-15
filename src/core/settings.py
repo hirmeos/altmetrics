@@ -108,7 +108,7 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    METRICS_VERSION = '0.2.10'
+    METRICS_VERSION = '0.2.11'
 
     # ## Twitter ##
     TWITTER_APP_KEY = getenv('TWITTER_APP_KEY')
