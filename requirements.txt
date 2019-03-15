@@ -42,6 +42,7 @@ Flask-Mail==0.9.1
 PyJWT==1.7.1
 requests-oauthlib==1.2.0
 TwitterSearch==1.0.2
+nameko==2.11.0
 
 -e git+https://github.com/rowan08/Wikipedia@cd67f2225b6a0616e47ef2a1c7d61ca72a765099#egg=wikipedia
 -e git+https://github.com/mattupstate/flask-security.git@develop#egg=Flask-Security
