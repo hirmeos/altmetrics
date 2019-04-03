@@ -1,8 +1,9 @@
 from collections.abc import Iterable
 from datetime import datetime
 from logging import getLogger
+import time
 
-from TwitterSearch import TwitterSearchOrder
+from TwitterSearch import TwitterSearchOrder, TwitterSearchException
 
 from flask import current_app
 
@@ -90,6 +91,34 @@ class TwitterProvider(GenericDataProvider):
 
         return event_dict, events
 
+    def rate_limited_search(self, tso):
+        """ Search Twitter, sleeping when rate limitations are reached.
+
+        Args:
+            tso (TwitterSearchOrder): Search parameters for Twitter.
+
+        Returns:
+            Iterable: Tweets matching search parameters.
+        """
+        try:
+            return self.client.search_tweets_iterable(tso)
+
+        except TwitterSearchException as e:
+            if e.code != 429:
+                raise e
+
+        reset_datetime = datetime.fromtimestamp(
+            int(self.client.get_metadata()['x-rate-limit-reset'])
+        )
+        delta = reset_datetime - datetime.now()
+
+        logger.error(
+            f'Twitter rate limit reached. Sleeping {delta.seconds} seconds.'
+        )
+        time.sleep(delta.seconds + 10)
+
+        return self.client.search_tweets_iterable(tso)
+
     def process(self, uri, origin, scrape, last_check, event_dict):
         """ Implement processing of an URI to get Twitter events.
 
@@ -122,7 +151,7 @@ class TwitterProvider(GenericDataProvider):
         if last_check:
             tso.set_since = last_check.date()
 
-        results_generator = self.client.search_tweets_iterable(tso)
+        results_generator = self.rate_limited_search(tso)
         valid, errors = self._validate(results_generator)
         event_dict, events = self._build(
             event_data=valid,
