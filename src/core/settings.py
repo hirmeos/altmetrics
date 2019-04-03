@@ -66,7 +66,7 @@ class Config:
     )
     RESULT_BACKEND = 'amqp'
 
-    # ## Nameiko
+    # ## Nameko
 
     NAMEKO_USER = getenv('NAMEKO_USER')
     NAMEKO_PASSWORD = getenv('NAMEKO_PASSWORD')
