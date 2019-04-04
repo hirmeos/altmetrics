@@ -91,17 +91,17 @@ class TwitterProvider(GenericDataProvider):
 
         return event_dict, events
 
-    def rate_limited_search(self, tso):
+    def rate_limited_search(self, tw_search_order):
         """ Search Twitter, sleeping when rate limitations are reached.
 
         Args:
-            tso (TwitterSearchOrder): Search parameters for Twitter.
+            tw_search_order (TwitterSearchOrder): Search parameters for Twitter.
 
         Returns:
             Iterable: Tweets matching search parameters.
         """
         try:
-            return self.client.search_tweets_iterable(tso)
+            return self.client.search_tweets_iterable(tw_search_order)
 
         except TwitterSearchException as e:
             if e.code != 429:
@@ -117,7 +117,7 @@ class TwitterProvider(GenericDataProvider):
         )
         time.sleep(delta.seconds + 10)
 
-        return self.client.search_tweets_iterable(tso)
+        return self.client.search_tweets_iterable(tw_search_order)
 
     def process(self, uri, origin, scrape, last_check, event_dict):
         """ Implement processing of an URI to get Twitter events.
@@ -144,14 +144,14 @@ class TwitterProvider(GenericDataProvider):
             scrape_id=scrape.id
         )
 
-        tso = TwitterSearchOrder()
-        tso.set_keywords([f'"{uri.raw}"'])
-        tso.set_include_entities(False)  # set True for retweet info
+        tw_search_order = TwitterSearchOrder()
+        tw_search_order.set_keywords([f'"{uri.raw}"'])
+        tw_search_order.set_include_entities(False)  # set True for retweet info
 
         if last_check:
-            tso.set_since = last_check.date()
+            tw_search_order.set_since = last_check.date()
 
-        results_generator = self.rate_limited_search(tso)
+        results_generator = self.rate_limited_search(tw_search_order)
         valid, errors = self._validate(results_generator)
         event_dict, events = self._build(
             event_data=valid,
