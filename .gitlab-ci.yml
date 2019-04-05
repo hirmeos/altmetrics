@@ -1,0 +1,68 @@
+image: upress/gitlab-base:19
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_DRIVER: overlay
+
+stages:
+  - version
+  - sentry
+  - 📦 docker
+  - helm
+  - flake
+
+version:
+  stage: version
+  script:
+    - echo "export VERSION=$(git describe --tags --abbrev=0)" > variables
+  artifacts:
+    paths:
+    - variables
+
+sentry:
+  stage: sentry
+  script:
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/ubiquitypress/kubernetes kubernetes
+    - python3 kubernetes/ci/produce_sentry_version_file.py
+  artifacts:
+    paths:
+    - kubernetes/
+  only:
+    - tags
+
+build-push-clean:
+  stage: 📦 docker
+  before_script:
+    - echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - docker login -u _json_key --password-stdin https://eu.gcr.io < ${HOME}/gcloud-service-key.json
+  script:
+    - source variables
+    - docker build -t $IMAGE_NAME -f docker/Dockerfile .
+    - docker tag $IMAGE_NAME "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
+    - docker push "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
+    - docker rmi "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
+  only:
+    - tags
+
+helm:
+  stage: helm
+  script:
+    - source variables
+    - helm init --client-only --skip-refresh
+    - helm plugin install https://github.com/hypnoglow/helm-s3.git
+    - helm repo add ubiquity s3://service-helm/charts
+    - python3 kubernetes/ci/update_chart.py $IMAGE_NAME $IMAGE_NAME
+    - helm package kubernetes/$IMAGE_NAME/helm/$IMAGE_NAME
+    - helm s3 push --force /ubiquitypress/$IMAGE_NAME/$IMAGE_NAME-$VERSION.tgz ubiquity
+  only:
+    - tags
+
+flake:
+  stage: flake
+  script:
+    - flake8 src
+  allow_failure: true
