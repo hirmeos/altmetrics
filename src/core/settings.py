@@ -132,7 +132,6 @@ class Config:
         ]
     )
 
-
     # ## Mail settings #
 
     TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')

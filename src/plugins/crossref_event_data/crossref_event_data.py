@@ -34,7 +34,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
             origin (Enum): Service which originated the event we are fetching.
 
         Returns:
-            Iterable: new Event objects.
+            dict: new Event objects.
         """
 
         data = (data for data, errors in event_data if not errors)

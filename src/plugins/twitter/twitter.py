@@ -144,7 +144,7 @@ class TwitterProvider(GenericDataProvider):
             last_check (datetime): when this uri was last successfully scraped.
 
         Returns:
-            Iterable: new Event objects.
+            dict: new Event objects.
         """
 
         self.assess_timeout()
