@@ -147,6 +147,8 @@ class TwitterProvider(GenericDataProvider):
             Iterable: new Event objects.
         """
 
+        self.assess_timeout()
+
         if not self.client:
             self.client = self.instantiate_client()
 
@@ -164,7 +166,7 @@ class TwitterProvider(GenericDataProvider):
         if last_check:
             tw_search_order.set_since = last_check.date()
 
-        results_generator = self.client.search_tweets_iterable(tw_search_order)
+        results_generator = self.rate_limited_search(tw_search_order)
         valid, errors = self._validate(results_generator)
         events = self._build(
             event_data=valid,

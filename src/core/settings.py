@@ -159,7 +159,7 @@ class Config:
 
     SENTRY_DSN = getenv('SENTRY_DSN', None)
 
-    REDIS_URL = 'redis://:foobared@localhost:9000/0'
+    REDIS_URL = 'redis://localhost:6379/0'
 
 
 class DevConfig(Config):
