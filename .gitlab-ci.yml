@@ -1,14 +1,19 @@
-image: upress/gitlab-base:19
+image: upress/gitlab-base:22
 
 services:
   - docker:dind
+  - postgres
 
 variables:
   DOCKER_HOST: tcp://localhost:2375
   DOCKER_DRIVER: overlay
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: "postgres"
 
 stages:
   - version
+  - test
   - sentry
   - 📦 docker
   - helm
@@ -21,6 +26,13 @@ version:
   artifacts:
     paths:
     - variables
+
+tox:
+  stage: test
+  script:
+    - export PATH="/root/.pyenv/bin:$PATH"
+    - pyenv local 3.7.1
+    - tox
 
 sentry:
   stage: sentry
