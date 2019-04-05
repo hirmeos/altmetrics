@@ -1,13 +1,14 @@
 from collections.abc import Iterable
 from datetime import datetime
 from logging import getLogger
-import time
 
 from TwitterSearch import TwitterSearchOrder, TwitterSearchException
 
 from flask import current_app
 
+from core import redis_store
 from generic.mount_point import GenericDataProvider
+from processor.exceptions import TimeoutException
 from processor.logic import set_generic_twitter_link
 from processor.models import Event, RawEvent
 
@@ -47,17 +48,16 @@ class TwitterProvider(GenericDataProvider):
 
         return subject_id, created_at
 
-    def _build(self, event_data, uri_id, origin, event_dict):
+    def _build(self, event_data, uri_id, origin):
         """ Build Event objects using the defined schema.
 
         Args:
             event_data (Iterable): list of Event dicts coming from the schema.
             uri_id (int): id or uri being queried.
             origin (Enum): Service which originated the event we are fetching.
-            event_dict: dict of events not yet committed to the db.
 
         Returns:
-            tuple: The input event_dict and an Iterable of Event objects.
+            dict: new Event (key) and RawEvent (values) objects.
         """
 
         events = {}
@@ -67,7 +67,6 @@ class TwitterProvider(GenericDataProvider):
             event = self.get_event(
                 uri_id=uri_id,
                 subject_id=subj,
-                event_dict=event_dict
             )
 
             if not event:
@@ -77,7 +76,6 @@ class TwitterProvider(GenericDataProvider):
                     origin=origin.value,
                     created_at=created_at
                 )
-                event_dict[subj] = event
 
                 events[event] = [
                     RawEvent(
@@ -89,14 +87,29 @@ class TwitterProvider(GenericDataProvider):
                     )
                 ]
 
-        return event_dict, events
+        return events
+
+    @staticmethod
+    def assess_timeout():
+        """Raise TimeOutException if Twitter-Lock is set."""
+
+        twitter_lock = redis_store.get('Twitter-Lock')
+        if not twitter_lock:
+            return
+
+        delta = datetime.fromtimestamp(int(twitter_lock)) - datetime.now()
+        if delta.days:
+            return
+
+        timeout = delta.seconds + 1
+        exception = TwitterSearchException(429, 'Twitter rate limit reached.')
+
+        raise TimeoutException(exception, timeout)
 
     def rate_limited_search(self, tw_search_order):
         """ Search Twitter, sleeping when rate limitations are reached.
-
         Args:
             tw_search_order (TwitterSearchOrder): Search parameters for Twitter.
-
         Returns:
             Iterable: Tweets matching search parameters.
         """
@@ -107,19 +120,21 @@ class TwitterProvider(GenericDataProvider):
             if e.code != 429:
                 raise e
 
-        reset_datetime = datetime.fromtimestamp(
-            int(self.client.get_metadata()['x-rate-limit-reset'])
-        )
-        delta = reset_datetime - datetime.now()
+            reset_value = int(self.client.get_metadata()['x-rate-limit-reset'])
+            reset_datetime = datetime.fromtimestamp(reset_value)
 
-        logger.error(
-            f'Twitter rate limit reached. Sleeping {delta.seconds} seconds.'
-        )
-        time.sleep(delta.seconds + 10)
+            delta = reset_datetime - datetime.now()
+            timeout = delta.seconds + 1
 
-        return self.client.search_tweets_iterable(tw_search_order)
+            logger.error(
+                f'Twitter rate limit reached. Setting Twitter-Lock: '
+                f'{timeout} seconds.'
+            )
+            redis_store.set('Twitter-Lock', reset_value, timeout)
 
-    def process(self, uri, origin, scrape, last_check, event_dict):
+            raise TimeoutException(e, timeout)
+
+    def process(self, uri, origin, scrape, last_check):
         """ Implement processing of an URI to get Twitter events.
 
         Args:
@@ -127,11 +142,9 @@ class TwitterProvider(GenericDataProvider):
             origin (Enum): Service which originated the event we are fetching.
             scrape (Scrape): Scrape from ORM, not saved to database (yet).
             last_check (datetime): when this uri was last successfully scraped.
-            event_dict: dict of events not yet committed to the db in the form:
-                {subj-id: event-object}
 
         Returns:
-            tuple: The input event_dict and an Iterable of Event objects.
+            Iterable: new Event objects.
         """
 
         if not self.client:
@@ -151,14 +164,13 @@ class TwitterProvider(GenericDataProvider):
         if last_check:
             tw_search_order.set_since = last_check.date()
 
-        results_generator = self.rate_limited_search(tw_search_order)
+        results_generator = self.client.search_tweets_iterable(tw_search_order)
         valid, errors = self._validate(results_generator)
-        event_dict, events = self._build(
+        events = self._build(
             event_data=valid,
             uri_id=uri.id,
             origin=origin,
-            event_dict=event_dict
         )
 
         self.log_new_events(uri, origin, self.provider, events)
-        return event_dict, events
+        return events

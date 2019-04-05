@@ -7,14 +7,54 @@ from flask import current_app
 
 from core import db
 from core.celery import celery as celery_app
+from core.logic import get_enum_by_value
 from core.settings import Origins, StaticProviders
 from processor.collections.reasons import doi_not_on_wikipedia_page
+from processor.exceptions import TimeoutException
 from processor.logic import check_wikipedia_event
 from processor.models import Event, RawEvent, Scrape, Uri
 
-from .utils import event_generator
 
 logger = get_task_logger(__name__)
+
+
+@celery_app.task(name='process-plugin', bind=True)
+def process_plugin(
+        self,
+        plugin_name,
+        uri_id,
+        origin_value,
+        scrape_id,
+        last_check_iso
+):
+    # Get around objects not being JSON serialisable for tasks...
+    plugin = current_app.config.get('PLUGINS').get(plugin_name)
+    uri = Uri.query.get(uri_id)
+    scrape = Scrape.query.get(scrape_id)
+    origin = get_enum_by_value(Origins, origin_value)
+    last_check = datetime.fromisoformat(last_check_iso)
+
+    try:
+        event_dict = plugin.PROVIDER.process(
+            uri,
+            origin,
+            scrape,
+            last_check
+        )
+
+        flatten = event_dict.keys()
+        flatten_raw = chain.from_iterable(event_dict.values())
+
+        for entry in flatten:
+            db.session.add(entry)
+
+        for raw_event in flatten_raw:
+            db.session.add(raw_event)
+
+        db.session.commit()
+
+    except TimeoutException as e:
+        raise self.retry(exc=e.exception, countdown=e.timeout)
 
 
 @celery_app.task(name='pull-metrics')
@@ -41,25 +81,16 @@ def pull_metrics():
 
         logger.info(f'processing {uri.raw}')
         last_check = uri.last_checked
-        uri.last_checked = datetime.utcnow()
-        events = event_generator(
-            uri=uri,
-            scrape=scrape,
-            last_check=last_check
-        )
 
-        flatten, flatten_raw = [], []
-        for event_dict in events:
-            flatten.extend(event_dict.keys())
-            flatten_raw.extend(
-                chain.from_iterable(event_dict.values())
-            )
-
-        for entry in flatten:
-            db.session.add(entry)
-
-        for raw_event in flatten_raw:
-            db.session.add(raw_event)
+        for origin, plugins in current_app.config.get("ORIGINS").items():
+            for plugin in plugins:
+                process_plugin.delay(
+                    plugin.__name__,
+                    uri.id,
+                    origin.value,
+                    scrape.id,
+                    last_check.isoformat()
+                )
 
     scrape.end_date = datetime.utcnow()
     db.session.commit()

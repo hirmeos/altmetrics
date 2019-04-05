@@ -132,6 +132,7 @@ class Config:
         ]
     )
 
+
     # ## Mail settings #
 
     TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
@@ -157,6 +158,8 @@ class Config:
     # ## SENTRY ##
 
     SENTRY_DSN = getenv('SENTRY_DSN', None)
+
+    REDIS_URL = 'redis://:foobared@localhost:9000/0'
 
 
 class DevConfig(Config):
