@@ -27,7 +27,7 @@ def process_plugin(
         scrape_id,
         last_check_iso
 ):
-    # Get around objects not being JSON serialisable for tasks...
+    # Get around objects not being JSON serializable for tasks.
     plugin = current_app.config.get('PLUGINS').get(plugin_name)
     uri = Uri.query.get(uri_id)
     scrape = Scrape.query.get(scrape_id)
@@ -35,13 +35,7 @@ def process_plugin(
     last_check = datetime.fromisoformat(last_check_iso)
 
     try:
-        event_dict = plugin.PROVIDER.process(
-            uri,
-            origin,
-            scrape,
-            last_check
-        )
-
+        event_dict = plugin.PROVIDER.process(uri, origin, scrape, last_check)
         flatten = event_dict.keys()
         flatten_raw = chain.from_iterable(event_dict.values())
 
