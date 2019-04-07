@@ -1,4 +1,4 @@
-__author__ = "Francesco de Virgilio"
+__author__ = "Rowan Hatherley"
 __version__ = 0.1
 __desc__ = "Provides URL-based Twitter as a source for metrics."
 
