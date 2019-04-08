@@ -35,6 +35,11 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
         return self.client_class(self.api_base)
 
     def _add_validator_context(self, **kwargs):
+        """ Add kwargs as additional context to the Marshmallow validator.
+
+        These will generally be independent of information retrieved from an
+        API call - e.g. URI ID, Scrape ID, etc.
+        """
         self.validator.context = kwargs
 
     @staticmethod

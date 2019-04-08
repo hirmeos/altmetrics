@@ -8,7 +8,6 @@ from flask import current_app
 
 from core import redis_store
 from generic.mount_point import GenericDataProvider
-from processor.exceptions import TimeoutException
 from processor.logic import set_generic_twitter_link
 from processor.models import Event, RawEvent
 
@@ -35,7 +34,20 @@ class TwitterProvider(GenericDataProvider):
             return None
 
     def _validate(self, results):
-        return self.validator.dump(results)
+        """ Make sure event passes validation.
+
+        Args:
+            results (Iterable): TwitterSearch result objects from the client.
+
+        Returns:
+            list: dicts of valid Twitter events.
+        """
+        valid, errors = self.validator.dump(results)
+
+        if errors:
+            logger.error(f'Twitter Validation Errors: {errors}')
+
+        return valid
 
     @staticmethod
     def _convert_to_python(event_entry):
@@ -52,7 +64,7 @@ class TwitterProvider(GenericDataProvider):
         """ Build Event objects using the defined schema.
 
         Args:
-            event_data (Iterable): list of Event dicts coming from the schema.
+            event_data (list): Event dicts coming from the schema.
             uri_id (int): id or uri being queried.
             origin (Enum): Service which originated the event we are fetching.
 
@@ -90,8 +102,12 @@ class TwitterProvider(GenericDataProvider):
         return events
 
     @staticmethod
-    def assess_timeout():
-        """Raise TimeOutException if Twitter-Lock is set."""
+    def assess_timeout(task):
+        """Retry current task after a timeout if the Redis Twitter-Lock is set.
+
+        Args:
+            task (object): Celery task running this plugin.
+        """
 
         twitter_lock = redis_store.get('Twitter-Lock')
         if not twitter_lock:
@@ -104,12 +120,13 @@ class TwitterProvider(GenericDataProvider):
         timeout = delta.seconds + 1
         exception = TwitterSearchException(429, 'Twitter rate limit reached.')
 
-        raise TimeoutException(exception, timeout)
+        raise task.retry(exc=exception, countdown=timeout)
 
-    def rate_limited_search(self, tw_search_order):
+    def rate_limited_search(self, tw_search_order, task):
         """ Search Twitter, sleeping when rate limitations are reached.
         Args:
             tw_search_order (TwitterSearchOrder): Search parameters for Twitter.
+            task (object): Celery task running this plugin.
         Returns:
             Iterable: Tweets matching search parameters.
         """
@@ -132,9 +149,9 @@ class TwitterProvider(GenericDataProvider):
             )
             redis_store.set('Twitter-Lock', reset_value, timeout)
 
-            raise TimeoutException(e, timeout)
+            raise task.retry(exc=e, countdown=timeout)
 
-    def process(self, uri, origin, scrape, last_check):
+    def process(self, uri, origin, scrape, last_check, task):
         """ Implement processing of an URI to get Twitter events.
 
         Args:
@@ -142,12 +159,13 @@ class TwitterProvider(GenericDataProvider):
             origin (Enum): Service which originated the event we are fetching.
             scrape (Scrape): Scrape from ORM, not saved to database (yet).
             last_check (datetime): when this uri was last successfully scraped.
+            task (object): Celery task running this plugin.
 
         Returns:
             dict: new Event objects.
         """
 
-        self.assess_timeout()
+        self.assess_timeout(task)
 
         if not self.client:
             self.client = self.instantiate_client()
@@ -166,10 +184,12 @@ class TwitterProvider(GenericDataProvider):
         if last_check:
             tw_search_order.set_since = last_check.date()
 
-        results_generator = self.rate_limited_search(tw_search_order)
-        valid, errors = self._validate(results_generator)
+        results_generator = self.rate_limited_search(tw_search_order, task)
+
+        event_data = self._validate(results_generator)
+
         events = self._build(
-            event_data=valid,
+            event_data=event_data,
             uri_id=uri.id,
             origin=origin,
         )

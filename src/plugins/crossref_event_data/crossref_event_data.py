@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from datetime import date
+from datetime import date, datetime
 from logging import getLogger
 
 from core.settings import Origins
@@ -21,9 +21,15 @@ class CrossrefEventDataProvider(GenericDataProvider):
             events (list): Event objects coming from the client.
 
         Returns:
-            list: Contains valid objects.
+            generator: Yields valid deserialized event objects.
         """
-        return (self.validator.dump(event) for event in events)
+
+        for event in events:
+            event_data, errors = self.validator.dump(event)
+            if errors:
+                logger.error(f'Crossref Event Data Validation Errors: {errors}')
+            else:
+                yield event_data
 
     def _build(self, event_data, uri_id, origin):
         """ Build Event objects using the defined schema.
@@ -37,9 +43,8 @@ class CrossrefEventDataProvider(GenericDataProvider):
             dict: new Event objects.
         """
 
-        data = (data for data, errors in event_data if not errors)
         raw_events_dict = {}
-        for entry in data:
+        for entry in event_data:
             raw_events_dict.setdefault(entry['subject_id'], []).append(entry)
 
         events = {}
@@ -84,7 +89,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
 
         return events
 
-    def process(self, uri, origin, scrape, last_check):
+    def process(self, uri, origin, scrape, last_check, task):
         """ Implement processing of an URI to get events.
 
         Args:
@@ -92,12 +97,13 @@ class CrossrefEventDataProvider(GenericDataProvider):
             origin (Enum): Service which originated the event we are fetching.
             scrape (Scrape): Scrape from ORM, not saved to database (yet).
             last_check (datetime): when this uri was last successfully scraped.
+            task (object): Celery task running the current plugin.
 
         Returns:
             dict: new Event (key) and RawEvent (values) objects.
         """
 
-        self._add_validator_context(
+        self._add_validator_context(  # Add context to Marshmallow validator
             uri_id=uri.id,
             origin=origin.value,
             provider=self.provider.value,

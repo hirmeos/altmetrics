@@ -129,6 +129,8 @@ class Config:
             '__pycache__',
             'facebook',
             'crossref_cited_by',
+            'crossref_event_data',
+            'hypothesis',
         ]
     )
 
@@ -158,7 +160,10 @@ class Config:
 
     SENTRY_DSN = getenv('SENTRY_DSN', None)
 
-    REDIS_URL = 'redis://localhost:6379/0'
+    # ## REDIS ##
+
+    REDIS_HOST = getenv('REDIS_HOST', 'localhost')
+    REDIS_URL = f'redis://{REDIS_HOST}:6379/0'
 
 
 class DevConfig(Config):
