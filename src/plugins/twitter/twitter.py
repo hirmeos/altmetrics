@@ -30,7 +30,7 @@ class TwitterProvider(GenericDataProvider):
                 ),
             )
         except RuntimeError:
-            logger.error('App not found - skipping client instantiation')
+            logger.error('App not found - skipping client instantiation.')
             return None
 
     def _validate(self, results):
@@ -50,8 +50,8 @@ class TwitterProvider(GenericDataProvider):
         return valid
 
     @staticmethod
-    def _convert_to_python(event_entry):
-        """ Parse data from twitter API and convert them to Python types."""
+    def _to_python(event_entry):
+        """Parse data from twitter API and convert them to Python types."""
         date_string = event_entry.pop('created_at_str')
         created_at = datetime.strptime(date_string, '%a %b %d %X %z %Y')
 
@@ -61,7 +61,7 @@ class TwitterProvider(GenericDataProvider):
         return subject_id, created_at
 
     def _build(self, event_data, uri_id, origin):
-        """ Build Event objects using the defined schema.
+        """Build Event objects using the defined schema.
 
         Args:
             event_data (list): Event dicts coming from the schema.
@@ -74,12 +74,9 @@ class TwitterProvider(GenericDataProvider):
 
         events = {}
         for event_entry in event_data:
-            subj, created_at = self._convert_to_python(event_entry)
+            subj, created_at = self._to_python(event_entry)
 
-            event = self.get_event(
-                uri_id=uri_id,
-                subject_id=subj,
-            )
+            event = self.get_event(uri_id=uri_id, subject_id=subj)
 
             if not event:
                 event = Event(
@@ -152,7 +149,7 @@ class TwitterProvider(GenericDataProvider):
             raise task.retry(exc=e, countdown=timeout)
 
     def process(self, uri, origin, scrape, last_check, task):
-        """ Implement processing of an URI to get Twitter events.
+        """ Implement processing of a URI to get Twitter events.
 
         Args:
             uri (Uri): An Uri object.
@@ -179,7 +176,7 @@ class TwitterProvider(GenericDataProvider):
 
         tw_search_order = TwitterSearchOrder()
         tw_search_order.set_keywords([f'"{uri.raw}"'])
-        tw_search_order.set_include_entities(False)  # set True for retweet info
+        tw_search_order.set_include_entities(False)  # `True` for retweet info.
 
         if last_check:
             tw_search_order.set_since = last_check.date()
