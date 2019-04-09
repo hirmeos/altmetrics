@@ -10,6 +10,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from flask_api import FlaskAPI
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_redis import FlaskRedis
 
 from .database import db
 
@@ -17,6 +18,7 @@ from .database import db
 CONFIG = os.getenv('CONFIG', 'DevConfig')
 celery_app = Celery()
 mail = Mail()
+redis_store = FlaskRedis()
 
 
 def create_app():
@@ -56,6 +58,8 @@ def create_app():
     init_admin(app, db)
 
     init_celery(app, celery_app)
+
+    redis_store.init_app(app)
 
     return app
 

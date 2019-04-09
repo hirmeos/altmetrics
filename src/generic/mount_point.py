@@ -35,12 +35,17 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
         return self.client_class(self.api_base)
 
     def _add_validator_context(self, **kwargs):
+        """ Add kwargs as additional context to the Marshmallow validator.
+
+        These will generally be independent of information retrieved from an
+        API call - e.g. URI ID, Scrape ID, etc.
+        """
         self.validator.context = kwargs
 
     @staticmethod
-    def get_event(uri_id, subject_id, event_dict):
+    def get_event(uri_id, subject_id):
         """Tries to get an event to prevent duplicates from being created. """
-        return event_dict.get(subject_id) or Event.query.filter_by(
+        return Event.query.filter_by(
             uri_id=uri_id,
             subject_id=subject_id
         ).first()  # like step 1 of get_or_create()

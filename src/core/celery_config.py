@@ -15,6 +15,7 @@ def init_celery(app, celery_app):
     celery_app.conf.task_routes = {
         'approve-user': {'queue': 'altmetrics.approve-user'},
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
+        'process-plugin': {'queue': 'altmetrics.process-plugin'},
     }
 
     celery_app.autodiscover_tasks(['user'])
@@ -66,6 +67,7 @@ def configure_celery(celery_app):
         'approve-user': {'queue': 'altmetrics.approve-user'},
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
         'pull-metrics': {'queue': 'altmetrics.pull-metrics'},
+        'process-plugin': {'queue': 'altmetrics.process-plugin'},
         'check-wikipedia-references': {'queue': 'altmetrics.plugin-admin'},
         'check-deleted-wikipedia-references': {
             'queue': 'altmetrics.plugin-admin'

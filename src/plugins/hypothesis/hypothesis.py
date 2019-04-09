@@ -13,7 +13,7 @@ logger = getLogger(__name__)
 class HypothesisDataProvider(GenericDataProvider):
     """ Implements Hypothes.is API integration. """
 
-    def process(self, uri, origin, scrape, last_check, event_dict):
+    def process(self, uri, origin, scrape, last_check, task):
         """ Pull annotations from Hypothesis API, and create Events. Note:
         this uses the wildcard_uri search option, which is subject to change;
         see https://h.readthedocs.io/en/latest/api-reference/#operation/search.
@@ -23,11 +23,10 @@ class HypothesisDataProvider(GenericDataProvider):
             origin (Enum): Service which originated the event we are fetching.
             scrape (Scrape): Scrape from ORM, not saved to database (yet).
             last_check (datetime): when this uri was last successfully scraped.
-            event_dict: dict of events not yet committed to the db in the form:
-                {subj-id: event-object}
+            task (object): Celery task running the current plugin.
 
         Returns:
-            tuple: The input event_dict and an Iterable of new Event objects.
+            dict: new Event (key) and RawEvent (values) objects.
         """
 
         parameters = {
@@ -61,10 +60,7 @@ class HypothesisDataProvider(GenericDataProvider):
         for result in results:
             subj = result.get('links', {}).get('html')
 
-            if (
-                    self.get_event(uri.id, subj, event_dict)
-                    or not result.get('text')
-            ):
+            if self.get_event(uri.id, subj) or not result.get('text'):
                 continue
 
             created_at = datetime.datetime.fromisoformat(
@@ -77,7 +73,6 @@ class HypothesisDataProvider(GenericDataProvider):
                 origin=origin.value,
                 created_at=created_at
             )
-            event_dict[subj] = event
 
             events[event] = [
                 RawEvent(
@@ -91,4 +86,4 @@ class HypothesisDataProvider(GenericDataProvider):
             ]
 
         self.log_new_events(uri, origin, self.provider, events)
-        return event_dict, events
+        return events
