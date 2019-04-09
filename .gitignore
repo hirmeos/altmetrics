@@ -12,3 +12,6 @@ docs/build
 
 # instance-specific files
 src/xref.csv
+
+# Celery beat
+src/celerybeat-schedule

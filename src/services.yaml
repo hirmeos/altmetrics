@@ -1,4 +1,4 @@
-AMQP_URI: !raw_env_var 'amqp://${NAMEKO_USER}:${NAMEKO_PASSWORD}@${RMQ_HOST}:5672/${NAMEKO_VHOST}'
+AMQP_URI: amqp://${NAMEKO_USER}:${NAMEKO_PASSWORD}@${RMQ_HOST}:5672/${NAMEKO_VHOST}
 WEB_SERVER_ADDRESS: '${RMQ_HOST}:15672'
 rpc_exchange: 'nameko-rpc'
 max_workers: 10
