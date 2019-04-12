@@ -140,7 +140,7 @@ class TwitterProvider(GenericDataProvider):
             delta = reset_datetime - datetime.now()
             timeout = delta.seconds + 1
 
-            logger.error(
+            logger.info(
                 f'Twitter rate limit reached. Setting Twitter-Lock: '
                 f'{timeout} seconds.'
             )
