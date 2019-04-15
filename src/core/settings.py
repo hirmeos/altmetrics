@@ -58,13 +58,13 @@ class Config:
     RMQ_VHOST = getenv('RMQ_VHOST')
 
     AMQ_URL = 'amqp://{user}:{password}@{host}:5672/{vhost}'
+    RESULT_BACKEND = None
     CELERY_BROKER_URL = AMQ_URL.format(
         user=RMQ_USER,
         password=RMQ_PASSWORD,
         host=RMQ_HOST,
         vhost=RMQ_VHOST
     )
-    RESULT_BACKEND = 'amqp'
 
     # ## Nameko
 
