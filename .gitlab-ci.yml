@@ -67,9 +67,14 @@ helm:
     - helm init --client-only --skip-refresh
     - helm plugin install https://github.com/hypnoglow/helm-s3.git
     - helm repo add ubiquity s3://service-helm/charts
-    - python3 kubernetes/ci/update_chart.py $IMAGE_NAME $IMAGE_NAME
-    - helm package kubernetes/$IMAGE_NAME/helm/$IMAGE_NAME
-    - helm s3 push --force /ubiquitypress/$IMAGE_NAME/$IMAGE_NAME-$VERSION.tgz ubiquity
+    - export CHART_VERSION=$(python3 kubernetes/ci/auto_update_chart.py $HELM_PROJECT_NAME $HELM_PROJECT_NAME $IMAGE_NAME)
+    - helm package kubernetes/$HELM_PROJECT_NAME/helm/$HELM_PROJECT_NAME
+    - helm s3 push --force /ubiquitypress/$IMAGE_NAME/$HELM_PROJECT_NAME-$CHART_VERSION.tgz ubiquity
+    - cd kubernetes/
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git commit -am 'auto update helm chart'
+    - git push https://${GITLAB_USER_NAME}:${GITLAB_ACCESS_TOKEN}@gitlab.com/ubiquitypress/kubernetes.git HEAD:master
   only:
     - tags
 
