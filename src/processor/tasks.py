@@ -12,6 +12,9 @@ from core.settings import Origins, StaticProviders
 from processor.collections.reasons import doi_not_on_wikipedia_page
 from processor.logic import check_wikipedia_event
 from processor.models import Event, RawEvent, Scrape, Uri
+from services import ServiceHandler, MetricsAPIServiceDispatcher
+
+from .logic import prepare_metrics_data
 
 
 logger = get_task_logger(__name__)
@@ -138,3 +141,17 @@ def check_deleted_wikipedia_references():
             event.is_deleted = False
 
     db.session.commit()
+
+
+@celery_app.task(name='send-metrics-to-metrics-api')
+def send_metrics_to_metrics_api(send_limit=None):
+    """ Send metrics to the metrics API using nameko."""
+
+    metrics_serice = ServiceHandler(service=MetricsAPIServiceDispatcher)
+    for event in Event.query.all()[:send_limit]:  # temp send limit
+        data = prepare_metrics_data(
+            uri=event.uri.raw,
+            origin=event.origin,
+            created_at=event.created_at
+        )
+        metrics_serice.send(data)

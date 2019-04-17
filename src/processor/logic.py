@@ -1,15 +1,17 @@
 from collections.abc import Iterable
+from datetime import datetime
+from itertools import chain
 from logging import getLogger
 from os import path
 import re
 import requests
-from itertools import chain
 from urllib.parse import unquote, urlsplit, parse_qs
 
 import wikipedia
 from wikipedia import PageError
 
 from core import db
+from core.settings import Origins
 
 
 logger = getLogger(__name__)
@@ -220,3 +222,33 @@ def set_generic_twitter_link(tweet_id):
             tweet_id = path.basename(tweet_id)
 
     return f'https://twitter.com/i/web/status/{tweet_id}'
+
+
+def prepare_metrics_data(uri, origin, created_at):
+    """Prepares data for a single event that will be sent to the metrics-api.
+
+    Args:
+        uri (str): DOI of entry to be sent.
+        origin (int): Value of origin that metrics was collected from.
+        created_at (datetime): When the event took place.
+
+    Returns:
+        dict: data that will be sent to the metrics-api.
+    """
+    measure_dict = {  # measure for each origin
+        Origins.hypothesis: 'annotations',
+        Origins.twitter: 'tweets',
+        Origins.wikipedia: 'wikipedia-references',
+        Origins.wordpressdotcom: 'wordpressdotcom-references',
+    }
+
+    measure_name = measure_dict[origin]
+
+    return {
+        'uri': f'info:doi:{uri}',
+        'measure': f'tag:operas.eu,2018:{measure_name}:hirmeos-altmetrics',
+        'value': 1,
+        'timestamp': f'{created_at.isoformat()}',
+        'country': 'urn:iso:std:3166:-2:ZZ',
+        'uploader': 'acct:tech@ubiquitypress.com'
+    }   # This will be less hard-coded in future

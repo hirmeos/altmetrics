@@ -16,6 +16,9 @@ def init_celery(app, celery_app):
         'approve-user': {'queue': 'altmetrics.approve-user'},
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
         'process-plugin': {'queue': 'altmetrics.process-plugin'},
+        'send-metrics-to-metrics-api': {
+            'queue': 'altmetrics.send-metrics-to-metrics-api'
+        },
     }
 
     celery_app.autodiscover_tasks(['user'])
@@ -71,6 +74,9 @@ def configure_celery(celery_app):
         'check-wikipedia-references': {'queue': 'altmetrics.plugin-admin'},
         'check-deleted-wikipedia-references': {
             'queue': 'altmetrics.plugin-admin'
+        },
+        'send-metrics-to-metrics-api': {
+            'queue': 'altmetrics.send-metrics-to-metrics-api'
         },
 
     }
