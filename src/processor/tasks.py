@@ -147,11 +147,11 @@ def check_deleted_wikipedia_references():
 def send_metrics_to_metrics_api(send_limit=None):
     """ Send metrics to the metrics API using nameko."""
 
-    metrics_serice = ServiceHandler(service=MetricsAPIServiceDispatcher)
+    metrics_service = ServiceHandler(service=MetricsAPIServiceDispatcher)
     for event in Event.query.all()[:send_limit]:  # temp send limit
         data = prepare_metrics_data(
             uri=event.uri.raw,
             origin=event.origin,
             created_at=event.created_at
         )
-        metrics_serice.send(data)
+        metrics_service.send(data)
