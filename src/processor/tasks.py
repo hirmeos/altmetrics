@@ -91,6 +91,7 @@ def pull_metrics():
                     scrape.id,
                     last_check_iso
                 )
+        uri.last_checked = datetime.utcnow()
 
     scrape.end_date = datetime.utcnow()
     db.session.commit()

@@ -142,6 +142,7 @@ class Event(Model):
 
     id = Column(Integer, primary_key=True)
     uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+    last_updated = Column(DateTime, default=datetime.utcnow)
 
     subject_id = Column(String, nullable=False)
     origin = Column(Integer, nullable=False)
