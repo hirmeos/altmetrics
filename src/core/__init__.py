@@ -47,6 +47,7 @@ def create_app():
     init_security(app)
 
     from api.views import bp as api_blueprint
+    from processor.tasks import pull_metrics  # noqa
     from processor.views import bp as processor_blueprint
 
     app.register_blueprint(api_blueprint)

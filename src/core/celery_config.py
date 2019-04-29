@@ -21,8 +21,6 @@ def init_celery(app, celery_app):
         },
     }
 
-    celery_app.autodiscover_tasks(['user'], ['processor'])
-
 
 def make_celery(app):
     """Used to instantiate celery in the workers."""
@@ -79,5 +77,3 @@ def configure_celery(celery_app):
             'queue': 'altmetrics.send-metrics-to-metrics-api'
         },
     }
-
-    celery_app.autodiscover_tasks(['user'], ['processor'])

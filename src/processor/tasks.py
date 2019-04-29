@@ -5,8 +5,7 @@ from arrow import utcnow
 from celery.utils.log import get_task_logger
 from flask import current_app
 
-from core import db
-from core.celery import celery as celery_app
+from core import celery_app, db
 from core.logic import get_enum_by_value
 from core.settings import Origins, StaticProviders
 from processor.collections.reasons import doi_not_on_wikipedia_page
