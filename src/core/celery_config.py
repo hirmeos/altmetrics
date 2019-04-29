@@ -21,7 +21,7 @@ def init_celery(app, celery_app):
         },
     }
 
-    celery_app.autodiscover_tasks(['user'])
+    celery_app.autodiscover_tasks(['user'], ['processor'])
 
 
 def make_celery(app):
@@ -78,7 +78,6 @@ def configure_celery(celery_app):
         'send-metrics-to-metrics-api': {
             'queue': 'altmetrics.send-metrics-to-metrics-api'
         },
-
     }
 
-    celery_app.autodiscover_tasks(['processor'])
+    celery_app.autodiscover_tasks(['user'], ['processor'])
