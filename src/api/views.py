@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from flask import Blueprint, abort, g, jsonify, request
 from flask.views import MethodView
 from flask_login import current_user
@@ -19,6 +21,7 @@ from .serializers import (
 )
 
 
+logger = getLogger(__name__)
 bp = Blueprint('api', __name__, url_prefix='/api')
 
 
@@ -76,14 +79,18 @@ class UriViewSet(MethodView):
         doi_list = request.get_json()
 
         if not doi_list:
-            abort(500, 'Error: DOI list not found. Please check input format.')
+            abort_message = 'DOI list not found in request JSON.'
+            logger.error(f'Bad Request: {abort_message} JSON: {doi_list}')
+            abort(400, abort_message)
 
         for doi_dict in doi_list:
 
             try:
                 doi_value = doi_dict['doi']
             except KeyError:
-                abort(500, 'Error: Identifier "doi" is required for each entry')
+                abort_message = 'Identifier "doi" is required for each entry.'
+                logger.error(f'Bad Request: {abort_message} JSON: {doi_list}')
+                abort(400, abort_message)
 
             uri = Uri.query.filter(Uri.raw == doi_value).first()
 
