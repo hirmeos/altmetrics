@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from configparser import ConfigParser
 import os
 
 from celery import Celery
-from .celery_config import init_celery
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -12,6 +10,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_redis import FlaskRedis
 
+from .celery_config import init_celery
 from .database import db
 
 
@@ -26,13 +25,9 @@ def create_app():
     app.config.from_object(f'core.settings.{CONFIG}')
 
     if app.config.get('SENTRY_DSN'):
-        config_file = ConfigParser()
-        config_file.read('sentry_version.ini')
-        sentry_release = config_file.get('sentry', 'version', fallback='ERROR')
-
         sentry_sdk.init(
             dsn=app.config.get('SENTRY_DSN'),
-            release=sentry_release,
+            release=os.getenv('SENTRY_RELEASE'),
             environment=os.getenv('SENTRY_ENV', 'production'),
             integrations=[FlaskIntegration()]
         )
@@ -40,8 +35,7 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
-    # Set up mail
-    mail.init_app(app)
+    mail.init_app(app)  # Set up mail.
 
     from .security import init_security
     init_security(app)

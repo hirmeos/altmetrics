@@ -6,7 +6,7 @@ services:
 
 variables:
   DOCKER_HOST: tcp://localhost:2375
-  DOCKER_DRIVER: overlay
+  DOCKER_DRIVER: overlay2
   POSTGRES_DB: postgres
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: "postgres"
@@ -38,9 +38,10 @@ sentry:
   stage: sentry
   script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/ubiquitypress/kubernetes kubernetes
-    - python3 kubernetes/ci/produce_sentry_version_file.py
+    - echo "export RELEASE=$(python3 kubernetes/ci/produce_sentry_version_file.py)" > release
   artifacts:
     paths:
+    - release
     - kubernetes/
   only:
     - tags
@@ -53,7 +54,8 @@ build-push-clean:
     - docker login -u _json_key --password-stdin https://eu.gcr.io < ${HOME}/gcloud-service-key.json
   script:
     - source variables
-    - docker build -t $IMAGE_NAME -f docker/Dockerfile .
+    - source release
+    - docker build --build-arg RELEASE -t $IMAGE_NAME -f docker/Dockerfile .
     - docker tag $IMAGE_NAME "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
     - docker push "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
     - docker rmi "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
