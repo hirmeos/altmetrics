@@ -15,6 +15,7 @@ def init_celery(app, celery_app):
     celery_app.conf.task_routes = {
         'approve-user': {'queue': 'altmetrics.approve-user'},
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
+        'pull-metrics': {'queue': 'altmetrics.pull-metrics'},
         'process-plugin': {'queue': 'altmetrics.process-plugin'},
         'send-metrics-to-metrics-api': {
             'queue': 'altmetrics.send-metrics-to-metrics-api'
