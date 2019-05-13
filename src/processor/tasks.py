@@ -38,7 +38,7 @@ def process_plugin(
     try:  # Lock DB row for this URI
         uri = Uri.query.with_for_update(nowait=True).get(uri_id)
     except OperationalError as exception:
-        raise self.retry(exc=exception, countdown=5, max_retries=10)
+        raise self.retry(exc=exception, countdown=5, max_retries=120)
 
     event_dict = plugin.PROVIDER.process(
         uri,
