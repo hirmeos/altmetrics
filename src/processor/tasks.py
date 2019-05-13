@@ -4,6 +4,7 @@ from itertools import chain
 from arrow import utcnow
 from celery.utils.log import get_task_logger
 from flask import current_app
+from sqlalchemy.exc import OperationalError
 
 from core import celery_app, db
 from core.logic import get_enum_by_value
@@ -30,10 +31,14 @@ def process_plugin(
 ):
     # Get around objects not being JSON serializable for tasks.
     plugin = current_app.config.get('PLUGINS').get(plugin_name)
-    uri = Uri.query.get(uri_id)
     scrape = Scrape.query.get(scrape_id)
     origin = get_enum_by_value(Origins, origin_value)
     last_check = last_check_iso and datetime.fromisoformat(last_check_iso)
+
+    try:  # Lock DB row for this URI
+        uri = Uri.query.with_for_update(nowait=True).get(uri_id)
+    except OperationalError as exception:
+        raise self.retry(exc=exception, countdown=5, max_retries=120)
 
     event_dict = plugin.PROVIDER.process(
         uri,
