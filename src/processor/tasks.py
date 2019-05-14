@@ -13,7 +13,6 @@ from processor.collections.reasons import doi_not_on_wikipedia_page
 from processor.logic import check_wikipedia_event
 from processor.models import Event, RawEvent, Scrape, Uri
 
-
 from .logic import send_events_to_metrics_api
 
 
