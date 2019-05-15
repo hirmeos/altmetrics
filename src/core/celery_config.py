@@ -17,9 +17,7 @@ def init_celery(app, celery_app):
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
         'pull-metrics': {'queue': 'altmetrics.pull-metrics'},
         'process-plugin': {'queue': 'altmetrics.process-plugin'},
-        'send-metrics-to-metrics-api': {
-            'queue': 'altmetrics.send-metrics-to-metrics-api'
-        },
+        'send-metrics': {'queue': 'altmetrics.send-metrics'},
     }
 
 
@@ -55,6 +53,10 @@ def configure_celery(celery_app):
             'task': 'pull-metrics',
             'schedule': crontab(minute=0, hour=12, day_of_week='*')
         },
+        'send-metrics-every-day': {
+            'task': 'send-metrics',
+            'schedule': crontab(minute=0, hour=18, day_of_week='*')
+        },
         'check-wikipedia-references-every-day': {
             'task': 'check-wikipedia-references',
             'schedule': crontab(minute=0, hour=10, day_of_week='*')
@@ -74,7 +76,5 @@ def configure_celery(celery_app):
         'check-deleted-wikipedia-references': {
             'queue': 'altmetrics.plugin-admin'
         },
-        'send-metrics-to-metrics-api': {
-            'queue': 'altmetrics.send-metrics-to-metrics-api'
-        },
+        'send-metrics': {'queue': 'altmetrics.send-metrics'},
     }

@@ -12,6 +12,7 @@ from wikipedia import PageError
 
 from core import db
 from core.settings import Origins
+from services import ServiceHandler, MetricsAPIServiceDispatcher
 
 
 logger = getLogger(__name__)
@@ -150,7 +151,7 @@ def check_wikipedia_event(event):
     """ Check a Wikipedia page to see if a DOI is still referenced.
 
     Args:
-        event (object): instance of an Event with origin wikipedia.
+        event (Event): instance of an Event with origin wikipedia.
 
     Returns:
         bool: True if doi is referenced in the Wikipedia page, else False.
@@ -252,3 +253,20 @@ def prepare_metrics_data(uri, origin, created_at):
         'country': 'urn:iso:std:3166:-2:ZZ',
         'uploader': 'acct:tech@ubiquitypress.com'
     }   # This will be less hard-coded in future
+
+
+def send_events_to_metrics_api(events):
+    """Send events as metrics to the metrics API using nameko.
+
+    Args:
+        events (list): Events to send to the metrics-api
+
+    """
+    metrics_service = ServiceHandler(service=MetricsAPIServiceDispatcher)
+    for event in events:
+        data = prepare_metrics_data(
+            uri=event.uri.raw,
+            origin=event.origin,
+            created_at=event.created_at
+        )
+        metrics_service.send(data)
