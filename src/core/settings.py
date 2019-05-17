@@ -129,6 +129,7 @@ class Config:
             '__pycache__',
             'facebook',
             'crossref_cited_by',
+            'crossref_event_data',
         ]
     )
 
