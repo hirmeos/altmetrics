@@ -19,11 +19,12 @@ more information on how to get in touch with the project management.
 .. _HIRMEOS: http://www.hirmeos.eu
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
 
    intro
    annotation/index
    metrics/index
+   widget/index
 
 
 Indices and tables
