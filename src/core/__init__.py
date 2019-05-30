@@ -41,10 +41,12 @@ def create_app():
     init_security(app)
 
     from api.views import bp as api_blueprint
+    from core.views import bp as core_blueprint
     from processor.tasks import pull_metrics  # noqa
     from processor.views import bp as processor_blueprint
 
     app.register_blueprint(api_blueprint)
+    app.register_blueprint(core_blueprint)
     app.register_blueprint(processor_blueprint)
 
     app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'

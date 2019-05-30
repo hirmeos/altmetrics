@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <title>Metrics App</title>
+
+    <!-- load css for this app-->
+    <link rel="stylesheet" href="https://storage.googleapis.com/hirmeos/metrics-widget/hirmeos-metrics-{{ widget_version }}.css">
+
+    <!--load bootstrap-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+      footer {
+        position: fixed;
+        background: black;
+        height: 40px;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <!-- this div will need to be included in existing page -->
+    <div id="metrics-block" style="width: 35%; margin: 10px;"></div>
+
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">Demo: Widget {{ widget_version }}.</span>
+      </div>
+    </footer>
+
+    <!-- Production React -->
+    <script src="https://unpkg.com/react@16.4.1/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16.4.1/umd/react-dom.production.min.js"></script>
+
+
+    <!-- Customise Widget parameters -->
+    <script>
+      let widget_params = {
+        //"baseUrl": "http://0.0.0.0:8080/metrics/",  // Change token to use the live site
+        "token": "{{ token }}",
+        "uri": "info:doi:10.5334/bbc",
+        "widgetTitle": "Book Metrics",
+      };
+    </script>
+
+    <!-- load js for this app-->
+    <script src="https://storage.googleapis.com/hirmeos/metrics-widget/hirmeos-metrics-{{ widget_version }}.min.js"></script>
+  </body>
+</html>

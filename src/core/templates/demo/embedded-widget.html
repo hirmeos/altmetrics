@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <title>Metrics App</title>
+
+    <!-- load css for this app-->
+    <link rel="stylesheet" href="https://storage.googleapis.com/hirmeos/metrics-widget/hirmeos-metrics-{{ widget_version }}.css">
+
+    <!--load bootstrap-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+      footer {
+        position: fixed;
+        background: black;
+        height: 40px;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+      }
+
+      .filler-text {
+        margin-top: 100px;
+      }
+
+      .image-bordered {
+        height:300px;
+        border: 1px solid grey;
+        text-align: center;
+      }
+    </style>
+
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Demo Press</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Journals
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Books
+            </a>
+          </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row" style="margin: 0 0 40px 0">
+        <div class="col-md-1" style="background: gray "></div>
+        <div class="col-md-2" style="margin-top: 30px;">
+          <div class="image-bordered">
+            <div class="filler-text">
+              <p>[Book Image]</p>
+            </div>
+          </div>
+          <div style="margin: 15px 0">
+            <br>
+            <strong>How to cite this book</strong>
+            <i>
+              Lorem ipsum et al., (2019). Excepteur sint occaecat
+              cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+              est laborum.
+            </i>
+          </div>
+          <div style="margin: 15px 0">
+            <strong>Peer Review Information</strong>
+            <br>
+            <div style="display: block;">
+              <img src="https://www.doabooks.org/doabImages/prCertificate.png">
+            </div>
+            <p>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum. Ut enim ad minim
+              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+              ex ea commodo consequat.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-5" style="margin-top: 30px;">
+          <h3>Book Title</h3>
+          <h5>Book sub-title</h5>
+          <h4>Authors</h4>
+
+          <br>
+
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+            commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+            est laborum.
+          </p>
+          <p>
+            Duis aute irure dolor in reprehenderit in voluptate
+            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+            est laborum.
+          </p>
+          <p>Ut enim ad minim
+            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+            commodo consequat.
+          </p>
+
+          <br>
+
+          <!-- this div will need to be included in existing page -->
+          <div id="metrics-block"></div>
+
+          <br>
+
+          <h4>Additional book details</h4>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+            commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+            est laborum.
+          </p>
+          <p>
+            Duis aute irure dolor in reprehenderit in voluptate
+            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+            est laborum.
+          </p>
+          <p>Ut enim ad minim
+            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+            commodo consequat.
+          </p>
+        </div>
+        <div class="col-md-3" style="margin-top: 30px;">
+          <div class="image-bordered" style="height: 100%">
+            <div class="filler-text">
+              <p>[Right Panel]</p>
+              <br>
+              <p>[Additional Book content]</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1" style="background: gray"></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">Demo: Widget {{ widget_version }}.</span>
+      </div>
+    </footer>
+
+    <!-- Production React -->
+    <script src="https://unpkg.com/react@16.4.1/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16.4.1/umd/react-dom.production.min.js"></script>
+
+
+    <!-- Customise Widget parameters -->
+    <script>
+      let widget_params = {
+        //"baseUrl": "http://0.0.0.0:8080/metrics/",  // Change token to use the live site
+        "token": "{{ token }}",
+        "uri": "info:doi:10.5334/bbc",
+        "widgetTitle": "Book Metrics",
+      };
+    </script>
+
+    <!-- load js for this app-->
+    <script src="https://storage.googleapis.com/hirmeos/metrics-widget/hirmeos-metrics-{{ widget_version }}.min.js"></script>
+  </body>
+</html>
