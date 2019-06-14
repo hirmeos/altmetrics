@@ -59,7 +59,7 @@ class UriViewSet(MethodView):
         query = Uri.query.filter(Uri.users.contains(g.user))
 
         page = int(request.args.get('page', 1))  # Apply pagination
-        per_page = int(request.args.get('page_size', 100))
+        per_page = int(request.args.get('per_page', 100))
 
         query_page = query.paginate(
             page=page,
