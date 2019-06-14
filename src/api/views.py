@@ -1,7 +1,9 @@
 from logging import getLogger
+from urllib.parse import urlencode
 
 from flask import Blueprint, abort, g, jsonify, request
 from flask.views import MethodView
+from flask_api.status import HTTP_404_NOT_FOUND
 from flask_login import current_user
 from flask_security.decorators import http_auth_required
 
@@ -38,7 +40,7 @@ class TokensViewSet(MethodView):
         return issue_token(email=user.email)
 
 
-bp.add_url_rule('/get_token', view_func=TokensViewSet.as_view('get-token'))
+bp.add_url_rule('/get_token/', view_func=TokensViewSet.as_view('get-token'))
 
 
 class UriViewSet(MethodView):
@@ -53,10 +55,29 @@ class UriViewSet(MethodView):
             many=True,
             only=('raw', 'urls', 'last_checked')
         )
-        uri_data, _ = schema.dump(
-            Uri.query.filter(Uri.users.contains(g.user))
+
+        query = Uri.query.filter(Uri.users.contains(g.user))
+
+        page = int(request.args.get('page', 1))  # Apply pagination
+        per_page = int(request.args.get('page_size', 100))
+
+        query_page = query.paginate(
+            page=page,
+            per_page=per_page
         )
-        return uri_data
+
+        uri_data, _ = schema.dump(query_page.items)
+
+        response = {'data': uri_data}
+        if query_page.has_next:
+            request_args = request.args.copy()
+            request_args.setlist('page', [page+1])
+            request_args.setlist('per_page', [per_page])
+            response.update(
+                next=f'{request.base_url}?{urlencode(request_args)}',
+            )
+
+        return response
 
     def post(self):
         """ Register DOIs in the Altmetrics service. Also check if the URLs
@@ -113,14 +134,42 @@ class UriViewSet(MethodView):
         return jsonify(200)
 
 
-bp.add_url_rule('/uriset', view_func=UriViewSet.as_view('uri-set'))
+bp.add_url_rule('/uriset/', view_func=UriViewSet.as_view('uri-set'))
+
+
+class UriGet(MethodView):
+    """ API endpoint to fetch a single URIs. """
+
+    decorators = [token_authenticated]
+    serializer_class = UriSerializer
+
+    def get(self, uri):
+        schema = self.serializer_class(
+            many=False,
+            only=('raw', 'urls', 'last_checked')
+        )
+        uri_data, _ = schema.dump(
+            Uri.query.filter(
+                Uri.users.contains(g.user),
+                Uri.raw == uri
+            ).one_or_none()
+        )
+        if uri_data:
+            return uri_data
+
+        return (
+            {'message': f'No URI {uri} associated with your account.'},
+            HTTP_404_NOT_FOUND,
+        )
+
+
+bp.add_url_rule('/uriset/<path:uri>/', view_func=UriGet.as_view('uri-get'))
 
 
 class EventViewSet(MethodView):
     """ API endpoint to display Events. """
 
     decorators = [token_authenticated]
-
     serializer_class = EventSerializer
 
     def get(self):

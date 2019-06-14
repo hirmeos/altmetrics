@@ -61,7 +61,7 @@ class AltmetricsClient:
             raise ValueError(response.content)
 
     def set_header(self):
-            self.header = {'Authorization': f'Bearer {self.token}'}
+        self.header = {'Authorization': f'Bearer {self.token}'}
 
     def register_dois(self, doi_list):
         """Post dois to the Altmetrics API.
@@ -78,10 +78,23 @@ class AltmetricsClient:
             headers=self.header
         )
 
-        return response
+        return response.status_code, response
 
     def query_dois(self):
         """Check all DOIs associated with user's account. """
         response = requests.get(self.doi_url, headers=self.header)
 
-        return utf8(response.content)
+        return response.status_code, utf8(response.content)
+
+    def fetch_doi(self, doi):
+        """Fetch a single doi associated with a user.
+
+        Returns:
+            tuple: status_code and Response returned by API
+        """
+        response = requests.get(
+            f'{self.doi_url}/{doi}',
+            headers=self.header
+        )
+
+        return response.status_code, utf8(response.content)
