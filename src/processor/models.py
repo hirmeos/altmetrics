@@ -71,7 +71,7 @@ class Url(Model):
 
     @validates('url')
     def url_validator(self, key, url):
-        assert url_validator(url)
+        assert url_validator(url.replace('_', '-'))
         return url
 
     def __str__(self):
