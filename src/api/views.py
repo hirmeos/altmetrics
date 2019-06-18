@@ -40,7 +40,11 @@ class TokensViewSet(MethodView):
         return issue_token(email=user.email)
 
 
-bp.add_url_rule('/get_token/', view_func=TokensViewSet.as_view('get-token'))
+bp.add_url_rule(
+    '/get_token/',
+    strict_slashes=False,
+    view_func=TokensViewSet.as_view('get-token')
+)
 
 
 class UriViewSet(MethodView):
@@ -134,7 +138,11 @@ class UriViewSet(MethodView):
         return jsonify(200)
 
 
-bp.add_url_rule('/uriset/', view_func=UriViewSet.as_view('uri-set'))
+bp.add_url_rule(
+    '/uriset/',
+    strict_slashes=False,
+    view_func=UriViewSet.as_view('uri-set')
+)
 
 
 class UriGet(MethodView):
@@ -163,7 +171,11 @@ class UriGet(MethodView):
         )
 
 
-bp.add_url_rule('/uriset/<path:uri>/', view_func=UriGet.as_view('uri-get'))
+bp.add_url_rule(
+    '/uriset/<path:uri>/',
+    strict_slashes=False,
+    view_func=UriGet.as_view('uri-get')
+)
 
 
 class EventViewSet(MethodView):
@@ -187,4 +199,8 @@ class EventViewSet(MethodView):
         return jsonify(event_data)
 
 
-bp.add_url_rule('/eventset/', view_func=EventViewSet.as_view('event-set'))
+bp.add_url_rule(
+    '/eventset/',
+    strict_slashes=False,
+    view_func=EventViewSet.as_view('event-set')
+)
