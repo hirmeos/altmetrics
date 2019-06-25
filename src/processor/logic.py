@@ -225,13 +225,14 @@ def set_generic_twitter_link(tweet_id):
     return f'https://twitter.com/i/web/status/{tweet_id}'
 
 
-def prepare_metrics_data(uri, origin, created_at):
+def prepare_metrics_data(uri, origin, created_at, subject_id):
     """Prepares data for a single event that will be sent to the metrics-api.
 
     Args:
         uri (str): DOI of entry to be sent.
         origin (int): Value of origin that metrics was collected from.
         created_at (datetime): When the event took place.
+        subject_id (str): Uri of the specific event
 
     Returns:
         dict: data that will be sent to the metrics-api.
@@ -246,12 +247,12 @@ def prepare_metrics_data(uri, origin, created_at):
     measure_name = measure_dict[origin]
 
     return {
-        'uri': f'info:doi:{uri}',
-        'measure': f'https://metrics.operas-eu.org/{measure_name}/v1',
+        'work_uri': f'info:doi:{uri}',
+        'measure_uri': f'https://metrics.operas-eu.org/{measure_name}/v1',
         'value': 1,
         'timestamp': f'{created_at.isoformat()}',
-        'country': '',
-        'uploader': 'acct:tech@ubiquitypress.com'
+        'event_uri': subject_id,
+        'uploader_uri': 'acct:tech@ubiquitypress.com'
     }   # This will be less hard-coded in future
 
 
@@ -267,6 +268,7 @@ def send_events_to_metrics_api(events):
         data = prepare_metrics_data(
             uri=event.uri.raw,
             origin=event.origin,
-            created_at=event.created_at
+            created_at=event.created_at,
+            subject_id=event.subject_id,
         )
         metrics_service.send(data)
