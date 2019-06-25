@@ -237,20 +237,20 @@ def prepare_metrics_data(uri, origin, created_at):
         dict: data that will be sent to the metrics-api.
     """
     measure_dict = {  # measure for each origin
-        Origins.hypothesis: 'annotations',
-        Origins.twitter: 'tweets',
-        Origins.wikipedia: 'wikipedia-references',
-        Origins.wordpressdotcom: 'wordpressdotcom-references',
+        Origins.hypothesis: 'hypothesis/annotations',
+        Origins.twitter: 'twitter/tweets',
+        Origins.wikipedia: 'wikipedia/references',
+        Origins.wordpressdotcom: 'wordpressdotcom/references',
     }
 
     measure_name = measure_dict[origin]
 
     return {
         'uri': f'info:doi:{uri}',
-        'measure': f'tag:operas.eu,2018:{measure_name}:hirmeos-altmetrics',
+        'measure': f'https://metrics.operas-eu.org/{measure_name}/v1',
         'value': 1,
         'timestamp': f'{created_at.isoformat()}',
-        'country': 'urn:iso:std:3166:-2:ZZ',
+        'country': '',
         'uploader': 'acct:tech@ubiquitypress.com'
     }   # This will be less hard-coded in future
 
