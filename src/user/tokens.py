@@ -27,8 +27,7 @@ def issue_token(user, lifespan=None):
         str: jwt token containing encrypted user data
     """
 
-    is_admin = user.has_role('admin') # 1 or 0
-    authority = ['user', 'admin'][is_admin]
+    authority = 'admin' if user.has_role('admin') else 'user'
 
     jwt_key = current_app.config.get('JWT_KEY')
     payload = {
