@@ -37,7 +37,7 @@ class TokensViewSet(MethodView):
         if not user:
             abort(401, "Invalid user credentials")
 
-        return issue_token(user=user, lifespan=1800)
+        return issue_token(user=user, lifespan=86400)
 
     @http_auth_required
     @account_approved
@@ -46,7 +46,7 @@ class TokensViewSet(MethodView):
         if not user:
             abort(401, "Invalid user credentials")
 
-        token = issue_token(user=user, lifespan=1800)
+        token = issue_token(user=user, lifespan=86400)
 
         return {
             'status': 'ok',
