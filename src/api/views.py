@@ -1,4 +1,3 @@
-import json
 from logging import getLogger
 from urllib.parse import urlencode
 
