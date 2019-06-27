@@ -31,7 +31,7 @@ def issue_token(user, lifespan=None):
 
     jwt_key = current_app.config.get('JWT_KEY')
     payload = {
-        'sub': f'acc:{user.email}',
+        'sub': f'acct:{user.email}',
         'email': user.email,
         'name': user.full_name,
         'authority': authority,
