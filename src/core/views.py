@@ -14,8 +14,7 @@ class DemoWidgetViewSet(MethodView):
 
     @staticmethod
     def get():
-        widget_version = 'prototype-0.0.3'
-        token = issue_token('demo.user@email.co.uk', lifespan=60)
+        widget_version = '0.1.0'
 
         return render_template('demo/widget.html', **locals())
 
@@ -25,8 +24,7 @@ class DemoEmbeddedWidgetViewSet(MethodView):
 
     @staticmethod
     def get():
-        widget_version = 'prototype-0.0.3'
-        token = issue_token('demo.user@email.co.uk', lifespan=60)
+        widget_version = '0.1.0'
 
         return render_template('demo/embedded-widget.html', **locals())
 

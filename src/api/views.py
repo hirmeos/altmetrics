@@ -37,7 +37,10 @@ class TokensViewSet(MethodView):
         if not user:
             abort(401, "Invalid user credentials")
 
-        return issue_token(email=user.email)
+        return issue_token(user=user, lifespan=1800)
+
+    def post(self):
+        return self.get()
 
 
 bp.add_url_rule(

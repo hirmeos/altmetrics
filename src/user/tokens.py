@@ -16,19 +16,27 @@ from flask import current_app, g
 from .models import User
 
 
-def issue_token(email, lifespan=None):
+def issue_token(user, lifespan=None):
     """ Create encoded JWT
 
     Args:
-        email (str): email used to identify user account
+        user (User): User account requesting token
         lifespan (int): (optional) Seconds token should be valid for
 
     Returns:
         str: jwt token containing encrypted user data
     """
 
+    is_admin = user.has_role('admin') # 1 or 0
+    authority = ['user', 'admin'][is_admin]
+
     jwt_key = current_app.config.get('JWT_KEY')
-    payload = {'email': email}
+    payload = {
+        'sub': f'acc:{user.email}',
+        'email': user.email,
+        'name': user.full_name,
+        'authority': authority,
+    }
 
     if lifespan:
         issued_at = datetime.utcnow()
