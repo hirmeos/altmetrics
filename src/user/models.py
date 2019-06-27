@@ -90,3 +90,12 @@ class User(Model, UserMixin):
 
     def __repr__(self):
         return f'<User {self.id}: {self.username}>'
+
+    def prepare_full_token_details(self, token):
+        return {
+            'surname': self.last_name,
+            'name': self.first_name,
+            'authority': 'admin' if self.has_role('admin') else 'user',
+            'token': token,
+            'email': self.email,
+        }

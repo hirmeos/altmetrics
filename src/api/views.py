@@ -37,7 +37,23 @@ class TokensViewSet(MethodView):
         if not user:
             abort(401, "Invalid user credentials")
 
-        return issue_token(email=user.email)
+        return issue_token(user=user, lifespan=1800)
+
+    @http_auth_required
+    @account_approved
+    def post(self):
+        user = current_user
+        if not user:
+            abort(401, "Invalid user credentials")
+
+        token = issue_token(user=user, lifespan=1800)
+
+        return {
+            'status': 'ok',
+            'count': 1,
+            'code': 200,
+            'data': [user.prepare_full_token_details(token)]
+        }
 
 
 bp.add_url_rule(
