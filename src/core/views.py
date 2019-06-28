@@ -1,9 +1,7 @@
 from logging import getLogger
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask.views import MethodView
-
-from user.tokens import issue_token
 
 logger = getLogger(__name__)
 bp = Blueprint('demo', __name__, url_prefix='/demo')
@@ -14,7 +12,9 @@ class DemoWidgetViewSet(MethodView):
 
     @staticmethod
     def get():
-        widget_version = '0.1.0'
+        widget_version = request.args.get('widget_version', '0.1.1')
+        uri = request.args.get('uri', 'info:doi:10.5334/bay')
+        locale = request.args.get('locale', 'en')
 
         return render_template('demo/widget.html', **locals())
 
@@ -24,7 +24,9 @@ class DemoEmbeddedWidgetViewSet(MethodView):
 
     @staticmethod
     def get():
-        widget_version = '0.1.0'
+        widget_version = request.args.get('widget_version', '0.1.1')
+        uri = request.args.get('uri', 'info:doi:10.5334/bay')
+        locale = request.args.get('locale', 'en')
 
         return render_template('demo/embedded-widget.html', **locals())
 
