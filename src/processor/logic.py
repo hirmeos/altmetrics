@@ -241,7 +241,7 @@ def prepare_metrics_data(uri, origin, created_at, subject_id):
         Origins.hypothesis: 'hypothesis/annotations',
         Origins.twitter: 'twitter/tweets',
         Origins.wikipedia: 'wikipedia/references',
-        Origins.wordpressdotcom: 'wordpressdotcom/references',
+        Origins.wordpressdotcom: 'wordpress/references',
     }
 
     measure_name = measure_dict[origin]
