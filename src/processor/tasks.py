@@ -12,6 +12,7 @@ from core.settings import Origins, StaticProviders
 from processor.collections.reasons import doi_not_on_wikipedia_page
 from processor.logic import check_wikipedia_event
 from processor.models import Event, RawEvent, Scrape, Uri
+from user.models import Role
 
 from .logic import send_events_to_metrics_api
 
@@ -155,4 +156,14 @@ def send_metrics():
         Event.last_updated >= utcnow().shift(days=-1).datetime
     )
     logger.info(f'Sending {events_to_send.count()} new events to metrics-api')
-    send_events_to_metrics_api(events_to_send)
+
+    admin = Role.query.first()
+    user = admin.users.first()
+
+    post_url = f'{current_app.config.get("METRICS_API_BASE")}/events'
+
+    send_events_to_metrics_api(
+        events=events_to_send,
+        user=user,
+        metrics_api_url=post_url
+    )

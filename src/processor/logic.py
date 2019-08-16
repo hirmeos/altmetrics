@@ -12,8 +12,7 @@ from wikipedia import PageError
 
 from core import db
 from core.settings import Origins
-from services import ServiceHandler, MetricsAPIServiceDispatcher
-
+from user.tokens import issue_token
 
 logger = getLogger(__name__)
 WIKI_PATTERN = re.compile('//[a-z]{2}[.]wikipedia[.]org/.*')
@@ -256,14 +255,17 @@ def prepare_metrics_data(uri, origin, created_at, subject_id):
     }   # This will be less hard-coded in future
 
 
-def send_events_to_metrics_api(events):
+def send_events_to_metrics_api(events, user, metrics_api_url):
     """Send events as metrics to the metrics API using nameko.
 
     Args:
         events (list): Events to send to the metrics-api
-
+        user (object): User instance needed to issue token
+        metrics_api_url (str): Url of the metrics API to send events to
     """
-    metrics_service = ServiceHandler(service=MetricsAPIServiceDispatcher)
+    token = issue_token(user)
+    header = {'Authorization': f'Bearer {token}'}
+
     for event in events:
         data = prepare_metrics_data(
             uri=event.uri.raw,
@@ -271,4 +273,4 @@ def send_events_to_metrics_api(events):
             created_at=event.created_at,
             subject_id=event.subject_id,
         )
-        metrics_service.send(data)
+        requests.post(metrics_api_url, json=data, headers=header)

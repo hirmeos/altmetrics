@@ -164,6 +164,9 @@ class Config:
     REDIS_HOST = getenv('REDIS_HOST', 'localhost')
     REDIS_URL = f'redis://{REDIS_HOST}:6379/0'
 
+    # ## METRICS_API ##
+
+    METRICS_API_BASE = getenv('METRICS_API_BASE', 'http://localhost:8000')
 
 class DevConfig(Config):
 
