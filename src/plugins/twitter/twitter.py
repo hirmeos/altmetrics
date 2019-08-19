@@ -121,9 +121,11 @@ class TwitterProvider(GenericDataProvider):
 
     def rate_limited_search(self, tw_search_order, task):
         """ Search Twitter, sleeping when rate limitations are reached.
+
         Args:
             tw_search_order (TwitterSearchOrder): Search parameters for Twitter.
             task (object): Celery task running this plugin.
+
         Returns:
             Iterable: Tweets matching search parameters.
         """
@@ -175,6 +177,18 @@ class TwitterProvider(GenericDataProvider):
         )
 
         tw_search_order = TwitterSearchOrder()
+
+        '''
+        What needs to be done here would be along the lines of
+        
+        keywords = [f'"url:{url.url}"' for url in uri.urls] + [f'"{uri.raw}"']
+        for keyword in keywords:
+            # as a new task
+            tw_search_order.set_keywords([keyword])
+            # then run search and process results as currently done for the 
+            # 'just doi' search shown below.            
+        '''
+
         tw_search_order.set_keywords([f'"{uri.raw}"'])
         tw_search_order.set_include_entities(False)  # `True` for retweet info.
 
