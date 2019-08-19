@@ -256,7 +256,7 @@ def prepare_metrics_data(uri, origin, created_at, subject_id):
 
 
 def send_events_to_metrics_api(events, user, metrics_api_url):
-    """Send events as metrics to the metrics API using nameko.
+    """Send events as metrics to the metrics API.
 
     Args:
         events (list): Events to send to the metrics-api

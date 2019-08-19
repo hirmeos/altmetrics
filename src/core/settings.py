@@ -6,8 +6,6 @@ from enum import IntEnum
 from os import getenv, pardir, path
 import re
 
-from nameko.standalone.rpc import ClusterRpcProxy
-
 from generic import utils
 
 re._pattern_type = re.Pattern  # Py3.7 workaround for re module used by celery
@@ -65,29 +63,6 @@ class Config:
         host=RMQ_HOST,
         vhost=RMQ_VHOST
     )
-
-    # ## Nameko
-
-    NAMEKO_USER = getenv('NAMEKO_USER')
-    NAMEKO_PASSWORD = getenv('NAMEKO_PASSWORD')
-    NAMEKO_VHOST = getenv('NAMEKO_VHOST')
-
-    NAMEKO_BROKER_URL = AMQ_URL.format(
-        user=NAMEKO_USER,
-        password=NAMEKO_PASSWORD,
-        host=RMQ_HOST,
-        vhost=NAMEKO_VHOST
-    )
-
-    NAMEKO_CONFIG = {
-        'AMQP_URI': NAMEKO_BROKER_URL,
-        'WEB_SERVER_ADDRESS': '{host}:15672'.format(host=RMQ_HOST),
-        'rpc_exchange': 'nameko-rpc',
-        'max_workers': 10,
-        'parent_calls_tracked': 10,
-    }
-
-    CLUSTER_RPC = ClusterRpcProxy(NAMEKO_CONFIG)
 
     # ## DATABASES ##
 
