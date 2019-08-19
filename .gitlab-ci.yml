@@ -1,12 +1,9 @@
-image: upress/gitlab-base:22
+image: us.gcr.io/tools-203611/gitlab-base:24
 
 services:
-  - docker:dind
   - postgres
 
 variables:
-  DOCKER_HOST: tcp://localhost:2375
-  DOCKER_DRIVER: overlay2
   POSTGRES_DB: postgres
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: "postgres"
@@ -22,7 +19,7 @@ stages:
 version:
   stage: version
   script:
-    - echo "export VERSION=$(git describe --tags --abbrev=0)" > variables
+    - echo "export VERSION=$(git describe --tags --abbrev=0)" > $CI_PROJECT_DIR/variables
   artifacts:
     paths:
     - variables
@@ -38,7 +35,7 @@ sentry:
   stage: sentry
   script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/ubiquitypress/kubernetes kubernetes
-    - echo "export RELEASE=$(python3 kubernetes/ci/produce_sentry_version_file.py)" > release
+    - echo "export RELEASE=$(python3 kubernetes/ci/produce_sentry_version_file.py)" > $CI_PROJECT_DIR/release
   artifacts:
     paths:
     - release
@@ -48,30 +45,31 @@ sentry:
 
 build-push-clean:
   stage: 📦 docker
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   before_script:
-    - echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
-    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
-    - docker login -u _json_key --password-stdin https://eu.gcr.io < ${HOME}/gcloud-service-key.json
+    - source $CI_PROJECT_DIR/release
+    - source $CI_PROJECT_DIR/variables
   script:
-    - source variables
-    - source release
-    - docker build --build-arg RELEASE -t $IMAGE_NAME -f docker/Dockerfile .
-    - docker tag $IMAGE_NAME "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
-    - docker push "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
-    - docker rmi "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
+    - /kaniko/executor
+      --build-arg RELEASE
+      --context $CI_PROJECT_DIR
+      --dockerfile $CI_PROJECT_DIR/docker/Dockerfile
+      --destination "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
   only:
     - tags
 
 helm:
   stage: helm
   script:
-    - source variables
+    - source $CI_PROJECT_DIR/variables
     - helm init --client-only --skip-refresh
     - helm plugin install https://github.com/hypnoglow/helm-s3.git
     - helm repo add ubiquity s3://service-helm/charts
     - export CHART_VERSION=$(python3 kubernetes/ci/auto_update_chart.py $HELM_PROJECT_NAME $HELM_PROJECT_NAME $IMAGE_NAME)
     - helm package kubernetes/$HELM_PROJECT_NAME/helm/$HELM_PROJECT_NAME
-    - helm s3 push --force /ubiquitypress/$IMAGE_NAME/$HELM_PROJECT_NAME-$CHART_VERSION.tgz ubiquity
+    - helm s3 push --force /builds/ubiquitypress/$IMAGE_NAME/$HELM_PROJECT_NAME-$CHART_VERSION.tgz ubiquity
     - cd kubernetes/
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"
