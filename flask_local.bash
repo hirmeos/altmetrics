@@ -29,6 +29,7 @@ export NAMEKO_VHOST=comms
 
 # Security 
 export SECURITY_PASSWORD_SALT='very-secure-password-salt'
+export JWT_KEY='very-secure-web-token-key'
 
 # Maigun credentials
 export MAIL_SERVER='smtp.mailgun.org'
@@ -44,7 +45,19 @@ export TWITTER_ACCESS_TOKEN='twitter-access-token'
 export TWITTER_ACCESS_TOKEN_SECRET='twitter-access-token-secret'
 export TWITTER_LABEL=dev
 
+# RabbitMQ configuration
+export RMQ_HOST=localhost
+export RMQ_VHOST=altmetrics
+export RMQ_PASSWORD=password
+export RMQ_USER=user
 
+# Names for measures
+export MEASURES_HYPOTHESIS='https://metrics.operas-eu.org/hypothesis/annotations/v1'
+export MEASURES_TWITTER='https://metrics.operas-eu.org/twitter/tweets/v1'
+export MEASURES_WIKIPEDIA='https://metrics.operas-eu.org/wikipedia/references/v1'
+export MEASURES_WORDPRESSDOTCOM='https://metrics.operas-eu.org/wordpress/references/v1'
+
+export REDIS_HOST=localhost
 export TECH_EMAIL=demo.user@mail.com
 
 ARGS=("$*")

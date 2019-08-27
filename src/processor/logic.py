@@ -10,8 +10,9 @@ from urllib.parse import unquote, urlsplit, parse_qs
 import wikipedia
 from wikipedia import PageError
 
+from flask import current_app
+
 from core import db
-from core.settings import Origins
 from user.tokens import issue_token
 
 logger = getLogger(__name__)
@@ -236,23 +237,16 @@ def prepare_metrics_data(uri, origin, created_at, subject_id):
     Returns:
         dict: data that will be sent to the metrics-api.
     """
-    measure_dict = {  # measure for each origin
-        Origins.hypothesis: 'hypothesis/annotations',
-        Origins.twitter: 'twitter/tweets',
-        Origins.wikipedia: 'wikipedia/references',
-        Origins.wordpressdotcom: 'wordpress/references',
-    }
 
-    measure_name = measure_dict[origin]
+    measure_name = current_app.config['MEASURES_DICT'][origin]
 
     return {
         'work_uri': f'info:doi:{uri}',
-        'measure_uri': f'https://metrics.operas-eu.org/{measure_name}/v1',
+        'measure_uri': measure_name,
         'value': 1,
         'timestamp': f'{created_at.isoformat()}',
         'event_uri': subject_id,
-        'uploader_uri': 'acct:tech@ubiquitypress.com'
-    }   # This will be less hard-coded in future
+    }
 
 
 def send_events_to_metrics_api(events, user, metrics_api_url):

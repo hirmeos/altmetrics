@@ -3,7 +3,7 @@ Common settings for the HIRMEOS Altmetrics project.
 """
 
 from enum import IntEnum
-from os import getenv, pardir, path
+from os import environ, getenv, pardir, path
 import re
 
 from generic import utils
@@ -110,7 +110,7 @@ class Config:
 
     # ## Mail settings #
 
-    TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
+    TECH_EMAIL = environ['TECH_EMAIL']
     TECH_NAME = getenv('TECH_NAME', 'tech')
 
     MAIL_SERVER = getenv('MAIL_SERVER', 'localhost')
@@ -142,6 +142,16 @@ class Config:
     # ## METRICS_API ##
 
     METRICS_API_BASE = getenv('METRICS_API_BASE', 'http://localhost:8000')
+
+    # ## MEASURES VALUES ## - Expand as plugins are added
+
+    MEASURES_DICT = {  # measure for each origin
+        Origins.hypothesis: environ['MEASURES_HYPOTHESIS'],
+        Origins.twitter: environ['MEASURES_TWITTER'],
+        Origins.wikipedia: environ['MEASURES_WIKIPEDIA'],
+        Origins.wordpressdotcom: environ['MEASURES_WORDPRESSDOTCOM'],
+    }
+
 
 class DevConfig(Config):
 
