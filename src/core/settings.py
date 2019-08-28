@@ -3,7 +3,7 @@ Common settings for the HIRMEOS Altmetrics project.
 """
 
 from enum import IntEnum
-from os import getenv, pardir, path
+from os import environ, pardir, path
 import re
 
 from generic import utils
@@ -38,22 +38,22 @@ class StaticProviders(IntEnum):
 
 class Config:
 
-    SECRET_KEY = getenv('SECRET_KEY', 'secret-key')
+    SECRET_KEY = environ.get('SECRET_KEY', 'secret-key')
 
     APP_DIR = path.dirname(path.dirname(path.abspath(__file__)))
     PROJECT_ROOT = path.abspath(path.join(APP_DIR, pardir))
 
     # ## Security ##
 
-    SECURITY_PASSWORD_SALT = getenv('SECURITY_PASSWORD_SALT')
-    SECURITY_REGISTERABLE = getenv('SECURITY_REGISTERABLE', True)
+    SECURITY_PASSWORD_SALT = environ.get('SECURITY_PASSWORD_SALT')
+    SECURITY_REGISTERABLE = environ.get('SECURITY_REGISTERABLE', True)
 
     # ## CELERY ##
 
-    RMQ_USER = getenv('RMQ_USER')
-    RMQ_PASSWORD = getenv('RMQ_PASSWORD')
-    RMQ_HOST = getenv('RMQ_HOST')
-    RMQ_VHOST = getenv('RMQ_VHOST')
+    RMQ_USER = environ.get('RMQ_USER')
+    RMQ_PASSWORD = environ.get('RMQ_PASSWORD')
+    RMQ_HOST = environ.get('RMQ_HOST')
+    RMQ_VHOST = environ.get('RMQ_VHOST')
 
     AMQ_URL = 'amqp://{user}:{password}@{host}:5672/{vhost}'
     RESULT_BACKEND = None
@@ -66,10 +66,10 @@ class Config:
 
     # ## DATABASES ##
 
-    DB_USER = getenv('DB_USER')
-    DB_PASSWORD = getenv('DB_PASSWORD')
-    DB_HOST = getenv('DB_HOST')
-    DB_NAME = getenv('DB_NAME')
+    DB_USER = environ.get('DB_USER')
+    DB_PASSWORD = environ.get('DB_PASSWORD')
+    DB_HOST = environ.get('DB_HOST')
+    DB_NAME = environ.get('DB_NAME')
     PORT = '5432'
 
     SQLALCHEMY_DATABASE_URI = (
@@ -86,13 +86,13 @@ class Config:
     METRICS_VERSION = '0.3.12'
 
     # ## Twitter ##
-    TWITTER_APP_KEY = getenv('TWITTER_APP_KEY')
-    TWITTER_APP_KEY_SECRET = getenv('TWITTER_APP_KEY_SECRET')
-    TWITTER_ACCESS_TOKEN = getenv('TWITTER_ACCESS_TOKEN')
-    TWITTER_ACCESS_TOKEN_SECRET = getenv(
+    TWITTER_APP_KEY = environ.get('TWITTER_APP_KEY')
+    TWITTER_APP_KEY_SECRET = environ.get('TWITTER_APP_KEY_SECRET')
+    TWITTER_ACCESS_TOKEN = environ.get('TWITTER_ACCESS_TOKEN')
+    TWITTER_ACCESS_TOKEN_SECRET = environ.get(
         'TWITTER_ACCESS_TOKEN_SECRET'
     )
-    TWITTER_LABEL = getenv('TWITTER_LABEL')
+    TWITTER_LABEL = environ.get('TWITTER_LABEL')
 
     # # ## PLUGINS ##
     #
@@ -110,16 +110,16 @@ class Config:
 
     # ## Mail settings #
 
-    TECH_EMAIL = getenv('TECH_EMAIL', 'tech@ubiquitypress.com')
-    TECH_NAME = getenv('TECH_NAME', 'tech')
+    TECH_EMAIL = environ['TECH_EMAIL']
+    TECH_NAME = environ.get('TECH_NAME', 'tech')
 
-    MAIL_SERVER = getenv('MAIL_SERVER', 'localhost')
-    MAIL_PORT = getenv('MAIL_PORT', '587')
-    MAIL_USERNAME = getenv('MAIL_USERNAME')
-    MAIL_PASSWORD = getenv('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = getenv('MAIL_DEFAULT_SENDER')
+    MAIL_SERVER = environ.get('MAIL_SERVER', 'localhost')
+    MAIL_PORT = environ.get('MAIL_PORT', '587')
+    MAIL_USERNAME = environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = environ.get('MAIL_DEFAULT_SENDER')
 
-    SECURITY_CONFIRMABLE = getenv('SECURITY_CONFIRMABLE', 'True') is 'True'
+    SECURITY_CONFIRMABLE = environ.get('SECURITY_CONFIRMABLE', 'True') is 'True'
     SECURITY_POST_REGISTER_VIEW = '/account/confirmation'
 
     # ## BEHAVIOUR #
@@ -128,30 +128,40 @@ class Config:
 
     # ## Temporary solution to cref cited-by credentials
 
-    CITED_BY_FILE = getenv('CITED_BY_FILE', 'xref.csv')
+    CITED_BY_FILE = environ.get('CITED_BY_FILE', 'xref.csv')
 
     # ## SENTRY ##
 
-    SENTRY_DSN = getenv('SENTRY_DSN', None)
+    SENTRY_DSN = environ.get('SENTRY_DSN', None)
 
     # ## REDIS ##
 
-    REDIS_HOST = getenv('REDIS_HOST', 'localhost')
+    REDIS_HOST = environ.get('REDIS_HOST', 'localhost')
     REDIS_URL = f'redis://{REDIS_HOST}:6379/0'
 
     # ## METRICS_API ##
 
-    METRICS_API_BASE = getenv('METRICS_API_BASE', 'http://localhost:8000')
+    METRICS_API_BASE = environ.get('METRICS_API_BASE', 'http://localhost:8000')
+
+    # ## MEASURES VALUES ## - Expand as plugins are added
+
+    MEASURES_DICT = {  # measure for each origin
+        Origins.hypothesis: environ['MEASURES_HYPOTHESIS'],
+        Origins.twitter: environ['MEASURES_TWITTER'],
+        Origins.wikipedia: environ['MEASURES_WIKIPEDIA'],
+        Origins.wordpressdotcom: environ['MEASURES_WORDPRESSDOTCOM'],
+    }
+
 
 class DevConfig(Config):
 
     DEBUG = True
     FLASK_ENV = 'development'
-    JWT_KEY = getenv('JWT_KEY', 'dev-key-ok-as-is')
+    JWT_KEY = environ.get('JWT_KEY', 'dev-key-ok-as-is')
 
 
 class LiveConfig(Config):
 
     DEBUG = False
     FLASK_ENV = 'production'
-    JWT_KEY = getenv('JWT_KEY', 'LIVE KEY - PLEASE SET THIS!')
+    JWT_KEY = environ.get('JWT_KEY', 'LIVE KEY - PLEASE SET THIS!')
