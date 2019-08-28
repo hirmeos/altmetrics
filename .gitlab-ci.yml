@@ -1,7 +1,7 @@
 image: us.gcr.io/tools-203611/gitlab-base:24
 
 services:
-  - postgres
+  - aidanlister/postgres-hstore
 
 variables:
   POSTGRES_DB: postgres

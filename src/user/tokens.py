@@ -56,13 +56,13 @@ def validate_token(token):
         token (str): JWT token
 
     Returns:
-        bool: whether or not token is valid
-        dict: either token payload or reason token is invalid
+        tuple (bool, dict): whether or not token is valid and either the token
+            payload or reason token is invalid
     """
     jwt_key = current_app.config.get('JWT_KEY')
 
     try:
-        payload = jwt.decode(token, jwt_key)
+        payload = jwt.decode(token, jwt_key, algorithms=['HS256'])
         return True, payload
     except (DecodeError, ExpiredSignatureError, InvalidTokenError) as e:
         return False, {'error': e}
