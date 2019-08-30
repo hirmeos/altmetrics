@@ -108,49 +108,55 @@ class Config:
         ]
     )
 
-    # ## Mail settings #
+    # ## Ignore settings for testing: ##
 
-    TECH_EMAIL = environ['TECH_EMAIL']
-    TECH_NAME = environ.get('TECH_NAME', 'tech')
+    if environ.get('CONFIG') != 'TestConfig':
+        # ## Mail settings #
+        TECH_EMAIL = environ['TECH_EMAIL']
+        TECH_NAME = environ.get('TECH_NAME', 'tech')
 
-    MAIL_SERVER = environ.get('MAIL_SERVER', 'localhost')
-    MAIL_PORT = environ.get('MAIL_PORT', '587')
-    MAIL_USERNAME = environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = environ.get('MAIL_DEFAULT_SENDER')
+        MAIL_SERVER = environ.get('MAIL_SERVER', 'localhost')
+        MAIL_PORT = environ.get('MAIL_PORT', '587')
+        MAIL_USERNAME = environ.get('MAIL_USERNAME')
+        MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
+        MAIL_DEFAULT_SENDER = environ.get('MAIL_DEFAULT_SENDER')
 
-    SECURITY_CONFIRMABLE = environ.get('SECURITY_CONFIRMABLE', 'True') is 'True'
-    SECURITY_POST_REGISTER_VIEW = '/account/confirmation'
+        SECURITY_CONFIRMABLE = environ.get(
+            'SECURITY_CONFIRMABLE', 'True'
+        ) is 'True'
+        SECURITY_POST_REGISTER_VIEW = '/account/confirmation'
 
-    # ## BEHAVIOUR #
+        # ## BEHAVIOUR #
 
-    DAYS_BEFORE_REFRESH = 1
+        DAYS_BEFORE_REFRESH = 1
 
-    # ## Temporary solution to cref cited-by credentials
+        # ## Temporary solution to cref cited-by credentials
 
-    CITED_BY_FILE = environ.get('CITED_BY_FILE', 'xref.csv')
+        CITED_BY_FILE = environ.get('CITED_BY_FILE', 'xref.csv')
 
-    # ## SENTRY ##
+        # ## SENTRY ##
 
-    SENTRY_DSN = environ.get('SENTRY_DSN', None)
+        SENTRY_DSN = environ.get('SENTRY_DSN', None)
 
-    # ## REDIS ##
+        # ## REDIS ##
 
-    REDIS_HOST = environ.get('REDIS_HOST', 'localhost')
-    REDIS_URL = f'redis://{REDIS_HOST}:6379/0'
+        REDIS_HOST = environ.get('REDIS_HOST', 'localhost')
+        REDIS_URL = f'redis://{REDIS_HOST}:6379/0'
 
-    # ## METRICS_API ##
+        # ## METRICS_API ##
 
-    METRICS_API_BASE = environ.get('METRICS_API_BASE', 'http://localhost:8000')
+        METRICS_API_BASE = environ.get(
+            'METRICS_API_BASE', 'http://localhost:8000'
+        )
 
-    # ## MEASURES VALUES ## - Expand as plugins are added
+        # ## MEASURES VALUES ## - Expand as plugins are added
 
-    MEASURES_DICT = {  # measure for each origin
-        Origins.hypothesis: environ['MEASURES_HYPOTHESIS'],
-        Origins.twitter: environ['MEASURES_TWITTER'],
-        Origins.wikipedia: environ['MEASURES_WIKIPEDIA'],
-        Origins.wordpressdotcom: environ['MEASURES_WORDPRESSDOTCOM'],
-    }
+        MEASURES_DICT = {  # measure for each origin
+            Origins.hypothesis: environ['MEASURES_HYPOTHESIS'],
+            Origins.twitter: environ['MEASURES_TWITTER'],
+            Origins.wikipedia: environ['MEASURES_WIKIPEDIA'],
+            Origins.wordpressdotcom: environ['MEASURES_WORDPRESSDOTCOM'],
+        }
 
 
 class DevConfig(Config):
@@ -165,3 +171,13 @@ class LiveConfig(Config):
     DEBUG = False
     FLASK_ENV = 'production'
     JWT_KEY = environ.get('JWT_KEY', 'LIVE KEY - PLEASE SET THIS!')
+
+
+class TestConfig(Config):
+
+    DEBUG = True
+    TESTING = True
+    FLASK_ENV = 'testing'
+    JWT_KEY = 'test-not-nb'
+
+    TECH_EMAIL = environ.get('TECH_EMAIL', 'tech@alt.m.com')
