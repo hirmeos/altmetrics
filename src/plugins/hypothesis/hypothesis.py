@@ -40,7 +40,7 @@ class HypothesisDataProvider(GenericDataProvider):
 
         if uri.urls:
             parameters.update(wildcard_uri=[])
-        
+
         for url in uri.urls:  # 2) Process urls
             parameters['uri'].append(url.url)
             parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
