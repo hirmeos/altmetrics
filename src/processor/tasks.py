@@ -14,7 +14,7 @@ from processor.logic import check_wikipedia_event
 from processor.models import Event, RawEvent, Scrape, Uri
 from user.models import Role
 
-from .logic import send_events_to_metrics_api
+from .logic import send_events_to_metrics_api, generate_queryset_chunks
 
 
 logger = get_task_logger(__name__)
@@ -60,6 +60,36 @@ def process_plugin(
     db.session.commit()
 
 
+@celery_app.task(name='trigger-plugins')
+def trigger_plugins(query_ids, scrape_id):
+    """Trigger plugins to pull metrics for a set of Uris.
+
+    Args:
+        query_ids (list): ids of uris to pull metrics for
+        scrape_id (int): id of current scrape
+    """
+    query_uris = Uri.query.filter(Uri.id.in_(query_ids))
+    scrape = Scrape.query.filter(Scrape.id == scrape_id).first()
+
+    for uri in query_uris:
+
+        logger.info(f'processing {uri.raw}')
+        last_check = uri.last_checked
+        last_check_iso = last_check and last_check.isoformat()
+
+        for origin, plugins in current_app.config.get("ORIGINS").items():
+            for plugin in plugins:
+                process_plugin.delay(
+                    plugin.__name__,
+                    uri.id,
+                    origin.value,
+                    scrape.id,
+                    last_check_iso
+                )
+        uri.last_checked = datetime.utcnow()
+    db.session.commit()
+
+
 @celery_app.task(name='pull-metrics')
 def pull_metrics():
     """ Call a scrape for each enabled data source plugin. """
@@ -80,22 +110,14 @@ def pull_metrics():
     db.session.add(scrape)
     db.session.commit()
 
-    for uri in uri_unprocessed_or_refreshable:
-
-        logger.info(f'processing {uri.raw}')
-        last_check = uri.last_checked
-        last_check_iso = last_check and last_check.isoformat()
-
-        for origin, plugins in current_app.config.get("ORIGINS").items():
-            for plugin in plugins:
-                process_plugin.delay(
-                    plugin.__name__,
-                    uri.id,
-                    origin.value,
-                    scrape.id,
-                    last_check_iso
-                )
-        uri.last_checked = datetime.utcnow()
+    for subset in generate_queryset_chunks(
+            full_queryset=uri_unprocessed_or_refreshable,
+            set_size=current_app.config.get('PULL_SET_SIZE')
+    ):
+        trigger_plugins.delay(
+            query_ids=list(chain.from_iterable(subset.values(Uri.id))),
+            scrape_id=scrape.id
+        )
 
     scrape.end_date = datetime.utcnow()
     db.session.commit()
