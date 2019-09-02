@@ -14,7 +14,7 @@ Reason = namedtuple('Reason', ['value', 'description'])
 
 _reasons_list = []
 
-   
+
 doi_not_on_wikipedia_page = Reason(
     value='doi-not-on-wiki-page',
     description=(

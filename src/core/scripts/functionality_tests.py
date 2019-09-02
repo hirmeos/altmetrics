@@ -39,16 +39,16 @@ def test_twitter_search(keywords):
 
 # Create demo events for testing
 @dataclass
-class DemoUri: 
-    raw: str 
-                                                                                                                                              
+class DemoUri:
+    raw: str
+
 
 @dataclass
-class DemoEvent: 
-    uri: DemoUri 
-    origin: int 
-    created_at: datetime 
-    subject_id: str 
+class DemoEvent:
+    uri: DemoUri
+    origin: int
+    created_at: datetime
+    subject_id: str
 
 
 def create_demo_event(uri_raw, origin, created_at, subject_id):

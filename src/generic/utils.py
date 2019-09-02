@@ -11,7 +11,7 @@ class MountPoint(type):
     def __init__(cls, name, bases, attrs):
         if not hasattr(cls, 'plugins'):
             cls.plugins = []
-        
+
         cls.plugins.append(cls)
 
 
@@ -97,7 +97,7 @@ def load_plugins(folder, **kwargs):
                     module.__author__
                 )
             )
-        except Exception as e:
+        except Exception:
             if file:
                 file.close()
 

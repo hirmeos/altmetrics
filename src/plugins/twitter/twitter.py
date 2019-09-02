@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from datetime import datetime
 from logging import getLogger
 
@@ -180,13 +179,13 @@ class TwitterProvider(GenericDataProvider):
 
         '''
         What needs to be done here would be along the lines of
-        
+
         keywords = [f'"url:{url.url}"' for url in uri.urls] + [f'"{uri.raw}"']
         for keyword in keywords:
             # as a new task
             tw_search_order.set_keywords([keyword])
-            # then run search and process results as currently done for the 
-            # 'just doi' search shown below.            
+            # then run search and process results as currently done for the
+            # 'just doi' search shown below.
         '''
 
         tw_search_order.set_keywords([f'"{uri.raw}"'])

@@ -1,5 +1,4 @@
-from collections.abc import Iterable
-from datetime import date, datetime
+from datetime import date
 from logging import getLogger
 
 from core.settings import Origins

@@ -1,5 +1,3 @@
-from collections.abc import Iterable
-from datetime import datetime
 from itertools import chain
 from logging import getLogger
 from os import path
