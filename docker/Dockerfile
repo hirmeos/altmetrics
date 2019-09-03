@@ -33,6 +33,7 @@ RUN apk del \
     rm -rf /var/cache/apk/*
 
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
+COPY docker/supervisord-workers.conf /etc/supervisor/supervisord-workers.conf
 COPY docker/default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
