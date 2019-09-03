@@ -128,7 +128,8 @@ class Config:
 
         # ## BEHAVIOUR #
 
-        DAYS_BEFORE_REFRESH = 1
+        DAYS_BEFORE_REFRESH = int(environ.get('DAYS_BEFORE_REFRESH', 1))
+        PULL_SET_SIZE = int(environ.get('PULL_SET_SIZE', 500))
 
         # ## Temporary solution to cref cited-by credentials
 

@@ -13,6 +13,7 @@ def init_celery(app, celery_app):
     celery_app.conf.update(app.config)
 
     celery_app.conf.task_routes = {
+        'trigger-plugins': {'queue': 'altmetrics.trigger-plugins'},
         'approve-user': {'queue': 'altmetrics.approve-user'},
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
         'pull-metrics': {'queue': 'altmetrics.pull-metrics'},
@@ -68,6 +69,7 @@ def configure_celery(celery_app):
     }
 
     celery_app.conf.task_routes = {
+        'trigger-plugins': {'queue': 'altmetrics.trigger-plugins'},
         'approve-user': {'queue': 'altmetrics.approve-user'},
         'send-approval-request': {'queue': 'altmetrics.send-approval-request'},
         'pull-metrics': {'queue': 'altmetrics.pull-metrics'},

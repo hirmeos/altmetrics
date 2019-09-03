@@ -266,3 +266,21 @@ def send_events_to_metrics_api(events, user, metrics_api_url):
             subject_id=event.subject_id,
         )
         requests.post(metrics_api_url, json=data, headers=header)
+
+
+def generate_queryset_chunks(full_queryset, set_size):
+    """Generator function to loop through a large queryset in smaller chunks.
+
+    Args:
+        full_queryset (BaseQuery): Database query.
+        set_size (int): number of entries per query subset.
+
+    Yields:
+        BaseQuery: Smaller subset of the original queryset.
+    """
+    step_size = 0
+    query_subset = full_queryset.limit(set_size).offset(step_size)
+    while query_subset.count():
+        yield query_subset
+        query_subset = full_queryset.limit(set_size).offset(step_size)
+        step_size += set_size
