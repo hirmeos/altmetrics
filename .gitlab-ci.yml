@@ -11,7 +11,7 @@ variables:
 stages:
   - version
   - test
-  - sentry
+  - k8s-scripts
   - 📦 docker
   - helm
   - flake
@@ -31,15 +31,13 @@ tox:
     - pyenv local 3.7.1
     - tox
 
-sentry:
-  stage: sentry
+scripts:
+  stage: k8s-scripts
   script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/ubiquitypress/kubernetes kubernetes
-    - echo "export RELEASE=$(python3 kubernetes/ci/produce_sentry_version_file.py)" > $CI_PROJECT_DIR/release
   artifacts:
     paths:
-    - release
-    - kubernetes/
+      - kubernetes/
   only:
     - tags
 
@@ -49,11 +47,9 @@ build-push-clean:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - source $CI_PROJECT_DIR/release
     - source $CI_PROJECT_DIR/variables
   script:
     - /kaniko/executor
-      --build-arg RELEASE
       --context $CI_PROJECT_DIR
       --dockerfile $CI_PROJECT_DIR/docker/Dockerfile
       --destination "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
