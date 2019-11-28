@@ -1,5 +1,6 @@
 from datetime import date
 from logging import getLogger
+from requests.exceptions import ReadTimeout
 
 from core.settings import Origins
 from generic.mount_point import GenericDataProvider
@@ -114,7 +115,11 @@ class CrossrefEventDataProvider(GenericDataProvider):
             parameters.update(
                 {'from-collected-date': last_check.date().isoformat()}
             )
-        events, errors = self.client.get_events(**parameters)
+
+        try:
+            events, errors = self.client.get_events(**parameters)
+        except ReadTimeout as exception:
+            raise task.retry(exc=exception, countdown=10)
 
         if errors:
             return {

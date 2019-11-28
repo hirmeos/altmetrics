@@ -102,7 +102,6 @@ class Config:
             'generic',
             '__init__.py',
             '__pycache__',
-            'crossref_event_data',
         ]
     )
 
