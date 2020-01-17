@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "https://altmetrics.ubiquity.press/api/uriset",
+			"name": "https://altmetrics.operas-eu.org/api/uriset",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -29,12 +29,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://altmetrics.ubiquity.press/api/uriset",
+					"raw": "https://altmetrics.operas-eu.org/api/uriset",
 					"protocol": "https",
 					"host": [
 						"altmetrics",
-						"ubiquity",
-						"press"
+						"operas-eu",
+						"org"
 					],
 					"path": [
 						"api",
@@ -54,12 +54,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://altmetrics.ubiquity.press/api/uriset",
+							"raw": "https://altmetrics.operas-eu.org/api/uriset",
 							"protocol": "https",
 							"host": [
 								"altmetrics",
-								"ubiquity",
-								"press"
+								"operas-eu",
+								"org"
 							],
 							"path": [
 								"api",
@@ -76,7 +76,7 @@
 			]
 		},
 		{
-			"name": "https://altmetrics.ubiquity.press/api/uriset",
+			"name": "https://altmetrics.operas-eu.org/api/uriset",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -93,8 +93,8 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
@@ -102,12 +102,12 @@
 					"raw": "[\n\t\t{\n\t\t\t\"doi\": \"10.5334/bcb\", \n\t\t\t\"url\": [\n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bcb/\", \n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bcb/read/\"\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\"doi\": \"10.5334/bbc\", \n\t\t\t\"url\": [\n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bbc/\", \n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bbc/read/\"\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\"doi\": \"10.5334/bay\", \n\t\t\t\"url\": [\n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bay/\", \n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bay/read\"\n\t\t\t]\n\t\t}\n]\n"
 				},
 				"url": {
-					"raw": "https://altmetrics.ubiquity.press/api/uriset",
+					"raw": "https://altmetrics.operas-eu.org/api/uriset",
 					"protocol": "https",
 					"host": [
 						"altmetrics",
-						"ubiquity",
-						"press"
+						"operas-eu",
+						"org"
 					],
 					"path": [
 						"api",
@@ -127,12 +127,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://altmetrics.ubiquity.press/api/uriset",
+							"raw": "https://altmetrics.operas-eu.org/api/uriset",
 							"protocol": "https",
 							"host": [
 								"altmetrics",
-								"ubiquity",
-								"press"
+								"operas-eu",
+								"org"
 							],
 							"path": [
 								"api",
@@ -149,7 +149,7 @@
 			]
 		},
 		{
-			"name": "https://altmetrics.ubiquity.press/api/get_token",
+			"name": "https://altmetrics.operas-eu.org/api/get_token",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -176,12 +176,12 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://altmetrics.ubiquity.press/api/get_token",
+					"raw": "https://altmetrics.operas-eu.org/api/get_token",
 					"protocol": "https",
 					"host": [
 						"altmetrics",
-						"ubiquity",
-						"press"
+						"operas-eu",
+						"org"
 					],
 					"path": [
 						"api",
@@ -201,12 +201,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://altmetrics.ubiquity.press/api/get_token",
+							"raw": "https://altmetrics.operas-eu.org/api/get_token",
 							"protocol": "https",
 							"host": [
 								"altmetrics",
-								"ubiquity",
-								"press"
+								"operas-eu",
+								"org"
 							],
 							"path": [
 								"api",

@@ -5,7 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-
+## [0.3.27] - 2019-12-01
+### Changed
+ - Updated docs to point to operas.eu URLs
+ - Updated docs to point to new storage bucket for the CDN
+  
 
 ## [0.3.26] - 2019-12-01
 ### Added

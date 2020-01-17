@@ -4,7 +4,7 @@ Altmetrics
 Setting up your user account
 ----------------------------
 
-You can register for an account at https://altmetrics.ubiquity.press/register.
+You can register for an account at https://altmetrics.operas-eu.org/register.
 
 You will be sent a an email asking you to confirm the email address you
 supplied. Click on the link given in this email.
@@ -34,7 +34,7 @@ Most requests to the Altmetrics API will need to validated with a JSON Web Token
 **Please note: Your account will need to be approved before you can be issued
 a JWT**.
 
-**API endpoint:** https://altmetrics.ubiquity.press/api/get_token
+**API endpoint:** https://altmetrics.operas-eu.org/api/get_token
 
 **Method:** `GET`
 
@@ -50,13 +50,13 @@ With `curl`, this can be done as either
 
     .. code-block:: bash
 
-        curl -u test.user@gmail.com:test-password-123 https://altmetrics.ubiquity.press/api/get_token
+        curl -u test.user@gmail.com:test-password-123 https://altmetrics.operas-eu.org/api/get_token
 
 or using the base64 encoding of `username`:`password`
 
     .. code-block:: bash
 
-        curl --header "Authorization: Basic dGVzdC51c2VyQGdtYWlsLmNvbTp0ZXN0LXBhc3N3b3JkLTEyMw==" https://altmetrics.ubiquity.press/api/get_token
+        curl --header "Authorization: Basic dGVzdC51c2VyQGdtYWlsLmNvbTp0ZXN0LXBhc3N3b3JkLTEyMw==" https://altmetrics.operas-eu.org/api/get_token
 
 
 Token Bearer schema
@@ -78,7 +78,7 @@ Registering DOIs
 
 You can post the DOIs of works to the Altmetrics API.
 
-**API endpoint:** https://altmetrics.ubiquity.press/api/uriset
+**API endpoint:** https://altmetrics.operas-eu.org/api/uriset
 
 **Method:** `POST`
 
@@ -109,7 +109,7 @@ Querying DOIs
 Check all DOIs associated with your user account. Remember to authenticate
 yourself with your JWT.
 
-**API endpoint:** https://altmetrics.ubiquity.press/api/uriset
+**API endpoint:** https://altmetrics.operas-eu.org/api/uriset
 
 **Method:** `GET`
 
