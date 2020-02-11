@@ -1,4 +1,4 @@
-image: us.gcr.io/tools-203611/gitlab-base:24
+image: us.gcr.io/tools-203611/gitlab-base:32
 
 services:
   - aidanlister/postgres-hstore
@@ -34,7 +34,7 @@ tox:
 scripts:
   stage: k8s-scripts
   script:
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/ubiquitypress/kubernetes kubernetes
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/ubiquitypress/kubernetes --depth 1 kubernetes
   artifacts:
     paths:
       - kubernetes/
@@ -44,7 +44,7 @@ scripts:
 build-push-clean:
   stage: 📦 docker
   image:
-    name: gcr.io/kaniko-project/executor:debug
+    name: gcr.io/kaniko-project/executor:debug-v0.17.1
     entrypoint: [""]
   before_script:
     - source $CI_PROJECT_DIR/variables
