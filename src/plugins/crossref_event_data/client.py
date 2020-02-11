@@ -1,10 +1,13 @@
+import requests
+
 from flask import current_app
 
-from generic.client import ApiClient
 
-
-class CrossRefEventDataClient(ApiClient):
+class CrossRefEventDataClient:
     """ Dedicated CrossRef Event Data API client. """
+
+    def __init__(self, api_base):
+        self.api_base = api_base
 
     @staticmethod
     def _build_filters(values):
@@ -28,10 +31,10 @@ class CrossRefEventDataClient(ApiClient):
             origin (str): Service which originated the event we are fetching.
 
         Returns:
-            dict: JSON containing CrossRef Event API information about the DOI.
+            requests.Response: CrossRef Event Data events for the DOI.
         """
         filters = self._build_filters(parameters)
-        return self.get(self.api_base, params=filters)
+        return requests.get(self.api_base, params=filters, timeout=5)
 
     def get_events(self, **parameters):
         """ Get list of CrossRef Event Data API events.
@@ -43,10 +46,10 @@ class CrossRefEventDataClient(ApiClient):
         Returns:
             list: An iterable of event dictionaries.
         """
-        response, status = self.get_doi(**parameters)
+        response = self.get_doi(**parameters)
 
-        result = self.decode(response)
-        if status != 200:  # TODO: Check status and handle error if not 200
+        result = response.json()
+        if response.status_code != 200:
             return None, result
 
         return result.get('message', {}).get('events', []), None

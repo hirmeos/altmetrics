@@ -32,7 +32,7 @@ The CDN folders are structure as follows:
 
 .. code-block:: html
 
-    https://storage.googleapis.com/hirmeos/<version>/<name>
+    https://storage.googleapis.com/operas/<version>/<name>
 
 Where:
 
@@ -48,13 +48,13 @@ The following table contains a list of the available libraries:
 +---------------+---------------------------------------------------------+
 | library       | public link                                             |
 +===============+=========================================================+
-| epub.js       | https://storage.googleapis.com/hirmeos/v1/epub.js       |
+| epub.js       | https://storage.googleapis.com/operas/v1/epub.js       |
 +---------------+---------------------------------------------------------+
-| epub.min.js   | https://storage.googleapis.com/hirmeos/v1/epub.min.js   |
+| epub.min.js   | https://storage.googleapis.com/operas/v1/epub.min.js   |
 +---------------+---------------------------------------------------------+
-| pdf.js        | https://storage.googleapis.com/hirmeos/v1/pdf.js        |
+| pdf.js        | https://storage.googleapis.com/operas/v1/pdf.js        |
 +---------------+---------------------------------------------------------+
-| pdf.worker.js | https://storage.googleapis.com/hirmeos/v1/pdf.worker.js |
+| pdf.worker.js | https://storage.googleapis.com/operas/v1/pdf.worker.js |
 +---------------+---------------------------------------------------------+
 
 HTML
@@ -74,8 +74,8 @@ EPUB are the Hypothes.is CDN, ``jszip 3.1.5`` and ``epub.js 0.3.66``:
 .. code-block:: html
 
     <script src="https://cdn.hypothes.is/hypothesis"></script>
-    <script src="https://storage.googleapis.com/hirmeos/v1/jszip.min.js"></script>
-    <script src="https://storage.googleapis.com/hirmeos/v1/epub.min.js"></script>
+    <script src="https://storage.googleapis.com/operas/v1/jszip.min.js"></script>
+    <script src="https://storage.googleapis.com/operas/v1/epub.min.js"></script>
 
 `This link`_ hosted by Hypothes.is contains a working implementation.
 In the example, a function in ``reader.js`` is called when loading the page.
@@ -131,5 +131,5 @@ The results are available on the HIRMEOS metrics, by source:
 
 .. code-block:: text
 
-    https://metrics.ubiquity.press/api/altmetrics?uri=10.5334/dsj-2016-006&view=source&source=hypothesis
+    https://metrics-api.operas-eu.org/api/altmetrics?uri=10.5334/dsj-2016-006&view=source&source=hypothesis
 
