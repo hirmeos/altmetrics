@@ -12,7 +12,7 @@ class DemoWidgetViewSet(MethodView):
 
     @staticmethod
     def get():
-        widget_version = request.args.get('widget_version', '0.1.1')
+        widget_version = request.args.get('widget_version', '0.2.0')
         uri = request.args.get('uri', 'info:doi:10.5334/bay')
         locale = request.args.get('locale', 'en')
 
@@ -24,7 +24,7 @@ class DemoEmbeddedWidgetViewSet(MethodView):
 
     @staticmethod
     def get():
-        widget_version = request.args.get('widget_version', '0.1.1')
+        widget_version = request.args.get('widget_version', '0.2.0')
         uri = request.args.get('uri', 'info:doi:10.5334/bay')
         locale = request.args.get('locale', 'en')
 

@@ -19,7 +19,7 @@ Because JavaScript code gets cached by Browsers, updates to the Widget code
 require these files to be renamed so they are downloaded.As a result, the Widget
 files are named based on their release versions.
 
-Descried in this document, these are ``hirmeos-metrics-0.1.1.min.js`` and
+Descried in this document, these are ``hirmeos-metrics-0.2.0.min.js`` and
 ``hirmeos-metrics-0.1.1.css``. The CSS and JavaScript files are released and
 versioned together to ensure that CSS files with a given version will support
 HTML that is created in JavaScript files with the same version.
@@ -75,7 +75,7 @@ You will need to edit the values in ``widget_params``.
         </script>
 
         <!-- load js for the Metrics Widget app-->
-        <script src="https://storage.googleapis.com/operas/metrics-widget/hirmeos-metrics-0.1.1.min.js"></script>
+        <script src="https://storage.googleapis.com/operas/metrics-widget/hirmeos-metrics-0.2.0.min.js"></script>
 
 
 Widget customisation

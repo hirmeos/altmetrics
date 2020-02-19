@@ -48,13 +48,13 @@ The following table contains a list of the available libraries:
 +---------------+---------------------------------------------------------+
 | library       | public link                                             |
 +===============+=========================================================+
-| epub.js       | https://storage.googleapis.com/operas/v1/epub.js       |
+| epub.js       | https://storage.googleapis.com/operas/v1/epub.js        |
 +---------------+---------------------------------------------------------+
-| epub.min.js   | https://storage.googleapis.com/operas/v1/epub.min.js   |
+| epub.min.js   | https://storage.googleapis.com/operas/v1/epub.min.js    |
 +---------------+---------------------------------------------------------+
-| pdf.js        | https://storage.googleapis.com/operas/v1/pdf.js        |
+| pdf.js        | https://storage.googleapis.com/operas/v1/pdf.js         |
 +---------------+---------------------------------------------------------+
-| pdf.worker.js | https://storage.googleapis.com/operas/v1/pdf.worker.js |
+| pdf.worker.js | https://storage.googleapis.com/operas/v1/pdf.worker.js  |
 +---------------+---------------------------------------------------------+
 
 HTML
@@ -131,5 +131,5 @@ The results are available on the HIRMEOS metrics, by source:
 
 .. code-block:: text
 
-    https://metrics-api.operas-eu.org/api/altmetrics?uri=10.5334/dsj-2016-006&view=source&source=hypothesis
+    https://metrics-api.operas-eu.org/events?filter=work_uri:info:doi:10.5334/bbc,measure_uri:https://metrics.operas-eu.org/hypothesis/annotations/v1
 
