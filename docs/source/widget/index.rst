@@ -20,7 +20,7 @@ require these files to be renamed so they are downloaded.As a result, the Widget
 files are named based on their release versions.
 
 Descried in this document, these are ``hirmeos-metrics-0.2.0.min.js`` and
-``hirmeos-metrics-0.1.1.css``. The CSS and JavaScript files are released and
+``hirmeos-metrics-0.2.0.css``. The CSS and JavaScript files are released and
 versioned together to ensure that CSS files with a given version will support
 HTML that is created in JavaScript files with the same version.
 
@@ -35,7 +35,7 @@ The widget has been built using Bootstrap 4, as well as some custom CSS.
     .. code-block:: html
 
         <!-- load css for this app-->
-        <link rel="stylesheet" href="https://storage.googleapis.com/operas/metrics-widget/hirmeos-metrics-0.1.1.css">
+        <link rel="stylesheet" href="https://storage.googleapis.com/operas/metrics-widget/hirmeos-metrics-0.2.0.css">
 
         <!--load bootstrap-->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
