@@ -1,4 +1,4 @@
-image: us.gcr.io/tools-203611/gitlab-base:32
+image: eu.gcr.io/ubiquity-ci/gitlab-base:38
 
 services:
   - aidanlister/postgres-hstore
@@ -9,20 +9,11 @@ variables:
   POSTGRES_PASSWORD: "postgres"
 
 stages:
-  - version
   - test
   - k8s-scripts
   - 📦 docker
   - helm
   - flake
-
-version:
-  stage: version
-  script:
-    - echo "export VERSION=$(git describe --tags --abbrev=0)" > $CI_PROJECT_DIR/variables
-  artifacts:
-    paths:
-    - variables
 
 tox:
   stage: test
@@ -46,31 +37,23 @@ build-push-clean:
   image:
     name: gcr.io/kaniko-project/executor:debug-v0.17.1
     entrypoint: [""]
-  before_script:
-    - source $CI_PROJECT_DIR/variables
   script:
     - /kaniko/executor
       --context $CI_PROJECT_DIR
       --dockerfile $CI_PROJECT_DIR/docker/Dockerfile
-      --destination "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$VERSION"
+      --destination "eu.gcr.io/$GCLOUD_PROJECT_ID/$IMAGE_NAME:$CI_COMMIT_TAG"
   only:
     - tags
 
 helm:
   stage: helm
   script:
-    - source $CI_PROJECT_DIR/variables
     - helm init --client-only --skip-refresh
-    - helm plugin install https://github.com/hypnoglow/helm-s3.git
-    - helm repo add ubiquity s3://service-helm/charts
-    - export CHART_VERSION=$(python3 kubernetes/ci/auto_update_chart.py $HELM_PROJECT_NAME $HELM_PROJECT_NAME $IMAGE_NAME)
-    - helm package kubernetes/$HELM_PROJECT_NAME/helm/$HELM_PROJECT_NAME
-    - helm s3 push --force /builds/ubiquitypress/$IMAGE_NAME/$HELM_PROJECT_NAME-$CHART_VERSION.tgz ubiquity
-    - cd kubernetes/
-    - git config --global user.name "${GITLAB_USER_NAME}"
-    - git config --global user.email "${GITLAB_USER_EMAIL}"
-    - git commit -am 'auto update helm chart'
-    - git push https://${GITLAB_USER_NAME}:${GITLAB_ACCESS_TOKEN}@gitlab.com/ubiquitypress/kubernetes.git HEAD:master
+    - helm plugin install https://github.com/viglesiasce/helm-gcs.git --version v0.2.0
+    - python3 kubernetes/ci/upgrade_chart.py kubernetes/$CI_PROJECT_NAME/helm/$IMAGE_NAME/Chart.yaml
+    - helm package kubernetes/$CI_PROJECT_NAME/helm/$IMAGE_NAME
+    - BOTO_CONFIG=/$GCLOUD_PROJECT_ID/boto_config helm repo add $HELM_REPO_NAME gs://$HELM_CHARTS_BUCKET
+    - BOTO_CONFIG=/$GCLOUD_PROJECT_ID/boto_config helm gcs push $(ls /builds/ubiquitypress/$CI_PROJECT_NAME/*.tgz) gs://$HELM_CHARTS_BUCKET
   only:
     - tags
 
