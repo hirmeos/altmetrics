@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "2a8e0ef6-0ecb-4aa2-99f9-c76f86d01be8",
+		"name": "Altmetrics API",
+		"description": "# Introduction\nThis API allows users to register DOIs to and query DOIs on the the Altmetrics service.\n\n# Overview\n\n\n# Authentication\nThis API handles authentication with JSON web tokens (JWT). In order to use this API, you will need to have an account on the Altmetrics system. Your user credentials can then be used to fetch a token to be used with each request.\n\n# Error Codes\n401 - Unauthorized user. This will be returned if the user credentials are invalid or if there is a problem with the JWT you supply when making a request. \n\n500 - This error may appear if you do not supply a DOI when registering a work with the Altmetrics server. \n\n# Rate limit\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "https://altmetrics.operas-eu.org/api/uriset",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://altmetrics.operas-eu.org/api/uriset",
+					"protocol": "https",
+					"host": [
+						"altmetrics",
+						"operas-eu",
+						"org"
+					],
+					"path": [
+						"api",
+						"uriset"
+					]
+				},
+				"description": "Check all DOIs associated with your user account"
+			},
+			"response": [
+				{
+					"name": "Default",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://altmetrics.operas-eu.org/api/uriset",
+							"protocol": "https",
+							"host": [
+								"altmetrics",
+								"operas-eu",
+								"org"
+							],
+							"path": [
+								"api",
+								"uriset"
+							]
+						}
+					},
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "https://altmetrics.operas-eu.org/api/uriset",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n\t\t{\n\t\t\t\"doi\": \"10.5334/bcb\", \n\t\t\t\"url\": [\n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bcb/\", \n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bcb/read/\"\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\"doi\": \"10.5334/bbc\", \n\t\t\t\"url\": [\n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bbc/\", \n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bbc/read/\"\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\"doi\": \"10.5334/bay\", \n\t\t\t\"url\": [\n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bay/\", \n\t\t\t\t\"https://www.ubiquitypress.com/site/books/10.5334/bay/read\"\n\t\t\t]\n\t\t}\n]\n"
+				},
+				"url": {
+					"raw": "https://altmetrics.operas-eu.org/api/uriset",
+					"protocol": "https",
+					"host": [
+						"altmetrics",
+						"operas-eu",
+						"org"
+					],
+					"path": [
+						"api",
+						"uriset"
+					]
+				},
+				"description": "Post dois to the Altmetrics API"
+			},
+			"response": [
+				{
+					"name": "Default",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://altmetrics.operas-eu.org/api/uriset",
+							"protocol": "https",
+							"host": [
+								"altmetrics",
+								"operas-eu",
+								"org"
+							],
+							"path": [
+								"api",
+								"uriset"
+							]
+						}
+					},
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "https://altmetrics.operas-eu.org/api/get_token",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{email}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://altmetrics.operas-eu.org/api/get_token",
+					"protocol": "https",
+					"host": [
+						"altmetrics",
+						"operas-eu",
+						"org"
+					],
+					"path": [
+						"api",
+						"get_token"
+					]
+				},
+				"description": "Makes a request to the altmetrics API to get a JWT token"
+			},
+			"response": [
+				{
+					"name": "Default",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://altmetrics.operas-eu.org/api/get_token",
+							"protocol": "https",
+							"host": [
+								"altmetrics",
+								"operas-eu",
+								"org"
+							],
+							"path": [
+								"api",
+								"get_token"
+							]
+						}
+					},
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": ""
+				}
+			]
+		}
+	]
+}
