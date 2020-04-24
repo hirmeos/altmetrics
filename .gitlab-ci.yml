@@ -50,8 +50,8 @@ helm:
   script:
     - helm init --client-only --skip-refresh
     - helm plugin install https://github.com/viglesiasce/helm-gcs.git --version v0.2.0
-    - python3 kubernetes/ci/upgrade_chart.py kubernetes/$CI_PROJECT_NAME/helm/$IMAGE_NAME/Chart.yaml
-    - helm package kubernetes/$CI_PROJECT_NAME/helm/$IMAGE_NAME
+    - python3 kubernetes/ci/upgrade_chart.py kubernetes/$HELM_PROJECT_NAME/helm/$IMAGE_NAME/Chart.yaml
+    - helm package kubernetes/$HELM_PROJECT_NAME/helm/$IMAGE_NAME
     - BOTO_CONFIG=/$GCLOUD_PROJECT_ID/boto_config helm repo add $HELM_REPO_NAME gs://$HELM_CHARTS_BUCKET
     - BOTO_CONFIG=/$GCLOUD_PROJECT_ID/boto_config helm gcs push $(ls /builds/ubiquitypress/$CI_PROJECT_NAME/*.tgz) gs://$HELM_CHARTS_BUCKET
   only:
