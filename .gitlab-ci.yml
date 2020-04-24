@@ -1,4 +1,4 @@
-image: eu.gcr.io/ubiquity-ci/gitlab-base:38
+image: eu.gcr.io/ubiquity-ci/gitlab-base:39
 
 services:
   - aidanlister/postgres-hstore
