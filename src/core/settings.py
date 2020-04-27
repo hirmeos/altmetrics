@@ -4,11 +4,8 @@ Common settings for the HIRMEOS Altmetrics project.
 
 from enum import IntEnum
 from os import environ, pardir, path
-import re
 
 from generic import utils
-
-re._pattern_type = re.Pattern  # Py3.7 workaround for re module used by celery
 
 
 # ## Enums used to keep track of origins and providers ##

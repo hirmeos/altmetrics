@@ -1,12 +1,10 @@
 alembic==1.1.0
-amqp==2.5.1
 arrow==0.12.1
 Babel==2.7.0
 bcrypt==3.1.6
 beautifulsoup4==4.8.0
-billiard==3.6.1.0
 blinker==1.4
-celery==4.3.0
+celery==4.4.2
 certifi==2018.10.15
 cffi==1.12.3
 chardet==3.0.4
@@ -15,7 +13,7 @@ colorlog==3.1.4
 decorator==4.4.0
 dnspython==1.16.0
 eventlet==0.24.1
-Flask==1.1.1
+Flask==1.1.2
 Flask-Admin==1.5.3
 Flask-API==1.1
 Flask-BabelEx==0.9.3
@@ -33,7 +31,6 @@ idna==2.7
 importlib-metadata==0.20
 itsdangerous==1.1.0
 Jinja2==2.10.1
-kombu==4.6.4
 Mako==1.1.0
 MarkupSafe==1.1.0
 marshmallow==2.16.3
@@ -41,7 +38,7 @@ monotonic==1.5
 more-itertools==7.2.0
 oauthlib==3.1.0
 passlib==1.7.1
-psycopg2==2.8.4
+psycopg2==2.8.5
 pycparser==2.19
 PyJWT==1.7.1
 python-dateutil==2.7.5
