@@ -57,6 +57,13 @@ helm:
   only:
     - tags
 
+create-version:
+  stage: jira
+  script:
+    - python3 kubernetes/ci/create_jira_release.py
+  only:
+    - tags
+
 flake:
   stage: flake
   script:
