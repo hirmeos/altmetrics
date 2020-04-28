@@ -13,6 +13,7 @@ stages:
   - k8s-scripts
   - 📦 docker
   - helm
+  - jira
   - flake
 
 tox:
