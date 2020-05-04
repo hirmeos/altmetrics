@@ -60,8 +60,6 @@ def create_app():
     from .admin import init_admin
     init_admin(app, db)
 
-    init_celery(app, celery_app)
-
     redis_store.init_app(app)
 
     return app
