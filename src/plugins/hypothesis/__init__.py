@@ -8,7 +8,7 @@ from . import hypothesis
 
 
 PROVIDER = hypothesis.HypothesisDataProvider(
-    provider=StaticProviders.crossref_event_data,
+    provider=StaticProviders.hypothesis,
     supported_origins=[Origins.hypothesis],
     api_base='https://hypothes.is/api/search',
 )

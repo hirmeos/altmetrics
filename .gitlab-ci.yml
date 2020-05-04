@@ -13,7 +13,6 @@ stages:
   - k8s-scripts
   - 📦 docker
   - helm
-  - jira
   - flake
 
 tox:
@@ -52,16 +51,10 @@ helm:
     - helm init --client-only --skip-refresh
     - helm plugin install https://github.com/viglesiasce/helm-gcs.git --version v0.2.0
     - python3 kubernetes/ci/upgrade_chart.py kubernetes/$HELM_PROJECT_NAME/helm/$IMAGE_NAME/Chart.yaml
+    - python3 kubernetes/ci/jira-releases/create_jira_release.py --values-file=kubernetes/$HELM_PROJECT_NAME/helm/$IMAGE_NAME/values.yaml
     - helm package kubernetes/$HELM_PROJECT_NAME/helm/$IMAGE_NAME
     - BOTO_CONFIG=/$GCLOUD_PROJECT_ID/boto_config helm repo add $HELM_REPO_NAME gs://$HELM_CHARTS_BUCKET
     - BOTO_CONFIG=/$GCLOUD_PROJECT_ID/boto_config helm gcs push $(ls /builds/ubiquitypress/$CI_PROJECT_NAME/*.tgz) gs://$HELM_CHARTS_BUCKET
-  only:
-    - tags
-
-create-version:
-  stage: jira
-  script:
-    - python3 kubernetes/ci/create_jira_release.py
   only:
     - tags
 
