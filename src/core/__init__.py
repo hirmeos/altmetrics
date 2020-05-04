@@ -10,13 +10,15 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_redis import FlaskRedis
 
-from .celery_config import init_celery
+from .celery import FlaskCelery
 from .database import db
+from .plugins import AltmetricsPlugins
 
 
 CONFIG = os.getenv('CONFIG', 'DevConfig')
-celery_app = Celery()
+celery_app = FlaskCelery()
 mail = Mail()
+plugins = AltmetricsPlugins()
 redis_store = FlaskRedis()
 
 
@@ -32,7 +34,11 @@ def create_app():
             integrations=[FlaskIntegration()]
         )
 
+    if CONFIG != 'TestConfig':
+        celery_app.init_app(app, plugins)
+
     db.init_app(app)
+    plugins.init_app(app)
     Migrate(app, db)
 
     mail.init_app(app)  # Set up mail.

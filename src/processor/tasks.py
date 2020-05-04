@@ -6,7 +6,7 @@ from celery.utils.log import get_task_logger
 from flask import current_app
 from sqlalchemy.exc import OperationalError
 
-from core import celery_app, db
+from core import celery_app, db, plugins
 from core.logic import get_enum_by_value
 from core.settings import Origins, StaticProviders
 from processor.collections.reasons import doi_not_on_wikipedia_page
@@ -60,6 +60,41 @@ def process_plugin(
     db.session.commit()
 
 
+@celery_app.task(name='process-plugin.crossref_event_data')
+def process_plugin__crossref_event_data(*args, **kwargs):
+    return process_plugin(*args, **kwargs)
+
+
+@celery_app.task(name='process-plugin.hypothesis')
+def process_plugin__hypothesis(*args, **kwargs):
+    return process_plugin(*args, **kwargs)
+
+
+@celery_app.task(name='process-plugin.twitter')
+def process_plugin__twitter(*args, **kwargs):
+    return process_plugin(*args, **kwargs)
+
+
+PROCESS_PLUGIN_TASKS = {
+    'process-plugin.crossref_event_data': process_plugin__crossref_event_data,
+    'process-plugin.hypothesis': process_plugin__hypothesis,
+    'process-plugin.twitter': process_plugin__twitter,
+}
+
+
+def get_process_plugin_function(provider):
+    """Determine which 'process_plugin' function to run for a given provider.
+
+    Args:
+        provider (enum): Provider for a given scrape.
+
+    Returns:
+        celery.local.PromiseProxy: Function to run for plugin task.
+    """
+    task_name = plugins.get_plugin_task_name(provider)
+    return PROCESS_PLUGIN_TASKS[task_name]
+
+
 @celery_app.task(name='trigger-plugins')
 def trigger_plugins(query_ids, scrape_id):
     """Trigger plugins to pull metrics for a set of Uris.
@@ -79,7 +114,10 @@ def trigger_plugins(query_ids, scrape_id):
 
         for origin, plugins in current_app.config.get("ORIGINS").items():
             for plugin in plugins:
-                process_plugin.delay(
+                plugin_function = get_process_plugin_function(
+                    plugin.PROVIDER.provider
+                )
+                plugin_function.delay(
                     plugin.__name__,
                     uri.id,
                     origin.value,
