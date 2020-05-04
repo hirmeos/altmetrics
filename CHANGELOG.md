@@ -5,6 +5,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.4.3] - 2019-05-04
+### Changed
+ - Assign queue and worker to each plugin task
+ 
+
+## [0.4.2] - 2019-04-28
+### Added
+ - Jira step added to CI
+
+
+## [0.4.1] - 2019-04-27
+### Changed
+ - Upgraded to Python 3.8
+ - Updated requirements 
+
+
 ## [0.3.27] - 2019-12-01
 ### Changed
  - Updated docs to point to operas.eu URLs
