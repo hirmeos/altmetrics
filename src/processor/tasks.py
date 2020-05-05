@@ -6,7 +6,7 @@ from celery.utils.log import get_task_logger
 from flask import current_app
 from sqlalchemy.exc import OperationalError
 
-from core import celery_app, db, plugins
+from core import celery_app, db, plugins as core_plugins
 from core.logic import get_enum_by_value
 from core.settings import Origins, StaticProviders
 from processor.collections.reasons import doi_not_on_wikipedia_page
@@ -91,7 +91,7 @@ def get_process_plugin_function(provider):
     Returns:
         celery.local.PromiseProxy: Function to run for plugin task.
     """
-    task_name = plugins.get_plugin_task_name(provider)
+    task_name = core_plugins.get_plugin_task_name(provider)
     return PROCESS_PLUGIN_TASKS[task_name]
 
 

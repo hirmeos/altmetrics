@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 
-from celery import Celery
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -34,9 +33,6 @@ def create_app():
             integrations=[FlaskIntegration()]
         )
 
-    if CONFIG != 'TestConfig':
-        celery_app.init_app(app, plugins)
-
     db.init_app(app)
     plugins.init_app(app)
     Migrate(app, db)
@@ -61,6 +57,9 @@ def create_app():
     init_admin(app, db)
 
     redis_store.init_app(app)
+
+    if CONFIG != 'TestConfig':
+        celery_app.init_app(app, plugins)
 
     return app
 

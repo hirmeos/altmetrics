@@ -117,7 +117,7 @@ class Config:
 
         SECURITY_CONFIRMABLE = environ.get(
             'SECURITY_CONFIRMABLE', 'True'
-        ) is 'True'
+        ) == 'True'
         SECURITY_POST_REGISTER_VIEW = '/account/confirmation'
 
         # ## BEHAVIOUR #

@@ -34,6 +34,8 @@ class FlaskCelery(Celery):
     def configure_celery(self, plugins):
         """Add configuration for celery tasks, including per-plugin routes."""
 
+        self.conf.task_create_missing_queues = False
+
         self.conf.beat_schedule = {
             'pull-metrics-every-day': {
                 'task': 'pull-metrics',

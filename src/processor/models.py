@@ -46,7 +46,7 @@ class Uri(Model):
     # TODO: Add validator DOIs.
     @validates('raw')
     def valid_uri(self, key, uri):
-        pattern = re.compile('10\.\d{4,9}/[-._;()/:A-Z0-9]+', re.I)
+        pattern = re.compile(r'10\.\d{4,9}/[-._;()/:A-Z0-9]+', re.I)
         assert pattern.match(uri)
         return uri
         # FIXME: this only validates DOIs.
