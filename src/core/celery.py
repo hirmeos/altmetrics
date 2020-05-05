@@ -69,4 +69,3 @@ class FlaskCelery(Celery):
             )
 
         self.conf.task_routes = celery_task_routes
-
