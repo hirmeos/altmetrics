@@ -29,9 +29,7 @@ RUN apk del \
     openssh-client && \
     rm -rf /var/cache/apk/*
 
-COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
-COPY docker/supervisord-workers.conf /etc/supervisor/supervisord-workers.conf
-COPY docker/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/supervisord*.conf /etc/supervisor/
 
 EXPOSE 80
 ENTRYPOINT  ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
