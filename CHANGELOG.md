@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.4.7] - 2019-05-07
+### Changed
+ - Create separate supervisord file for each each plugin task.
+ 
+
+## [0.4.4 - 0.4.6] - 2019-05-04
+### Changed
+ - Apply fixes to celery task and queue settings. 
+
+
 ## [0.4.3] - 2019-05-04
 ### Changed
  - Assign queue and worker to each plugin task
