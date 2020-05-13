@@ -1,4 +1,5 @@
 from datetime import date
+from json import JSONDecodeError
 from logging import getLogger
 from requests.exceptions import ReadTimeout
 
@@ -118,7 +119,7 @@ class CrossrefEventDataProvider(GenericDataProvider):
 
         try:
             events, errors = self.client.get_events(**parameters)
-        except ReadTimeout as exception:
+        except (JSONDecodeError, ReadTimeout) as exception:
             raise task.retry(exc=exception, countdown=10)
 
         if errors:

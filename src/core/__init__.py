@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+from celery.exceptions import Retry
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -21,12 +22,23 @@ plugins = AltmetricsPlugins()
 redis_store = FlaskRedis()
 
 
+def before_send(event, hint):
+    """Intercept Sentry event - do not report if exception is a celery Retry."""
+    if 'exc_info' in hint:
+        exc_type, exc_value, tb = hint['exc_info']
+        if isinstance(exc_value, Retry):
+            return None
+
+    return event
+
+
 def create_app():
     app = FlaskAPI(__name__, template_folder='templates')
     app.config.from_object(f'core.settings.{CONFIG}')
 
     if app.config.get('SENTRY_DSN'):
         sentry_sdk.init(
+            before_send=before_send,
             dsn=app.config.get('SENTRY_DSN'),
             release=app.config.get('METRICS_VERSION'),
             environment=os.getenv('SENTRY_ENV', 'production'),
