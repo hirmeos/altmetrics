@@ -3,10 +3,12 @@ from itertools import chain
 
 from arrow import utcnow
 from celery.utils.log import get_task_logger
+from celery.exceptions import Retry
 from flask import current_app
 from sqlalchemy.exc import OperationalError
 
 from core import celery_app, db, plugins as core_plugins
+from core.celery import CeleryRetry
 from core.logic import get_enum_by_value
 from core.settings import Origins, StaticProviders
 from processor.collections.reasons import doi_not_on_wikipedia_page
@@ -18,9 +20,10 @@ from .logic import send_events_to_metrics_api, generate_queryset_chunks
 
 
 logger = get_task_logger(__name__)
+THROWS = (CeleryRetry, Retry)
 
 
-@celery_app.task(name='process-plugin', bind=True)
+@celery_app.task(name='process-plugin', bind=True, throws=THROWS)
 def process_plugin(
         self,
         plugin_name,
@@ -37,8 +40,12 @@ def process_plugin(
 
     try:  # Lock DB row for this URI
         uri = Uri.query.with_for_update(nowait=True).get(uri_id)
-    except OperationalError as exception:
-        raise self.retry(exc=exception, countdown=5, max_retries=120)
+    except OperationalError as e:
+        raise self.retry(
+            exc=CeleryRetry(e, 'Database row is locked'),
+            countdown=5,
+            max_retries=120
+        )
 
     event_dict = plugin.PROVIDER.process(
         uri,
@@ -60,17 +67,17 @@ def process_plugin(
     db.session.commit()
 
 
-@celery_app.task(name='process-plugin.crossref_event_data')
+@celery_app.task(name='process-plugin.crossref_event_data', throws=THROWS)
 def process_plugin__crossref_event_data(*args, **kwargs):
     return process_plugin(*args, **kwargs)
 
 
-@celery_app.task(name='process-plugin.hypothesis')
+@celery_app.task(name='process-plugin.hypothesis', throws=THROWS)
 def process_plugin__hypothesis(*args, **kwargs):
     return process_plugin(*args, **kwargs)
 
 
-@celery_app.task(name='process-plugin.twitter')
+@celery_app.task(name='process-plugin.twitter', throws=THROWS)
 def process_plugin__twitter(*args, **kwargs):
     return process_plugin(*args, **kwargs)
 

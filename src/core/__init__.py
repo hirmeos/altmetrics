@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 
-from celery.exceptions import Retry
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -10,7 +9,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_redis import FlaskRedis
 
-from .celery import FlaskCelery
+from .celery import CeleryRetry, FlaskCelery
 from .database import db
 from .plugins import AltmetricsPlugins
 
@@ -26,7 +25,7 @@ def before_send(event, hint):
     """Intercept Sentry event - do not report if exception is a celery Retry."""
     if 'exc_info' in hint:
         exc_type, exc_value, tb = hint['exc_info']
-        if isinstance(exc_value, Retry):
+        if isinstance(exc_value, CeleryRetry):
             return None
 
     return event

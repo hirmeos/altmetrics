@@ -6,6 +6,7 @@ from TwitterSearch import TwitterSearchOrder, TwitterSearchException
 from flask import current_app
 
 from core import redis_store
+from core.celery import CeleryRetry
 from generic.mount_point import GenericDataProvider
 from processor.logic import set_generic_twitter_link
 from processor.models import Event, RawEvent
@@ -114,7 +115,11 @@ class TwitterProvider(GenericDataProvider):
             return
 
         timeout = delta.seconds + 1
-        exception = TwitterSearchException(429, 'Twitter rate limit reached.')
+
+        exception = CeleryRetry(
+            TwitterSearchException(429, 'Twitter rate limit reached.'),
+            'Twitter rate limit reached'
+        )
 
         raise task.retry(exc=exception, countdown=timeout)
 
@@ -147,7 +152,8 @@ class TwitterProvider(GenericDataProvider):
             )
             redis_store.set('Twitter-Lock', reset_value, timeout)
 
-            raise task.retry(exc=e, countdown=timeout)
+            exception = CeleryRetry(e, 'Twitter rate limit reached')
+            raise task.retry(exc=exception, countdown=timeout)
 
     def process(self, uri, origin, scrape, last_check, task):
         """ Implement processing of a URI to get Twitter events.

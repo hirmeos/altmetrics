@@ -3,6 +3,7 @@ from json import JSONDecodeError
 from logging import getLogger
 from requests.exceptions import ReadTimeout
 
+from core.celery import CeleryRetry
 from core.settings import Origins
 from generic.mount_point import GenericDataProvider
 from processor.logic import check_existing_entries, set_generic_twitter_link
@@ -119,7 +120,8 @@ class CrossrefEventDataProvider(GenericDataProvider):
 
         try:
             events, errors = self.client.get_events(**parameters)
-        except (JSONDecodeError, ReadTimeout) as exception:
+        except (JSONDecodeError, ReadTimeout) as e:
+            exception = CeleryRetry(e, 'Request timeout/server overloaded')
             raise task.retry(exc=exception, countdown=10)
 
         if errors:

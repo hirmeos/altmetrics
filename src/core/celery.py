@@ -2,6 +2,13 @@ from celery import Celery
 from celery.schedules import crontab
 
 
+class CeleryRetry(Exception):
+
+    def __init__(self, exception, message):
+        self.exception = exception
+        self.message = message
+
+
 class FlaskCelery(Celery):
     celery = None
 
