@@ -70,10 +70,10 @@ class HypothesisDataProvider(GenericDataProvider):
         if uri.urls:
             parameters.update(wildcard_uri=[])
 
-            for url in uri.urls:  # 2) Process urls
-                parameters['uri'].append(url.url)
-                if not url.endswith('.pdf'):
-                    parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
+            for url_obj in uri.urls:  # 2) Process urls
+                parameters['uri'].append(url_obj.url)
+                if not url_obj.url.endswith('.pdf'):
+                    parameters['wildcard_uri'].append(f'{url_obj.url}/?loc=*')
 
         segments = [parameters]
         if len(parameters.get('wildcard_uri', [])) > 10:
