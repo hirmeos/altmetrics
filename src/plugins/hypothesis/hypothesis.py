@@ -9,9 +9,15 @@ from processor.models import Event, RawEvent
 logger = getLogger(__name__)
 
 
-def balance_parameters(parameters):
-    """Divides wildcard and uri parameters into smaller chunks to prevent the
+def split_parameters(parameters):
+    """Divide wildcard and uri parameters into smaller chunks to prevent the
     URL query from being too many characters long.
+
+    Args:
+        parameters (dict): Parameters that need to query Hypothesis.
+
+    Returns:
+        list: Smaller dicts containing the parameters for multiple queries.
     """
     params = parameters.copy()
     wildcards = params.pop('wildcard_uri')
@@ -71,7 +77,7 @@ class HypothesisDataProvider(GenericDataProvider):
 
         segments = [parameters]
         if len(parameters.get('wildcard_uri', [])) > 10:
-            segments = balance_parameters(parameters)
+            segments = split_parameters(parameters)
 
         results = []
         for parameters in segments:
