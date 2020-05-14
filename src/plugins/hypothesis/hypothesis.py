@@ -1,5 +1,4 @@
 import datetime
-import json
 from logging import getLogger
 import requests
 
@@ -8,6 +7,30 @@ from processor.models import Event, RawEvent
 
 
 logger = getLogger(__name__)
+
+
+def balance_parameters(parameters):
+    """Divides wildcard and uri parameters into smaller chunks to prevent the
+    URL query from being too many characters long.
+    """
+    params = parameters.copy()
+    wildcards = params.pop('wildcard_uri')
+    uris = params.pop('uri')
+
+    segments = []
+    chunk_size = 10
+
+    for i in range(0, len(wildcards), chunk_size):
+        trimmed_params = params.copy()
+        trimmed_params.update(wildcard_uri=wildcards[i:i+chunk_size])
+        segments.append(trimmed_params)
+
+    for i in range(0, len(uris), chunk_size):
+        trimmed_params = params.copy()
+        trimmed_params.update(uri=uris[i:i+chunk_size])
+        segments.append(trimmed_params)
+
+    return segments
 
 
 class HypothesisDataProvider(GenericDataProvider):
@@ -41,21 +64,27 @@ class HypothesisDataProvider(GenericDataProvider):
         if uri.urls:
             parameters.update(wildcard_uri=[])
 
-        for url in uri.urls:  # 2) Process urls
-            parameters['uri'].append(url.url)
-            parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
+            for url in uri.urls:  # 2) Process urls
+                parameters['uri'].append(url.url)
+                if not url.endswith('.pdf'):
+                    parameters['wildcard_uri'].append(f'{url.url}/?loc=*')
 
-        response = requests.get(self.api_base, params=parameters)
+        segments = [parameters]
+        if len(parameters.get('wildcard_uri', [])) > 10:
+            segments = balance_parameters(parameters)
 
-        if not response.content:
-            logger.error(
-                f'Unexpected: No response from request using request '
-                f'parameters: {parameters}. Reason: {response.reason}.'
-            )
-            results = []
-        else:
-            response_content = json.loads(response.content)
-            results = response_content.get('rows')
+        results = []
+        for parameters in segments:
+            response = requests.get(self.api_base, params=parameters)
+
+            if not response.content:
+                logger.error(
+                    f'Unexpected: No response from request using request '
+                    f'parameters: {parameters}. Reason: {response.reason}.'
+                )
+            else:
+                response_content = response.json()
+                results.extend(response_content.get('rows'))
 
         for result in results:
             subj = result.get('links', {}).get('html')
