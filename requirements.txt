@@ -62,7 +62,4 @@ zenlog==1.1
 zipp==0.6.0
 
 -e git+https://github.com/mattupstate/flask-security.git@develop#egg=Flask-Security
-
--i https://pkg.ubiquity.press/simple/
-wikipedia==1.4.1
-
+-e git+https://github.com/ubiquitypress/wikipedia.git@v1.4.3#egg=wikipedia
