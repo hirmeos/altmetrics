@@ -7,18 +7,19 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from flask_api import FlaskAPI
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_redis import FlaskRedis
+
 
 from .celery import CeleryRetry, FlaskCelery
 from .database import db
 from .plugins import AltmetricsPlugins
+from .redis import AutoPrefixFlaskRedis
 
 
 CONFIG = os.getenv('CONFIG', 'DevConfig')
 celery_app = FlaskCelery()
 mail = Mail()
 plugins = AltmetricsPlugins()
-redis_store = FlaskRedis()
+redis_store = AutoPrefixFlaskRedis()
 
 
 def before_send(event, hint):
@@ -67,7 +68,7 @@ def create_app():
     from .admin import init_admin
     init_admin(app, db)
 
-    redis_store.init_app(app)
+    redis_store.init_app(app, prefix=app.config.get('REDIS_PREFIX'))
 
     if CONFIG != 'TestConfig':
         celery_app.init_app(app, plugins)

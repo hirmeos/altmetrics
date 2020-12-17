@@ -137,6 +137,7 @@ class Config:
 
         REDIS_HOST = environ.get('REDIS_HOST', 'localhost')
         REDIS_URL = f'redis://{REDIS_HOST}:6379/0'
+        REDIS_PREFIX = environ.get('REDIS_PREFIX')
 
         # ## METRICS_API ##
 
