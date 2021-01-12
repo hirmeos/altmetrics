@@ -20,3 +20,16 @@ def queryset_exists(queryset):
 
     """
     return db.session.query(queryset.exists()).scalar()
+
+
+def get_uri_prefix(uri):
+    """Currently gets the prefix of DOIs only.
+
+    Args:
+        uri (str): URI to process.
+
+    Returns:
+        str: uri prefix if URI is a DOI else None.
+    """
+    if '/' in uri:
+        return uri[:uri.index('/')]

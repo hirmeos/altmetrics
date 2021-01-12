@@ -60,13 +60,12 @@ class TwitterProvider(GenericDataProvider):
 
         return subject_id, created_at
 
-    def _build(self, event_data, uri_id, origin):
+    def _build(self, event_data, uri_id):
         """Build Event objects using the defined schema.
 
         Args:
             event_data (list): Event dicts coming from the schema.
             uri_id (int): id or uri being queried.
-            origin (Enum): Service which originated the event we are fetching.
 
         Returns:
             dict: new Event (key) and RawEvent (values) objects.
@@ -82,7 +81,7 @@ class TwitterProvider(GenericDataProvider):
                 event = Event(
                     uri_id=uri_id,
                     subject_id=subj,
-                    origin=origin.value,
+                    origin=self.origin.value,
                     created_at=created_at
                 )
 
@@ -90,7 +89,7 @@ class TwitterProvider(GenericDataProvider):
                     RawEvent(
                         event=event,
                         scrape_id=event_entry['scrape_id'],
-                        origin=origin.value,
+                        origin=self.origin.value,
                         provider=self.provider.value,
                         created_at=created_at
                     )
@@ -155,12 +154,11 @@ class TwitterProvider(GenericDataProvider):
             exception = CeleryRetry(e, 'Twitter rate limit reached')
             raise task.retry(exc=exception, countdown=timeout)
 
-    def process(self, uri, origin, scrape, last_check, task):
+    def process(self, uri, scrape, last_check, task):
         """ Implement processing of a URI to get Twitter events.
 
         Args:
             uri (Uri): An Uri object.
-            origin (Enum): Service which originated the event we are fetching.
             scrape (Scrape): Scrape from ORM, not saved to database (yet).
             last_check (datetime): when this uri was last successfully scraped.
             task (object): Celery task running this plugin.
@@ -176,7 +174,7 @@ class TwitterProvider(GenericDataProvider):
 
         self._add_validator_context(
             uri_id=uri.id,
-            origin=origin.value,
+            origin=self.origin.value,
             provider=self.provider.value,
             scrape_id=scrape.id
         )
@@ -207,8 +205,7 @@ class TwitterProvider(GenericDataProvider):
         events = self._build(
             event_data=event_data,
             uri_id=uri.id,
-            origin=origin,
         )
 
-        self.log_new_events(uri, origin, self.provider, events)
+        self.log_new_events(uri, self.origin, self.provider, events)
         return events

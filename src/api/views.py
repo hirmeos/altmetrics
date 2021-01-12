@@ -10,13 +10,18 @@ from flask_security.decorators import http_auth_required
 from core import db
 from processor.models import (
     Uri,
+    UriPrefix,
     Url,
     Event,
 )
 from user.decorators import account_approved, token_authenticated
 from user.tokens import issue_token
 
-from .logic import get_origin_from_name, queryset_exists
+from .logic import (
+    get_origin_from_name,
+    get_uri_prefix,
+    queryset_exists,
+)
 from .serializers import (
     EventSerializer,
     UriSerializer,
@@ -37,7 +42,7 @@ class TokensViewSet(MethodView):
         if not user:
             abort(401, "Invalid user credentials")
 
-        return issue_token(user=user)  # , lifespan=86400)  # TODO: change back
+        return issue_token(user=user, lifespan=86400)
 
     @http_auth_required
     @account_approved
@@ -46,7 +51,7 @@ class TokensViewSet(MethodView):
         if not user:
             abort(401, "Invalid user credentials")
 
-        token = issue_token(user=user)  # , lifespan=86400)  # TODO: change back
+        token = issue_token(user=user, lifespan=86400)
 
         return {
             'status': 'ok',
@@ -138,6 +143,13 @@ class UriViewSet(MethodView):
             if not uri:
                 uri = Uri(raw=doi_value, last_checked=None)
                 uri.users.append(g.user)
+
+                uri.prefix = get_uri_prefix(doi_value)
+
+                if not queryset_exists(UriPrefix.query(value=uri.prefix)):
+                    db.session.add(UriPrefix(value=uri.prefix))
+                    db.session.commit()
+
                 db.session.add(uri)
 
             elif not queryset_exists(uri.users.filter_by(id=g.user.id)):

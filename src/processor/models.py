@@ -2,7 +2,7 @@ from datetime import datetime
 import re
 
 from sqlalchemy.dialects.postgresql import HSTORE
-from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy.schema import UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import validates
 
 from validators import url as url_validator
@@ -17,6 +17,26 @@ from core.database import (
     Model,
     String,
 )
+
+
+class UriPrefix(Model):
+    """Common prefix amount various URIs (only DOI for now).
+
+    Columns
+    -------
+    value:
+        String representation of the doi/uri prefix.
+    """
+
+    __tablename__ = 'uri_prefix'
+
+    id = Column(Integer, primary_key=True)
+    value = Column(String, unique=True, nullable=False)
+    last_checked = Column(DateTime)
+    # # TODO: replace last_checked with another table - one day.
+
+    uris = relationship('Uri', backref='uri_prefix')  # Child Relationships
+    errors = relationship('Error', backref='uri_prefix')
 
 
 class Uri(Model):
@@ -36,12 +56,15 @@ class Uri(Model):
     raw = Column(String, unique=True, nullable=False)
     last_checked = Column(DateTime)
 
-    # Child Relationships
-    errors = relationship('Error', backref='uri')
+    errors = relationship('Error', backref='uri')  # Child Relationships
     events = relationship('Event', backref='uri')
     urls = relationship('Url', backref='uri')
-
     metrics = relationship('Metric', uselist=False, backref='uri')
+
+    prefix = Column(
+        String,
+        ForeignKey('uri_prefix.value', name='uri_prefix_fkey')
+    )
 
     # TODO: Add validator DOIs.
     @validates('raw')
@@ -109,13 +132,26 @@ class Error(Model):
     """
 
     __tablename__ = 'error'
+    __table_args__ = (
+        (
+            CheckConstraint(
+                '(uri_id IS NULL) <> (uri_prefix_id IS NULL)',
+                name='uri_xor_uri_prefix_required'
+            )
+        ),
+    )
 
     id = Column(Integer, primary_key=True)
 
-    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=False)
+    uri_id = Column(Integer, ForeignKey('uri.id'), nullable=True)
+    uri_prefix_id = Column(
+        Integer,
+        ForeignKey('uri_prefix.id', name='error_uri_prefix_id_fkey'),
+        nullable=True,
+    )
     scrape_id = Column(Integer, ForeignKey('scrape.id'), nullable=False)
 
-    origin = Column(Integer, nullable=False)
+    origin = Column(Integer, nullable=True)
     provider = Column(Integer, nullable=False)
     description = Column(String(100))
     last_successful_scrape_at = Column(DateTime, nullable=False)

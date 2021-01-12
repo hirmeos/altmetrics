@@ -1,16 +1,19 @@
+from datetime import datetime
 from itertools import chain
 from logging import getLogger
 from os import path
 import re
-import requests
 from urllib.parse import unquote, urlsplit, parse_qs
 
+from arrow import utcnow
+import requests
 import wikipedia
 from wikipedia import PageError
 
 from flask import current_app
 
 from core import db
+from .models import Scrape
 from user.tokens import issue_token
 
 logger = getLogger(__name__)
@@ -284,3 +287,42 @@ def generate_queryset_chunks(full_queryset, set_size):
         yield query_subset
         query_subset = full_queryset.limit(set_size).offset(step_size)
         step_size += set_size
+
+
+def trigger_latest_scrapes(model_class, task_function):
+    """Call a scrape for each enabled data source plugin, based on URI type.
+
+    Args:
+        model_class (db.Model): Model containing URIs/Prefixes to scrape.
+        task_function (celery.local.PromiseProxy): Celery function that runs
+            the metrics scrape.
+    """
+
+    unprocessed_or_refreshable = model_class.query.filter(
+        (model_class.last_checked.is_(None)) |
+        (
+            model_class.last_checked <= utcnow().shift(
+                days=-current_app.config.get("DAYS_BEFORE_REFRESH")
+            ).datetime
+        )
+    )
+
+    if unprocessed_or_refreshable:
+
+        scrape = Scrape()
+        db.session.add(scrape)
+        db.session.commit()
+
+        for subset in generate_queryset_chunks(
+                full_queryset=unprocessed_or_refreshable,
+                set_size=current_app.config.get('PULL_SET_SIZE')
+        ):
+            task_function.delay(
+                query_ids=list(
+                    chain.from_iterable(subset.values(model_class.id))
+                ),
+                scrape_id=scrape.id
+            )
+
+        scrape.end_date = datetime.utcnow()
+        db.session.commit()

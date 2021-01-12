@@ -4,10 +4,14 @@ from marshmallow import Schema, fields
 class EventSchema(Schema):
     """ Base schema for HIRMEOS metrics Event """
 
-    uri_id = fields.Method('get_uri', attribute="uri")
-    origin = fields.Method('get_origin')
-    provider = fields.Method('get_provider')
-    scrape_id = fields.Method('get_scrape', deserialize='get_scrape')
+    uri_id = fields.Method('get_uri', required=True)
+    origin = fields.Method('get_origin', required=True)
+    provider = fields.Method('get_provider', required=True)
+    scrape_id = fields.Method(
+        'get_scrape',
+        deserialize='get_scrape',
+        required=True
+    )
 
     def get_origin(self, obj):
         return self.context['origin']

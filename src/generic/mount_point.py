@@ -1,11 +1,19 @@
+from enum import Enum
 from logging import getLogger
 
+from core.logic import get_enum_by_value
 from processor.models import Event
 
 from . import utils
 
 
 logger = getLogger(__name__)
+
+
+class URITypes(Enum):
+    doi = 1
+    doi_prefix = 2
+    all = 3  # Will attempt to support this in future
 
 
 class GenericDataProvider(object, metaclass=utils.MountPoint):
@@ -17,7 +25,8 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
             supported_origins,
             api_base=None,
             client_class=None,
-            validator=None
+            validator=None,
+            uri_type=URITypes.doi,
     ):
         self.provider = provider
         self.supported_origins = supported_origins
@@ -27,6 +36,12 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
 
         if client_class and api_base:
             self.client = self.instantiate_client()
+
+        self.uri_type = uri_type  # Plugin Execution Info
+
+        self.origin = None
+        if len(supported_origins) == 1:
+            self.origin = get_enum_by_value(supported_origins[0])
 
     def __str__(self):
         return self.__class__.__name__

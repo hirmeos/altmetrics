@@ -56,7 +56,7 @@ def create_app():
 
     from api.views import bp as api_blueprint
     from core.views import bp as core_blueprint
-    from processor.tasks import pull_metrics, trigger_plugins  # noqa
+    from processor.tasks import pull_metrics, trigger_plugins_by_doi  # noqa
     from processor.views import bp as processor_blueprint
 
     app.register_blueprint(api_blueprint)

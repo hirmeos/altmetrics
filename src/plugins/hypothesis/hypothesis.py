@@ -42,14 +42,13 @@ def split_parameters(parameters):
 class HypothesisDataProvider(GenericDataProvider):
     """ Implements Hypothes.is API integration. """
 
-    def process(self, uri, origin, scrape, last_check, task):
+    def process(self, uri, scrape, last_check, task):
         """ Pull annotations from Hypothesis API, and create Events. Note:
         this uses the wildcard_uri search option, which is subject to change;
         see https://h.readthedocs.io/en/latest/api-reference/#operation/search.
 
         Args:
             uri (Uri): An Uri object.
-            origin (Enum): Service which originated the event we are fetching.
             scrape (Scrape): Scrape from ORM, not saved to database (yet).
             last_check (datetime): when this uri was last successfully scraped.
             task (object): Celery task running the current plugin.
@@ -57,7 +56,6 @@ class HypothesisDataProvider(GenericDataProvider):
         Returns:
             dict: new Event (key) and RawEvent (values) objects.
         """
-
         parameters = {
             'uri': [uri.raw],
             'order': 'asc',
@@ -105,7 +103,7 @@ class HypothesisDataProvider(GenericDataProvider):
             event = Event(
                 uri_id=uri.id,
                 subject_id=subj,
-                origin=origin.value,
+                origin=self.origin.value,
                 created_at=created_at
             )
 
@@ -114,11 +112,11 @@ class HypothesisDataProvider(GenericDataProvider):
                     event=event,
                     scrape_id=scrape.id,
                     external_id=result.get('id'),
-                    origin=origin.value,
+                    origin=self.origin.value,
                     provider=self.provider.value,
                     created_at=created_at
                 )
             ]
 
-        self.log_new_events(uri, origin, self.provider, events)
+        self.log_new_events(uri, self.origin, self.provider, events)
         return events
