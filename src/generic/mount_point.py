@@ -2,6 +2,7 @@ from enum import Enum
 from logging import getLogger
 
 from core.logic import get_enum_by_value
+from core.variables import Origins
 from processor.models import Event
 
 from . import utils
@@ -41,7 +42,7 @@ class GenericDataProvider(object, metaclass=utils.MountPoint):
 
         self.origin = None
         if len(supported_origins) == 1:
-            self.origin = get_enum_by_value(supported_origins[0])
+            self.origin = get_enum_by_value(Origins, supported_origins[0])
 
     def __str__(self):
         return self.__class__.__name__

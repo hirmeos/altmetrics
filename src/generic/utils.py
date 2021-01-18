@@ -98,7 +98,7 @@ def load_plugins(folder, **kwargs):
             )
 
         except Exception:
-            # sys.exit(f'Failed to load {addon} because {e}')
+            # sys.exit(f'Failed to load {addon} because {sys.exc_info()[1]}')
             logging.info(sys.exc_info()[1])
 
     return loaded_plugins, load_origins(loaded_plugins)
