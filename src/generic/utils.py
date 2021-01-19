@@ -1,4 +1,4 @@
-import imp
+import importlib
 import logging
 import os
 import sys
@@ -86,9 +86,8 @@ def load_plugins(folder, **kwargs):
             continue
 
         try:
-            file = None
-            file, path, description = imp.find_module(addon, ['plugins'])
-            module = imp.load_module(addon, file, path, description)
+            module_name = f'plugins.{addon}'
+            module = importlib.import_module(module_name, '.')
             loaded_plugins[addon] = module
             logging.info(
                 "Plugin {} v{} by {} loaded".format(
@@ -97,11 +96,9 @@ def load_plugins(folder, **kwargs):
                     module.__author__
                 )
             )
-        except Exception:
-            if file:
-                file.close()
 
-            # sys.exit(f'Failed to load {addon} beacuse {e}')
+        except Exception:
+            # sys.exit(f'Failed to load {addon} because {sys.exc_info()[1]}')
             logging.info(sys.exc_info()[1])
 
     return loaded_plugins, load_origins(loaded_plugins)

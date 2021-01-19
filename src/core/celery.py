@@ -61,7 +61,12 @@ class FlaskCelery(Celery):
         }
 
         celery_task_routes = {
-            'trigger-plugins': {'queue': 'altmetrics.trigger-plugins'},
+            'trigger-plugins-by-doi': {
+                'queue': 'altmetrics.trigger-plugins-by-doi'
+            },
+            'trigger-plugins-by-prefix': {
+                'queue': 'altmetrics.trigger-plugins-by-prefix'
+            },
             'approve-user': {'queue': 'altmetrics.approve-user'},
             'send-approval-request': {
                 'queue': 'altmetrics.send-approval-request'

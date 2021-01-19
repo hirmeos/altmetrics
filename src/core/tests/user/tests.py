@@ -33,6 +33,15 @@ class MockUser:
 
 @patch('user.tokens.current_app')
 class TokensTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.app = create_app()
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+
+    def tearDown(self):
+        self.app_context.pop()
+
     jwt_key = 'n/a'
     jwt_key_2 = 'N/A'
     demo_user = MockUser(
@@ -97,6 +106,15 @@ class TokensTestCase(unittest.TestCase):
 
 
 class TasksTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.app = create_app()
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+
+    def tearDown(self):
+        self.app_context.pop()
+
     demo_user = MockUser(
         email='demo@acc.com',
         first_name='The',

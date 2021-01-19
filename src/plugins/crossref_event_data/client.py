@@ -1,6 +1,12 @@
+from logging import getLogger
+
 import requests
+from requests.exceptions import HTTPError
 
 from flask import current_app
+
+
+logger = getLogger(__name__)
 
 
 class CrossRefEventDataClient:
@@ -34,7 +40,7 @@ class CrossRefEventDataClient:
             requests.Response: CrossRef Event Data events for the DOI.
         """
         filters = self._build_filters(parameters)
-        return requests.get(self.api_base, params=filters, timeout=5)
+        return requests.get(self.api_base, params=filters, timeout=30)
 
     def get_events(self, **parameters):
         """ Get list of CrossRef Event Data API events.
@@ -47,9 +53,25 @@ class CrossRefEventDataClient:
             list: An iterable of event dictionaries.
         """
         response = self.get_doi(**parameters)
-
         result = response.json()
-        if response.status_code != 200:
-            return None, result
 
-        return result.get('message', {}).get('events', []), None
+        if response.status_code != 200:
+            try:
+                description = result['message'][0]['message']
+                if (
+                        response.status_code == 400 and
+                        description == 'Invalid cursor supplied.'
+                ):
+                    raise HTTPError('Unexpected 400 Error')
+
+            except (IndexError, TypeError) as e:
+                if 'message' in result:  # need to retry
+                    raise e
+
+            return None, result, None
+
+        message = result.get('message', {})
+        events = message.get('events', [])
+        next_cursor = message.get('next-cursor')
+
+        return events, None, next_cursor

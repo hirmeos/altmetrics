@@ -97,6 +97,29 @@ used by the Altmetrics service and apply any migrations.
     $ altmetrics db upgrade
 
 
+**Note for developers:** If you add new tables to the database. create
+migrations by running the migrate command. Inspect the new migration file in
+the migrations/versions directory. If they look correct, you can run db upgrade
+command to apply the new migrations.
+
+.. code-block:: bash
+
+    $ altmetrics db migrate
+    $
+    $ # Inspect the new migration file
+    $
+    $ altmetrics db upgrade
+
+
+To undo last migration:
+
+.. code-block:: bash
+
+    $ altmetrics db downgrade
+
+Then delete the migration file.
+
+
 Create an admin user
 ....................
 

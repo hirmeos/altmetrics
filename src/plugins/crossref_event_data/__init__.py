@@ -3,6 +3,7 @@ __version__ = 0.1
 __desc__ = "Provides DOI-based CrossRef Event Data as a source for metrics."
 
 from core.settings import StaticProviders, Origins
+from generic.mount_point import URITypes
 
 from . import crossref_event_data
 from .client import CrossRefEventDataClient
@@ -20,4 +21,5 @@ PROVIDER = crossref_event_data.CrossrefEventDataProvider(
     api_base='https://api.eventdata.crossref.org/v1/events',
     client_class=CrossRefEventDataClient,
     validator=CrossRefEventSchema(),
+    uri_type=URITypes.doi_prefix,
 )

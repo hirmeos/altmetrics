@@ -1,3 +1,6 @@
+from generic.mount_point import URITypes
+
+
 class AltmetricsPlugins:
     """Keep track of plugins used by the altmetrics service."""
 
@@ -5,6 +8,7 @@ class AltmetricsPlugins:
         self.plugins_list = []
         self.plugins_dict = {}
         self.plugin_task_names = []
+        self.plugins_by_type = {uri_type: [] for uri_type in URITypes}
 
         if app is not None:
             self.init_app(app)
@@ -15,6 +19,9 @@ class AltmetricsPlugins:
             self.plugins_dict[plugin.PROVIDER.provider] = plugin
             self.plugin_task_names.append(
                 self.get_plugin_task_name(plugin.PROVIDER.provider.value)
+            )
+            self.plugins_by_type[plugin.PROVIDER.uri_type].append(
+                plugin.PROVIDER.provider
             )
 
     def get_plugin(self, provider_enum):
@@ -48,4 +55,4 @@ class AltmetricsPlugins:
         Returns:
             str: Name of the task assigned to run the plugin.
         """
-        return f'process-plugin.{self.get_plugin_name(provider_enum)}'
+        return f'process.{self.get_plugin_name(provider_enum)}'
