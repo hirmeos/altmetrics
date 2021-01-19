@@ -19,7 +19,7 @@ tox:
   stage: test
   script:
     - export PATH="/root/.pyenv/bin:$PATH"
-    - pyenv local 3.8.1
+    - pyenv local 3.8.2
     - tox
 
 scripts:
