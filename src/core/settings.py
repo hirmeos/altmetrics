@@ -4,7 +4,7 @@ Common settings for the HIRMEOS Altmetrics project.
 
 from os import environ, pardir, path
 
-from .variables import Origins, StaticProviders
+from .variables import Origins, StaticProviders  # noqa
 from generic import utils
 
 

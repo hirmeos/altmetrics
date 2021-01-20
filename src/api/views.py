@@ -144,12 +144,15 @@ class UriViewSet(MethodView):
                 uri = Uri(raw=doi_value, last_checked=None)
                 uri.users.append(g.user)
 
-                uri.prefix = get_uri_prefix(doi_value)
+                uri_prefix = get_uri_prefix(doi_value)
 
-                if not queryset_exists(UriPrefix.query(value=uri.prefix)):
-                    db.session.add(UriPrefix(value=uri.prefix))
+                if not queryset_exists(
+                        UriPrefix.query.filter_by(value=uri_prefix)
+                ):
+                    db.session.add(UriPrefix(value=uri_prefix))
                     db.session.commit()
 
+                uri.prefix = uri_prefix
                 db.session.add(uri)
 
             elif not queryset_exists(uri.users.filter_by(id=g.user.id)):
