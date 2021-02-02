@@ -55,7 +55,7 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    METRICS_VERSION = '0.5.2'
+    METRICS_VERSION = '0.5.3'
 
     # ## Twitter ##
     TWITTER_APP_KEY = environ.get('TWITTER_APP_KEY')
