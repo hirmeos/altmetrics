@@ -177,10 +177,10 @@ def trigger_plugins_by_doi(query_ids, scrape_id):
         for plugin in core_plugins.plugins_by_type[URITypes.doi]:
             plugin_function = get_process_plugin_function(plugin)
             plugin_function.delay(
-                plugin.name,
-                uri.id,
-                scrape.id,
-                last_check_iso
+                plugin_name=plugin.name,
+                uri_id=uri.id,
+                scrape_id=scrape.id,
+                last_check_iso=last_check_iso
             )
         uri.last_checked = datetime.utcnow()
     db.session.commit()
