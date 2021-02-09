@@ -23,10 +23,12 @@ class AutoPrefixFlaskRedis(FlaskRedis):
     def get(self, name):
         return self._redis_client.get(name=self.get_key_value(name))
 
-    def set(self, name, value):
+    def set(self, name, value, *args, **kwargs):
         return self._redis_client.set(
-            name=self.get_key_value(name),
-            value=value
+            self.get_key_value(name),
+            value,
+            *args,
+            **kwargs,
         )
 
     def delete(self, *names):
