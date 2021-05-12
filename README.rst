@@ -3,6 +3,9 @@ HIRMEOS Altmetrics (WP6)
 
 This project implements the HIRMEOS Work Package 6.
 
+This project is archived, the project is now being developed on Gitlab:
+https://gitlab.com/ubiquitypress/altmetrics
+
 How to run the service
 ----------------------
 
